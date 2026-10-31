@@ -76,15 +76,15 @@
 
 body {
   position: relative;
-  background-color: #021811;
+  background-color: #020302;
   color: var(--text-main);
   font-family: var(--font-sans);
   line-height: 1.5;
   min-height: 100vh;
   padding: 1.5rem 2rem;
-  /* Dark forest obsidian canvas */
+  /* Deep abyssal obsidian canvas */
   background-image: 
-    radial-gradient(ellipse at 50% 20%, #03271a 0%, #021811 60%, #010f0a 100%);
+    radial-gradient(ellipse at 50% 15%, #050806 0%, #020302 50%, #000000 100%);
   transition: background-color 1.35s cubic-bezier(0.33, 1, 0.68, 1), background-image 1.35s ease;
 }
 
@@ -358,9 +358,9 @@ body {
 }
 
 .hero-left-field {
-  background: radial-gradient(ellipse at 70% 30%, rgba(24, 100, 65, 0.6) 0%, transparent 65%),
-              radial-gradient(circle at 20% 80%, rgba(15, 75, 45, 0.5) 0%, transparent 60%),
-              #021a11;
+  background: radial-gradient(ellipse at 70% 30%, rgba(12, 48, 30, 0.5) 0%, transparent 65%),
+              radial-gradient(circle at 20% 80%, rgba(6, 28, 18, 0.45) 0%, transparent 60%),
+              #010905;
   padding: 3.5rem 2.5rem;
   position: relative;
   overflow: hidden;
@@ -1829,10 +1829,10 @@ body {
 #modeTransitionOverlay.wipe-to-dark {
   background: linear-gradient(
     to right,
-    #021811 0%,
-    #021811 60%,
-    rgba(2, 24, 17, 0.85) 75%,
-    rgba(3, 39, 26, 0.5) 88%,
+    #000000 0%,
+    #020302 60%,
+    rgba(2, 3, 2, 0.85) 75%,
+    rgba(1, 2, 1, 0.45) 88%,
     transparent 100%
   );
   opacity: 1;
