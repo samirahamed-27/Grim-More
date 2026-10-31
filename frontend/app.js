@@ -98,6 +98,7 @@ const elAlertBanner = document.getElementById("alertBanner");
 const elAlertTitle = document.getElementById("alertTitle");
 const elAlertMessage = document.getElementById("alertMessage");
 const elChartTitle = document.getElementById("chartTitle");
+const elAlertQuickJump = document.getElementById("alertQuickJump");
 const elBtnTriggerSpike = document.getElementById("btnTriggerSpike");
 const elBtnAnnounceEvent = document.getElementById("btnAnnounceEvent");
 const elBtnReset = document.getElementById("btnReset");
@@ -223,15 +224,32 @@ function renderCards(ingredients) {
     card.addEventListener("pointercancel", () => card.classList.remove("pointer-active"));
 
     card.addEventListener("click", () => {
-      selectedIngredientId = ing.id;
-      document.querySelectorAll(".ingredient-card").forEach(c => c.classList.remove("selected"));
-      card.classList.add("selected");
-      renderChart(ing.id);
-      renderWorkedExample(ing.id);
+      selectIngredient(ing.id);
     });
 
     elIngredientsGrid.appendChild(card);
   });
+}
+
+// Select active ingredient and synchronize all views
+function selectIngredient(ingredientId) {
+  selectedIngredientId = ingredientId;
+  
+  // Synchronize card selection
+  document.querySelectorAll(".ingredient-card").forEach(c => {
+    if (parseInt(c.dataset.id, 10) === ingredientId) {
+      c.classList.add("selected");
+    } else {
+      c.classList.remove("selected");
+    }
+  });
+
+  // Synchronize chart and proof box
+  renderChart(ingredientId);
+  renderWorkedExample(ingredientId);
+
+  // Synchronize quick jump tags
+  renderAlertQuickJump();
 }
 
 // Render Reorders Table (Urgency Ranked)
@@ -252,6 +270,9 @@ function renderReorderTable(ingredients) {
     const icon = INGREDIENT_ICONS[ing.id] || "🌿";
     const coverDisplay = Number(ing.days_of_cover).toFixed(1);
 
+    row.style.cursor = "pointer";
+    row.title = `Click to inspect ${ing.name} trajectory`;
+
     row.innerHTML = `
       <td><span class="table-priority-chip ${chipClass}">${ing.priority}</span></td>
       <td><strong>${icon} ${ing.name}</strong></td>
@@ -266,21 +287,65 @@ function renderReorderTable(ingredients) {
           : `<span style="color: #2ecc71;">✓ Covered</span>`}
       </td>
     `;
+
+    row.addEventListener("pointerdown", () => row.classList.add("pointer-active"));
+    row.addEventListener("pointerup", () => row.classList.remove("pointer-active"));
+    row.addEventListener("pointerleave", () => row.classList.remove("pointer-active"));
+    row.addEventListener("click", () => selectIngredient(ing.id));
+
     elReordersTableBody.appendChild(row);
   });
 }
 
 // Render Top Alert Banner
 function renderAlertBanner(ingredients) {
-  const criticalItems = ingredients.filter(i => i.status === "critical");
-  if (criticalItems.length > 0) {
-    const item = criticalItems[0];
-    elAlertTitle.textContent = `CRITICAL DEFICIT: ${item.name.toUpperCase()} RUNS OUT IN ${Number(item.days_of_cover).toFixed(1)} DAYS`;
-    elAlertMessage.textContent = `Supplier delivery takes ${item.lead_time_days} days! Reorder at least ${item.order_qty.toLocaleString()} units now to avoid a complete stockout.`;
+  const alertItems = ingredients.filter(i => i.status === "critical" || i.priority === "high" || (isFestivalActive && [1, 2, 3].includes(i.id)));
+  
+  if (alertItems.length > 0) {
+    if (alertItems.length > 1) {
+      elAlertTitle.textContent = `CRITICAL DEFICIT DETECTED ACROSS ${alertItems.length} APOTHECARY INGREDIENTS`;
+      elAlertMessage.textContent = `Festival surge demands immediate emergency reorders. Select an ingredient below to inspect its trajectory and lead-time collision:`;
+    } else {
+      const item = alertItems[0];
+      elAlertTitle.textContent = `CRITICAL DEFICIT: ${item.name.toUpperCase()} RUNS OUT IN ${Number(item.days_of_cover).toFixed(1)} DAYS`;
+      elAlertMessage.textContent = `Supplier delivery takes ${item.lead_time_days} days! Reorder at least ${item.order_qty.toLocaleString()} units now to avoid a complete stockout.`;
+    }
+    renderAlertQuickJump(alertItems);
     elAlertBanner.classList.remove("hidden");
   } else {
+    if (elAlertQuickJump) elAlertQuickJump.innerHTML = "";
     elAlertBanner.classList.add("hidden");
   }
+}
+
+// Render Quick-Jump Buttons for Multi-Deficit Ingredients
+function renderAlertQuickJump(alertItems) {
+  if (!elAlertQuickJump) return;
+  const items = alertItems || currentIngredientsData.filter(i => i.status === "critical" || i.priority === "high" || (isFestivalActive && [1, 2, 3].includes(i.id)));
+  if (items.length <= 1) {
+    elAlertQuickJump.innerHTML = "";
+    return;
+  }
+
+  elAlertQuickJump.innerHTML = `<span class="quick-jump-label">QUICK SWITCH TELEMETRY:</span>`;
+  items.forEach(item => {
+    const icon = INGREDIENT_ICONS[item.id] || "🌿";
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `quick-jump-btn ${item.id === selectedIngredientId ? "active" : ""}`;
+    btn.innerHTML = `<span>${icon} ${item.name}</span> <span class="tag-cover">(${Number(item.days_of_cover).toFixed(1)}d cover)</span>`;
+
+    btn.addEventListener("pointerdown", () => btn.classList.add("pointer-active"));
+    btn.addEventListener("pointerup", () => btn.classList.remove("pointer-active"));
+    btn.addEventListener("pointerleave", () => btn.classList.remove("pointer-active"));
+    btn.addEventListener("pointercancel", () => btn.classList.remove("pointer-active"));
+
+    btn.addEventListener("click", () => {
+      selectIngredient(item.id);
+    });
+
+    elAlertQuickJump.appendChild(btn);
+  });
 }
 
 // Render Dynamic Worked Example for Judges

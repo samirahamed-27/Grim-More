@@ -315,6 +315,71 @@ body {
   box-shadow: 0 0 10px var(--glow-blaze);
 }
 
+.alert-quick-jump {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.quick-jump-label {
+  font-family: var(--font-rave);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.quick-jump-btn {
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid var(--border-maroon);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.28rem 0.65rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background-color 0.12s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.12s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.12s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.08s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.quick-jump-btn:hover {
+  background: rgba(132, 0, 0, 0.5);
+  border-color: var(--c-blaze);
+}
+
+.quick-jump-btn.active {
+  background: var(--c-blaze);
+  color: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 0 10px var(--glow-blaze);
+}
+
+.quick-jump-btn:active, .quick-jump-btn.pointer-active {
+  transform: scale(0.96);
+}
+
+.quick-jump-btn .tag-cover {
+  color: #ffb8b8;
+  font-size: 0.72rem;
+}
+
+.quick-jump-btn.active .tag-cover {
+  color: #ffffff;
+  font-weight: 700;
+}
+
 @keyframes bannerEntrance {
   0% {
     opacity: 0;
