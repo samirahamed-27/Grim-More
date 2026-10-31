@@ -7,18 +7,25 @@
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;600;700;900&family=Instrument+Serif:ital@0;1&family=Marcellus&family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts: Jost, Marcellus, Syne, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;700;800;900&family=Marcellus&family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     body {
       padding: 0;
       margin: 0;
-      background: #000000;
-      color: #ffffff;
+      background: #F8EBDD;
+      color: #022015;
       font-family: var(--font-sans);
       overflow: hidden;
       height: 100vh;
       display: flex;
       flex-direction: column;
+      background-image: 
+        linear-gradient(rgba(2, 32, 21, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(2, 32, 21, 0.05) 1px, transparent 1px);
+      background-size: 36px 36px;
     }
 
     /* Deck Layout */
@@ -27,9 +34,9 @@
       justify-content: space-between;
       align-items: center;
       padding: 1rem 2rem;
-      border-bottom: 1px solid var(--border-maroon);
-      background: rgba(12, 2, 2, 0.95);
-      backdrop-filter: blur(10px);
+      border-bottom: 3px solid #022015;
+      background: #FFFFFF;
+      box-shadow: 0 2px 0px #022015;
       z-index: 100;
     }
 
@@ -41,24 +48,26 @@
 
     .deck-title {
       font-family: var(--font-primary-display);
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       font-weight: 900;
-      letter-spacing: 2px;
-      color: #ff4d4d;
+      letter-spacing: 1.5px;
+      color: #022015;
+      text-transform: uppercase;
     }
 
     .timer-pill {
       font-family: var(--font-mono);
       font-size: 0.95rem;
       font-weight: 700;
-      background: #110303;
-      border: 1px solid var(--border-maroon);
-      color: #ff7675;
+      background: #F3D3B1;
+      border: 2px solid #022015;
+      color: #022015;
       padding: 0.4rem 0.9rem;
-      border-radius: 999px;
+      border-radius: 0px;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
+      box-shadow: 2px 2px 0px #022015;
     }
 
     .slide-viewport {
@@ -76,10 +85,10 @@
       max-width: 1150px;
       height: 80%;
       max-height: 640px;
-      background: var(--bg-card);
-      border: 1.5px solid var(--border-maroon);
-      border-radius: var(--radius-lg);
-      box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(189, 0, 0, 0.25);
+      background: #FFFFFF;
+      border: 3px solid #022015;
+      border-radius: 0px;
+      box-shadow: 6px 6px 0px #022015;
       padding: 3rem 4rem;
       display: none;
       flex-direction: column;
@@ -87,7 +96,7 @@
       box-sizing: border-box;
       opacity: 0;
       transform: scale(0.97);
-      transition: all 0.35s ease-out;
+      transition: all 0.25s ease-out;
     }
 
     .slide.active {
@@ -100,9 +109,9 @@
       font-family: var(--font-rave);
       font-size: 0.85rem;
       font-weight: 800;
-      color: var(--c-blaze);
+      color: #A65600;
       text-transform: uppercase;
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
       margin-bottom: 0.5rem;
       display: inline-block;
     }
@@ -111,18 +120,16 @@
       font-family: var(--font-primary-display);
       font-size: 2.6rem;
       font-weight: 900;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
       margin-bottom: 1.5rem;
       line-height: 1.2;
-      background: linear-gradient(135deg, #ffffff 40%, #ff4d4d 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #022015;
     }
 
     .slide-body {
       font-size: 1.15rem;
       line-height: 1.7;
-      color: #e5c9ce;
+      color: #4A6256;
     }
 
     .slide-grid-2 {
@@ -133,30 +140,32 @@
     }
 
     .feature-card {
-      background: #000000;
-      border: 1px solid var(--border-maroon);
-      border-radius: var(--radius-md);
+      background: #F8EBDD;
+      border: 2px solid #022015;
+      border-radius: 0px;
+      box-shadow: 2px 2px 0px #022015;
       padding: 1.5rem;
     }
 
     .feature-card strong {
-      font-family: var(--font-secondary-display);
-      font-size: 1.3rem;
+      font-family: var(--font-primary-display);
+      font-size: 1.25rem;
+      font-weight: 800;
       display: block;
-      color: #ff4d4d;
+      color: #022015;
       margin-bottom: 0.5rem;
     }
 
     .feature-card p {
       font-size: 0.95rem;
-      color: #b09ba0;
+      color: #4A6256;
     }
 
     .slide-footer-nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      border-top: 2px solid #022015;
       padding-top: 1rem;
       margin-top: 1rem;
     }
@@ -165,10 +174,11 @@
       font-family: var(--font-rave);
       font-size: 0.8rem;
       font-weight: 800;
-      color: #ffffff;
-      background: var(--c-maroon);
+      color: #FFFFFF;
+      background: #A65600;
       padding: 0.35rem 0.8rem;
-      border-radius: 999px;
+      border-radius: 0px;
+      border: 1px solid #022015;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
@@ -180,21 +190,22 @@
     }
 
     .nav-btn {
-      background: var(--bg-card);
-      border: 1px solid var(--border-maroon);
-      color: #fff;
-      font-size: 1rem;
-      padding: 0.4rem 1rem;
-      border-radius: var(--radius-sm);
+      background: #FFFFFF;
+      border: 2px solid #022015;
+      color: #022015;
+      font-size: 0.9rem;
+      padding: 0.45rem 1rem;
+      border-radius: 0px;
       cursor: pointer;
       font-family: var(--font-rave);
-      font-weight: 700;
-      transition: all 0.2s;
+      font-weight: 800;
+      box-shadow: 2px 2px 0px #022015;
+      transition: all 0.15s;
     }
 
     .nav-btn:hover {
-      border-color: var(--c-blaze);
-      background: var(--c-maroon);
+      background: #022015;
+      color: #FFFFFF;
     }
   </style>
 </head>

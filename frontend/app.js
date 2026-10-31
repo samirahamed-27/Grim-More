@@ -467,39 +467,39 @@ async function renderChart(ingredientId) {
         {
           label: "Historical Daily Sales",
           data: historySeries,
-          borderColor: "#bd0000",
-          backgroundColor: "rgba(132, 0, 0, 0.2)",
+          borderColor: "#022015",
+          backgroundColor: "rgba(2, 32, 21, 0.08)",
           borderWidth: 2.5,
           tension: 0.2,
           pointRadius: 2.5,
-          pointBackgroundColor: "#840000",
+          pointBackgroundColor: "#022015",
           pointHoverRadius: 5
         },
         {
           label: "Forecast Demand",
           data: forecastSeries,
-          borderColor: "#ff0000",
+          borderColor: "#A65600",
           backgroundColor: "transparent",
           borderWidth: 3.5,
           borderDash: [6, 4],
           tension: 0.2,
           pointRadius: 4.5,
-          pointBackgroundColor: "#ff0000",
+          pointBackgroundColor: "#A65600",
           pointHoverRadius: 7
         },
         {
           label: "Uncertainty Upper Bound (+1σ)",
           data: upperSeries,
-          borderColor: "rgba(255, 255, 255, 0.15)",
+          borderColor: "rgba(166, 86, 0, 0.35)",
           borderWidth: 1,
           pointRadius: 0,
           fill: "+1",
-          backgroundColor: "rgba(255, 0, 0, 0.08)"
+          backgroundColor: "rgba(243, 211, 177, 0.45)"
         },
         {
           label: "Uncertainty Lower Bound (-1σ)",
           data: lowerSeries,
-          borderColor: "rgba(255, 255, 255, 0.15)",
+          borderColor: "rgba(166, 86, 0, 0.35)",
           borderWidth: 1,
           pointRadius: 0,
           fill: false
@@ -507,20 +507,20 @@ async function renderChart(ingredientId) {
         {
           label: "Stock Trajectory (No Reorder - CRASH)",
           data: simNoReorder,
-          borderColor: "#e74c3c",
+          borderColor: "#872200",
           borderWidth: 2,
           borderDash: [3, 3],
           pointRadius: 3,
-          pointBackgroundColor: "#e74c3c",
+          pointBackgroundColor: "#872200",
           tension: 0.1
         },
         {
           label: "Stock Trajectory (Protected With Reorder)",
           data: simWithReorder,
-          borderColor: "#2ecc71",
+          borderColor: "#1B5E20",
           borderWidth: 2.5,
           pointRadius: 3.5,
-          pointBackgroundColor: "#2ecc71",
+          pointBackgroundColor: "#1B5E20",
           tension: 0.1
         }
       ]
@@ -541,10 +541,10 @@ async function renderChart(ingredientId) {
           display: false // Custom styled chips used
         },
         tooltip: {
-          backgroundColor: "#0c0202",
-          titleColor: "#ff4d4d",
-          bodyColor: "#ffffff",
-          borderColor: "#840000",
+          backgroundColor: "#022015",
+          titleColor: "#F3D3B1",
+          bodyColor: "#FFFFFF",
+          borderColor: "#A65600",
           borderWidth: 1.5,
           padding: 10,
           boxPadding: 4
@@ -553,27 +553,27 @@ async function renderChart(ingredientId) {
       scales: {
         x: {
           grid: {
-            color: "rgba(132, 0, 0, 0.18)"
+            color: "rgba(2, 32, 21, 0.08)"
           },
           ticks: {
-            color: "#b09ba0",
+            color: "#4A6256",
             maxTicksLimit: 12,
             font: { family: "'JetBrains Mono', monospace", size: 10 }
           }
         },
         y: {
           grid: {
-            color: "rgba(132, 0, 0, 0.18)"
+            color: "rgba(2, 32, 21, 0.08)"
           },
           ticks: {
-            color: "#b09ba0",
+            color: "#4A6256",
             font: { family: "'JetBrains Mono', monospace", size: 11 }
           },
           title: {
             display: true,
             text: "Units (Sales & Stock)",
-            color: "#b09ba0",
-            font: { size: 11 }
+            color: "#022015",
+            font: { size: 11, weight: "bold" }
           }
         }
       }
@@ -589,8 +589,8 @@ async function renderChart(ingredientId) {
 async function handleTriggerFestival() {
   isFestivalActive = true;
   elBtnTriggerSpike.innerHTML = `[SURGE ACTIVE]`;
-  elBtnTriggerSpike.style.background = `linear-gradient(135deg, #ff0000, #840000)`;
-  elBtnTriggerSpike.style.boxShadow = `0 0 25px rgba(255, 0, 0, 0.8)`;
+  elBtnTriggerSpike.style.background = `#A65600`;
+  elBtnTriggerSpike.style.boxShadow = `3px 3px 0px #022015`;
 
   if (isBackendLive) {
     try {
@@ -612,8 +612,8 @@ async function handleAnnounceEvent() {
   isFestivalActive = true;
   if (elBtnAnnounceEvent) {
     elBtnAnnounceEvent.innerHTML = `[EVENT DECLARED (3X)]`;
-    elBtnAnnounceEvent.style.borderColor = "#2ecc71";
-    elBtnAnnounceEvent.style.color = "#2ecc71";
+    elBtnAnnounceEvent.style.borderColor = "#1B5E20";
+    elBtnAnnounceEvent.style.color = "#1B5E20";
   }
 
   if (isBackendLive) {
@@ -643,6 +643,13 @@ async function handleReset() {
   isFestivalActive = false;
   isAnnouncementActive = false;
   elBtnTriggerSpike.innerHTML = `[SIMULATE SURGE]`;
+  elBtnTriggerSpike.style.background = "";
+  elBtnTriggerSpike.style.boxShadow = "";
+  if (elBtnAnnounceEvent) {
+    elBtnAnnounceEvent.innerHTML = `[ADVANCE EVENT]`;
+    elBtnAnnounceEvent.style.borderColor = "";
+    elBtnAnnounceEvent.style.color = "";
+  }
   elBtnTriggerSpike.style.background = "";
   elBtnTriggerSpike.style.boxShadow = "";
 
