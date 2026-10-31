@@ -116,6 +116,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function setupEventListeners() {
+  // Fluid response: trigger on click and add tactile pointer-down feedback
+  const buttons = [elBtnTriggerSpike, elBtnAnnounceEvent, elBtnReset].filter(Boolean);
+  buttons.forEach(btn => {
+    btn.addEventListener("pointerdown", () => btn.classList.add("pointer-active"));
+    btn.addEventListener("pointerup", () => btn.classList.remove("pointer-active"));
+    btn.addEventListener("pointerleave", () => btn.classList.remove("pointer-active"));
+    btn.addEventListener("pointercancel", () => btn.classList.remove("pointer-active"));
+  });
+
   if (elBtnTriggerSpike) elBtnTriggerSpike.addEventListener("click", handleTriggerFestival);
   if (elBtnAnnounceEvent) elBtnAnnounceEvent.addEventListener("click", handleAnnounceEvent);
   if (elBtnReset) elBtnReset.addEventListener("click", handleReset);
@@ -206,6 +215,12 @@ function renderCards(ingredients) {
       </div>
       ${ing.status === 'critical' ? `<div class="card-footer-alert">🚨 Stockout in ${coverDisplay}d (Lead: ${ing.lead_time_days}d)</div>` : ''}
     `;
+
+    // Direct tactile response on card pointer-down
+    card.addEventListener("pointerdown", () => card.classList.add("pointer-active"));
+    card.addEventListener("pointerup", () => card.classList.remove("pointer-active"));
+    card.addEventListener("pointerleave", () => card.classList.remove("pointer-active"));
+    card.addEventListener("pointercancel", () => card.classList.remove("pointer-active"));
 
     card.addEventListener("click", () => {
       selectedIngredientId = ing.id;
