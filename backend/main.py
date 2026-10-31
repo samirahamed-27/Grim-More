@@ -37,6 +37,7 @@ from backend.spike import detect_spike
 from backend.reorder import calculate_reorder
 from backend.moon_calendar import get_upcoming_full_moons
 from backend.routes.restock import router as restock_router
+from backend.routes.auth import router as auth_router
 
 
 @asynccontextmanager
@@ -87,6 +88,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 # Register modular routers
 app.include_router(restock_router)
+app.include_router(auth_router)
 # ---------------------------------------------------------------------------
 # Pydantic Request Models
 # ---------------------------------------------------------------------------

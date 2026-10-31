@@ -15,6 +15,9 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;700;800;900&family=Marcellus&family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap"
     rel="stylesheet">
+  <!-- Potion Pantry Authentication Guard -->
+  <script src="auth.js"></script>
+  <script>PotionAuth.requireAuth();</script>
 </head>
 
 <body class="home-view">
@@ -460,6 +463,8 @@
         }
       });
     })();
+    // Initialize authenticated user badge & sign out in navbar
+    document.addEventListener('DOMContentLoaded', PotionAuth.initNavbarAuth);
   </script>
 
   <!-- GSAP & ScrollTrigger for React Bits AnimatedContent Physics -->

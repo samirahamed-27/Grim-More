@@ -24,6 +24,9 @@
     rel="stylesheet">
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Potion Pantry Authentication Guard -->
+  <script src="auth.js"></script>
+  <script>PotionAuth.requireAuth();</script>
 </head>
 
 <body>
@@ -323,6 +326,7 @@
 
   <script src="app.js"></script>
   <script src="copilot.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', PotionAuth.initNavbarAuth);</script>
 </body>
 
 </html>

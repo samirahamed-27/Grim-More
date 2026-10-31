@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Login — Grim-More Potion Pantry</title>
+  <link rel="stylesheet" href="style.css?v=20261101_email_auth">
+  <!-- Google Fonts: Jost, Marcellus, Syne, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;700;800;900&family=Marcellus&family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <!-- Official Google Identity Services SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body class="home-view login-body">
+  <!-- Theme Transition Overlay -->
+  <div id="modeTransitionOverlay"></div>
+
+  <div class="login-wrapper">
+    <div class="login-card">
+      
+      <!-- Brand Header -->
+      <div class="login-brand">
+        <div class="brand-icon login-icon" title="Grim-More Scribe">
+          <svg class="pencil-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" fill="#3D7D54" stroke="#022015" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="m15 5 4 4" stroke="#022015" stroke-width="1.8"/>
+            <path d="M2 22l3.5-1-2.5-2.5Z" fill="#022015"/>
+          </svg>
+        </div>
+        <h1 class="login-title">GRIM-MORE</h1>
+        <p class="login-subtitle">Potion Pantry Demand & Spike Control</p>
+      </div>
+
+      <div class="login-divider">
+        <span class="login-divider-glyph">✦ ⚗️ ✦</span>
+      </div>
+
+      <!-- Description -->
+      <p class="login-instructions">
+        Access festival surge forecasting, live alchemy stock monitoring, and automated potion replenishment.
+      </p>
+
+      <!-- Google Sign-in Area -->
+      <div id="googleAuthSection" class="auth-action-area" style="display: none;">
+        <div id="googleSignInBtn" class="google-btn-slot"></div>
+        <div class="login-or-divider">
+          <span>OR CONTINUE WITH EMAIL</span>
+        </div>
+      </div>
+
+      <!-- Email Login Form -->
+      <form id="emailLoginForm" class="email-login-form">
+        <div class="auth-field-group">
+          <label for="emailInput" class="auth-field-label">Alchemist Email Address</label>
+          <div class="input-with-glyph">
+            <input 
+              type="email" 
+              id="emailInput" 
+              class="auth-text-input" 
+              placeholder="e.g. alchemist@potionpantry.io" 
+              required 
+              autocomplete="email"
+            />
+          </div>
+        </div>
+        <button type="submit" id="emailSubmitBtn" class="btn-email-submit">
+          <span>Enter Pantry Sanctum</span>
+          <span class="submit-arrow">→</span>
+        </button>
+      </form>
+
+      <!-- Status & Error Feedback Message Box -->
+      <div id="authStatusMessage" class="auth-status-message" style="display: none;"></div>
+
+      <!-- Setup Notice (if Google Client ID is not yet configured) -->
+      <div id="configNotice" class="config-notice-card" style="display: none;">
+        <div class="config-notice-title">💡 Google Sign-In Setup (Optional)</div>
+        <p>Set <code>GOOGLE_CLIENT_ID</code> in <code>.env</code> to activate one-click Google Sign-In. You can also sign in directly with your email above anytime.</p>
+      </div>
+
+      <!-- Security Trust Footer -->
+      <div class="login-footer">
+        <p>🔒 Secure Session Token Authentication (HMAC-SHA256)</p>
+        <p class="login-legal-note">Authorized alchemists only • Potion Pantry Hack-o-Lantern 2026</p>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    (function () {
+      // Check if user is already logged in; redirect if so
+      PotionAuth.redirectIfAuthenticated();
+
+      const statusBox = document.getElementById('authStatusMessage');
+      const configNotice = document.getElementById('configNotice');
+      const googleSection = document.getElementById('googleAuthSection');
+      const btnSlot = document.getElementById('googleSignInBtn');
+      const emailForm = document.getElementById('emailLoginForm');
+      const emailInput = document.getElementById('emailInput');
+      const emailSubmitBtn = document.getElementById('emailSubmitBtn');
+
+      function showStatus(text, isError = false) {
+        statusBox.textContent = text;
+        statusBox.className = `auth-status-message ${isError ? 'status-error' : 'status-info'}`;
+        statusBox.style.display = 'block';
+      }
+
+      function completeLogin(data) {
+        PotionAuth.setAuthSession(data);
+        const params = new URLSearchParams(window.location.search);
+        const nextUrl = params.get('redirect') || PotionAuth.AUTH_CONFIG.HOME_PAGE;
+        setTimeout(() => {
+          window.location.href = nextUrl;
+        }, 350);
+      }
+
+      /**
+       * Handle Direct Email Authentication Submission
+       */
+      emailForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        if (!email) {
+          showStatus('Please enter your email address.', true);
+          return;
+        }
+
+        emailSubmitBtn.disabled = true;
+        showStatus('Verifying alchemist email with sanctum...', false);
+
+        try {
+          const res = await fetch(`${PotionAuth.AUTH_CONFIG.API_BASE}/api/auth/email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ email: email }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            const errMsg = data.error || data.detail || 'Email sign-in failed.';
+            showStatus(errMsg, true);
+            emailSubmitBtn.disabled = false;
+            return;
+          }
+
+          showStatus(`Welcome, ${data.user.name}! Entering pantry...`, false);
+          completeLogin(data);
+        } catch (err) {
+          console.error('Email login error:', err);
+          showStatus('Unable to connect to backend server on port 8000. Is Uvicorn running?', true);
+          emailSubmitBtn.disabled = false;
+        }
+      });
+
+      /**
+       * Callback triggered by Google Identity Services on successful account selection
+       */
+      async function handleGoogleCredential(response) {
+        if (!response || !response.credential) {
+          showStatus('No credential received from Google Identity.', true);
+          return;
+        }
+
+        showStatus('Verifying Google credentials with Potion Pantry sanctum...', false);
+
+        try {
+          const res = await fetch(`${PotionAuth.AUTH_CONFIG.API_BASE}/api/auth/google`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ credential: response.credential }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            const errMsg = data.error || data.detail || 'Authentication failed. Please verify your account.';
+            showStatus(errMsg, true);
+            return;
+          }
+
+          showStatus(`Welcome, ${data.user.name}! Entering pantry...`, false);
+          completeLogin(data);
+
+        } catch (err) {
+          console.error('Google login network error:', err);
+          showStatus('Unable to connect to backend server on port 8000. Is Uvicorn running?', true);
+        }
+      }
+
+      /**
+       * Fetch Google Client ID and initialize Google Identity Services
+       */
+      async function initGoogleAuth() {
+        try {
+          let clientId = '985847650621-a83dhfihhfijl3j1bl0ssmu5k10srthb.apps.googleusercontent.com';
+          try {
+            const res = await fetch(`${PotionAuth.AUTH_CONFIG.API_BASE}/api/auth/config`);
+            if (res.ok) {
+              const config = await res.json();
+              if (config.google_client_id) {
+                clientId = config.google_client_id;
+              }
+            }
+          } catch (cfgErr) {
+            console.warn('API config unavailable, falling back to embedded Google Client ID:', cfgErr);
+          }
+
+          if (!clientId || clientId.includes('your-google-client-id-here')) {
+            configNotice.style.display = 'block';
+            return;
+          }
+
+          // If valid Client ID exists, display the Google section
+          googleSection.style.display = 'flex';
+
+          // Wait until GIS script is ready
+          const checkGIS = setInterval(() => {
+            if (window.google && window.google.accounts && window.google.accounts.id) {
+              clearInterval(checkGIS);
+
+              window.google.accounts.id.initialize({
+                client_id: clientId,
+                callback: handleGoogleCredential,
+                auto_select: false,
+                cancel_on_tap_outside: true,
+              });
+
+              // Render official Google button
+              window.google.accounts.id.renderButton(
+                btnSlot,
+                {
+                  theme: 'filled_black',
+                  size: 'large',
+                  text: 'signin_with',
+                  shape: 'rectangular',
+                  width: 320,
+                }
+              );
+
+              // Optionally prompt Google One-Tap
+              window.google.accounts.id.prompt();
+            }
+          }, 100);
+
+        } catch (err) {
+          console.error('Failed to initialize Google Auth:', err);
+          // Show email login directly even if auth config check failed
+        }
+      }
+
+      initGoogleAuth();
+    })();
+  </script>
+</body>
+
+</html>
