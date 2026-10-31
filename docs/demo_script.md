@@ -1,6 +1,6 @@
 # Potion Pantry: 6-Step Live Demo Script
 
-**Speaker**: Person C (The Face)  
+**Speaker**: Person A  
 **Target Duration**: 75 seconds during Slide 4 of the pitch  
 **Screen**: Browser showing `http://127.0.0.1:8000` (or local `frontend/index.html`)
 

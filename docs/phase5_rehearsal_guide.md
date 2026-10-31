@@ -10,13 +10,12 @@
 
 | Time | Slide | Speaker | Core Message to Deliver |
 | :--- | :--- | :--- | :--- |
-| **0:00 - 0:45** | **Slide 1: The Potion Shop Dilemma** | **Person C (The Face)** | Open with the crisis: apothecary runs on steady sales; Full Moon Festival triples demand. Doing nothing = 1.3d stockout before 2.0d delivery; over-ordering = cash locked in dead stock. |
-| **0:45 - 1:15** | **Slide 2: Dual-Path Spike Intelligence** | **Person C (The Face)** | Distinguish our system from naive `x3` multipliers. Pathway 1: Surprise surge caught automatically via z-score ($z > 3.0$). Pathway 2: 7-day advance announcement allowing buffer delivery. |
-| **1:15 - 1:45** | **Slide 3: Person A — The Brain** | **Person A (The Brain)** | Explain statistical forecasting: 90 days synthetic transactional history with weekday variance, exponential smoothing, and anomaly detection. |
-| **1:45 - 2:15** | **Slide 3: Person B — The Engine** | **Person B (The Engine)** | Explain safety stock and reordering: $\text{SS} = 1.65 \times \sigma \times \sqrt{L}$ (95% service level) + Target Stock formula ensuring zero stockouts. |
-| **2:15 - 3:30** | **Slide 4: The Live Demonstration** | **Person C (The Face)** | **Live Demo Flow**: (1) Baseline calm green state $\rightarrow$ (2) Click `🌕 Trigger Festival Spike` $\rightarrow$ (3) Chart jumps from 100 to 300 $\rightarrow$ (4) Moonflower flashes red alert (stockout in 1.3d) $\rightarrow$ (5) Reorder table prescribes +1,170 units $\rightarrow$ (6) Show green simulation curve maintaining stock above 0. |
-| **3:30 - 4:00** | **Slide 5: Quantified Impact** | **Person A & Person C** | Highlight zero stockouts, low forecast error on test partitions, and automatic contraction back to baseline holding costs after the festival. |
-| **4:00 - 4:25** | **Slide 6: Honest Limits & Next Steps** | **Person C (The Face)** | Acknowledge edge cases (perishability dates, supplier MOQs) and outline ML roadmap (Prophet, multi-supplier RFQ webhooks). Hand over to judges for Q&A. |
+| **0:00 - 0:45** | **Slide 1: The Potion Shop Dilemma** | **Person A** | Open with the crisis: apothecary runs on steady sales; Full Moon Festival triples demand. Doing nothing = 1.3d stockout before 2.0d delivery; over-ordering = cash locked in dead stock. |
+| **0:45 - 1:15** | **Slide 2: Dual-Path Spike Intelligence** | **Person A** | Distinguish our system from naive `x3` multipliers. Pathway 1: Surprise surge caught automatically via z-score ($z > 3.0$). Pathway 2: 7-day advance announcement allowing buffer delivery. |
+| **1:15 - 1:45** | **Slide 3: Architecture & Math Engine** | **Person A** | Explain statistical forecasting and safety stock formulas: 90 days transactional history, anomaly detection, and $\text{SS} = 1.65 \times \sigma \times \sqrt{L}$ (95% service level) ensuring zero stockouts. |
+| **1:45 - 3:00** | **Slide 4: The Live Demonstration** | **Person A** | **Live Demo Flow**: (1) Baseline calm green state $\rightarrow$ (2) Click `[SIMULATE SURGE]` $\rightarrow$ (3) Chart jumps from 100 to 300 $\rightarrow$ (4) Moonflower flashes red alert (stockout in 1.3d) $\rightarrow$ (5) Reorder table prescribes +1,170 units $\rightarrow$ (6) Show green simulation curve maintaining stock above 0. |
+| **3:00 - 3:45** | **Slide 5: Quantified Impact** | **Person A** | Highlight zero stockouts, low forecast error on test partitions, and automatic contraction back to baseline holding costs after the festival. |
+| **3:45 - 4:25** | **Slide 6: Honest Limits & Next Steps** | **Person A** | Acknowledge edge cases (perishability dates, supplier MOQs) and outline ML roadmap (Prophet, multi-supplier RFQ webhooks). Hand over to judges for Q&A. |
 
 ---
 
