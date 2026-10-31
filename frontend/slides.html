@@ -55,21 +55,6 @@
       text-transform: uppercase;
     }
 
-    .timer-pill {
-      font-family: var(--font-mono);
-      font-size: 0.95rem;
-      font-weight: 700;
-      background: #F3D3B1;
-      border: 2px solid #022015;
-      color: #022015;
-      padding: 0.4rem 0.9rem;
-      border-radius: 0px;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      box-shadow: 2px 2px 0px #022015;
-    }
-
     .slide-viewport {
       flex: 1;
       position: relative;
@@ -216,12 +201,6 @@
     <div class="deck-brand">
       <span style="font-size: 1.5rem;">🧪</span>
       <span class="deck-title">GRIM-MORE // JUDGES PITCH</span>
-      <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #ff7675; background: #1a0000; padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px solid #840000;">DEMO TIMELINE: JAN 2024</span>
-    </div>
-    <div class="timer-pill">
-      <span>⏱️ PITCH TIMER:</span>
-      <span id="timerDisplay">04:30</span>
-      <button id="btnToggleTimer" style="background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 0.9rem;">▶</button>
     </div>
     <div class="nav-controls">
       <a href="index.html" class="nav-btn" style="text-decoration: none;">🏠 Home</a>
@@ -317,10 +296,10 @@
     <!-- Slide 4 -->
     <section class="slide" id="slide-4">
       <div>
-        <span class="slide-tag">Action Phase • January 2024 Demo Timeline</span>
+        <span class="slide-tag">Action Phase</span>
         <h1 class="slide-h1">Live Demonstration Walkthrough</h1>
         <div class="slide-body">
-          <p>Watch Grim-More avert an inventory blackout live in 6 simple steps (Anchored at Jan 1, 2024 dataset cutoff):</p>
+          <p>Watch Grim-More avert an inventory blackout live in 6 simple steps:</p>
           <div style="background: #000; border: 1px solid var(--border-maroon); border-radius: 8px; padding: 1rem 1.5rem; font-size: 0.95rem; line-height: 1.8;">
             1. <strong>Calm Baseline</strong>: Moonflower stock lasts 4.0 days; lead time is 2 days; status is green (<code>ok</code>).<br>
             2. <strong>Festival Trigger</strong>: Click <code>🌕 Trigger Festival Spike</code>.<br>
@@ -418,36 +397,6 @@
         showSlide(currentSlide + 1);
       } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
         showSlide(currentSlide - 1);
-      }
-    });
-
-    // 4:30 countdown timer
-    let remainingSeconds = 270;
-    let timerRunning = false;
-    let timerInterval = null;
-    const timerDisplay = document.getElementById("timerDisplay");
-    const btnToggle = document.getElementById("btnToggleTimer");
-
-    btnToggle.addEventListener("click", () => {
-      if (timerRunning) {
-        clearInterval(timerInterval);
-        timerRunning = false;
-        btnToggle.textContent = "▶";
-      } else {
-        timerRunning = true;
-        btnToggle.textContent = "⏸";
-        timerInterval = setInterval(() => {
-          if (remainingSeconds > 0) {
-            remainingSeconds--;
-            const mins = String(Math.floor(remainingSeconds / 60)).padStart(2, "0");
-            const secs = String(remainingSeconds % 60).padStart(2, "0");
-            timerDisplay.textContent = `${mins}:${secs}`;
-          } else {
-            clearInterval(timerInterval);
-            timerDisplay.style.color = "#ff0000";
-            timerDisplay.textContent = "00:00 (TIME)";
-          }
-        }, 1000);
       }
     });
   </script>
