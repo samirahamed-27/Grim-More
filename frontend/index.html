@@ -4,193 +4,204 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Grim-More — The Potion Pantry Notebook</title>
+  <title>Grim-More — Potion Pantry Surge Intelligence</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Sketch Fonts: Kalam (Headings), Patrick Hand (Body), Caveat (Margin notes), Architects Daughter -->
+  <!-- Google Fonts: Jost, Marcellus, Syne, Inter, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Caveat:wght@400;600;700&family=Kalam:wght@300;400;700&family=Patrick+Hand&family=JetBrains+Mono:wght@400;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;700;800;900&family=Marcellus&family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap"
     rel="stylesheet">
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="sketch-body">
+<body>
   <div class="app-container">
-    <!-- Header -->
+
+    <!-- Header (Bauhaus Architectural Bar) -->
     <header class="main-header">
       <div class="brand">
         <div class="brand-icon">🧪</div>
         <div>
           <h1>GRIM-MORE</h1>
-          <p class="subtitle">The Potion Pantry Notebook • Inventory Surge Control</p>
+          <p class="subtitle">Predictive Inventory & Festival Demand Surge Control</p>
         </div>
       </div>
 
       <nav class="nav-links">
-        <a href="home.html" class="sketch-link">Home 🏠</a>
-        <a href="index.html" class="sketch-link active">Live Pantry 📊</a>
-        <a href="slides.html" class="sketch-link">Pitch Deck (5 min) 🎯</a>
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="dashboard.html" class="nav-link">Live Pantry</a>
+        <a href="slides.html" class="nav-link">Pitch Deck (5m)</a>
       </nav>
 
       <div class="header-actions">
-        <div class="data-mode-badge" id="dataModeBadge">
-          <span class="status-dot mock-dot"></span>
-          <span id="dataModeText">Mock Data Mode</span>
-        </div>
-        <button id="btnTriggerSpike" class="btn btn-primary pulse-hover" title="Surprise Path: Instant demand surge detected from data">
-          [SIMULATE SURGE ⚡]
-        </button>
-        <button id="btnAnnounceEvent" class="btn btn-secondary" title="Announcement Path: Festival declared 7 days in advance">
-          [ADVANCE EVENT 📅]
-        </button>
-        <button id="btnReset" class="btn btn-secondary" title="Reset shop back to calm baseline">
-          [RESET SHOP ↺]
-        </button>
+        <a href="dashboard.html" class="btn btn-primary" title="Launch the live apothecary simulation">
+          [LAUNCH DASHBOARD →]
+        </a>
       </div>
     </header>
 
-    <!-- Top Alert Banner (Hidden by default, activated on critical status) -->
-    <div id="alertBanner" class="alert-banner hidden">
-      <div class="alert-icon">⚠️</div>
-      <div class="alert-content">
-        <strong id="alertTitle">CRITICAL STOCKOUT RISK DETECTED</strong>
-        <p id="alertMessage">Moonflower stock will deplete in 1.3 days, but delivery takes 2.0 days! Urgent
-          replenishment required.</p>
-        <div id="alertQuickJump" class="alert-quick-jump"></div>
-      </div>
-      <div class="alert-action">
-        <span class="alert-pill">Immediate Action Needed</span>
-      </div>
+    <!-- Bauhaus 5-Band Color DNA Strip -->
+    <div class="color-dna" title="Identity DNA: Ochre · Cypress · Warm Buff · Dark · Alabaster">
+      <div class="dna-band c1"></div>
+      <div class="dna-band c2"></div>
+      <div class="dna-band c3"></div>
+      <div class="dna-band c4"></div>
+      <div class="dna-band c5"></div>
     </div>
 
-    <!-- Friendly Notebook Margin Note -->
-    <div class="sketch-annotation" style="margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-note); font-size: 1.35rem; color: var(--accent-terracotta);">
-      <span>✏️ <strong>Operator's Notebook:</strong> Click any ingredient card to inspect its forecast curve, or click <strong>[SIMULATE SURGE ⚡]</strong> to see the festival spike in action! ⤵</span>
-    </div>
+    <!-- Bauhaus Asymmetric Hero Section (42% Deep Cypress / 58% White) -->
+    <section class="hero-bauhaus">
+      <div class="hero-left-field">
+        <div class="hero-eyebrow">Track 01 • Inventory Surge Control</div>
+        <h2 class="hero-h1-poster">
+          THE POTION<br>PANTRY<br><span class="accent">SURGE.</span>
+        </h2>
+        <div class="hero-tagline-sub">Explainable Mathematical Telemetry • Zero Stockouts</div>
+      </div>
 
-    <!-- Main Content Layout -->
-    <main class="dashboard-grid">
-      <!-- Section 1: Ingredient Cards -->
-      <section class="section-container">
-        <div class="section-header">
-          <h2>Apothecary Inventory Status</h2>
-          <span class="section-hint">Click any ingredient card to inspect forecast curves</span>
-        </div>
-        <div class="cards-grid" id="ingredientsGrid">
-          <!-- Populated dynamically via JS -->
-        </div>
-      </section>
-
-      <!-- Section 2: Deep Dive Analytics (Chart + Diagnostics) -->
-      <section class="section-container analytics-row">
-        <div class="chart-panel card">
-          <div class="chart-header">
-            <div>
-              <h3 id="chartTitle">Demand Trajectory: Moonflower (🌸)</h3>
-              <p class="chart-sub">30-day sales history vs 7-day predicted demand trajectory</p>
-            </div>
-            <div class="chart-legend-custom">
-              <span class="legend-chip history-chip">Historical Sales</span>
-              <span class="legend-chip forecast-chip">Forecast Demand</span>
-              <span class="legend-chip uncertainty-chip">±1σ Uncertainty</span>
-              <span class="legend-chip depletion-chip">No Reorder (Crash)</span>
-              <span class="legend-chip protected-chip">Protected Stock</span>
-            </div>
-          </div>
-          <div class="chart-wrapper">
-            <canvas id="forecastChart"></canvas>
-          </div>
+      <div class="hero-right-field">
+        <div>
+          <p class="hero-desc-lead">
+            Running an apothecary is predictable until the kingdom declares the <strong>Full Moon Festival</strong>.
+            Demand instantly triples overnight, supplier delivery takes <strong>2.0 days</strong>, and inventory depletes in <strong>1.3 days</strong>.
+          </p>
+          <p class="hero-desc-sub" style="margin-top: 0.85rem;">
+            Grim-More calculates statistical safety stocks, predicts depletion crash curves, and recommends exact purchase orders before supply runs dry.
+          </p>
         </div>
 
-        <div class="formula-panel card">
-          <div class="panel-header">
-            <h3>Inventory Logic Explainer</h3>
-            <span class="badge-pill">Judges Reference 📐</span>
-          </div>
-          <div class="formula-list">
-            <div class="formula-item">
-              <span class="f-num">Z-SCORE</span>
-              <div class="f-body">
-                <strong>Spike Detection ($z > 3.0$)</strong>
-                <p>Compares recent 2-day demand to 14-day baseline standard deviations.</p>
-              </div>
-            </div>
-            <div class="formula-item">
-              <span class="f-num">SAFETY</span>
-              <div class="f-body">
-                <strong>Safety Stock (95% Service Level)</strong>
-                <code>1.65 × Std × √(Lead Time)</code>
-                <p>Protects against unpredictable supply delays and demand spikes.</p>
-              </div>
-            </div>
-            <div class="formula-item">
-              <span class="f-num">TARGET</span>
-              <div class="f-body">
-                <strong>Target Stock & Order Quantity</strong>
-                <code>Forecast × (Lead + Cover) + Safety Stock</code>
-                <p>Guarantees zero stockouts with minimum idle holding cost.</p>
-              </div>
-            </div>
-          </div>
-          <div class="math-proof-box" id="workedExampleBox">
-            <h4>Worked Example (Moonflower During Festival)</h4>
-            <div class="proof-row"><span>Daily Forecast:</span> <strong>300 units/day (was 100)</strong></div>
-            <div class="proof-row"><span>Lead Time:</span> <strong>2 days (Cover buffer: 3 days)</strong></div>
-            <div class="proof-row"><span>Safety Stock:</span> <strong>70 units (was 23)</strong></div>
-            <div class="proof-row highlight-row"><span>Target Stock:</span> <strong>1,570 units</strong></div>
-            <div class="proof-row highlight-row"><span>Recommended Order:</span> <strong>1,170 units</strong></div>
-          </div>
+        <div class="hero-cta-bar">
+          <a href="dashboard.html" class="btn btn-primary">
+            [OPEN LIVE PANTRY DASHBOARD →]
+          </a>
+          <a href="slides.html" class="btn btn-secondary">
+            [VIEW 5-MINUTE PITCH DECK]
+          </a>
         </div>
-      </section>
 
-      <!-- Section 3: Prioritized Reorders Table -->
-      <section class="section-container">
-        <div class="section-header">
-          <h2>Automated Purchase Orders & Reorder Recommendations</h2>
-          <span class="section-hint">Ranked by urgency: stockout probability and lead-time safety window</span>
+        <div class="hero-stats-row">
+          <div class="hero-stat-cell">
+            <div class="hero-stat-num accent-ochre">1.3d</div>
+            <div class="hero-stat-lbl">Stockout Collision</div>
+          </div>
+          <div class="hero-stat-cell">
+            <div class="hero-stat-num">2.0d</div>
+            <div class="hero-stat-lbl">Supplier Lead Time</div>
+          </div>
+          <div class="hero-stat-cell">
+            <div class="hero-stat-num accent-green">95%</div>
+            <div class="hero-stat-lbl">Service Level Math</div>
+          </div>
         </div>
-        <div class="table-container card">
-          <table class="reorder-table">
-            <thead>
-              <tr>
-                <th>Priority</th>
-                <th>Ingredient</th>
-                <th>Current Stock</th>
-                <th>Forecast (Daily)</th>
-                <th>Days of Cover</th>
-                <th>Lead Time</th>
-                <th>Order Quantity</th>
-                <th>Stockout Risk</th>
-              </tr>
-            </thead>
-            <tbody id="reordersTableBody">
-              <!-- Populated dynamically via JS -->
-            </tbody>
-          </table>
+      </div>
+    </section>
+
+    <!-- Bauhaus Asymmetric Feature Grid (2fr / 1fr / 1fr) -->
+    <section class="feature-grid-bauhaus">
+      <div class="b-cell b-cell-white">
+        <div>
+          <div class="b-cell-eyebrow">The 3-Second Perception</div>
+          <h3 class="b-cell-title">Real-Time Trajectory Telemetry</h3>
+          <p class="b-cell-body">
+            Detect demand shocks within 3 seconds of viewing the viewport. Solid curves track 30 days of sales history, while dashed vectors simulate the stockout crash curve vs. the protected replenishment curve.
+          </p>
         </div>
-      </section>
-    </main>
+        <div style="margin-top: 1.5rem;">
+          <a href="dashboard.html" class="btn btn-secondary" style="font-size: 0.78rem;">[Inspect Curves →]</a>
+        </div>
+      </div>
+
+      <div class="b-cell b-cell-ochre">
+        <div>
+          <div class="b-cell-eyebrow">Collision Warning</div>
+          <h3 class="b-cell-title" style="color: #FFFFFF;">Critical Deficit</h3>
+          <p class="b-cell-body">
+            Supplier lead time exceeds remaining days of cover. Immediate emergency replenishment triggered for all festival ingredients.
+          </p>
+        </div>
+        <div style="margin-top: 1.5rem; font-family: var(--font-mono); font-size: 1.1rem; font-weight: 800;">
+          +1,170 UNITS
+        </div>
+      </div>
+
+      <div class="b-cell b-cell-buff">
+        <div>
+          <div class="b-cell-eyebrow">Explainable Math</div>
+          <h3 class="b-cell-title">Safety Stock Formula</h3>
+          <p class="b-cell-body">
+            No black-box guesses. Z-score standard deviation buffers protect against supplier variance with minimal working capital tied up.
+          </p>
+        </div>
+        <div style="margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.88rem; font-weight: 700;">
+          Z = 1.65 (95% SL)
+        </div>
+      </div>
+    </section>
+
+    <!-- Bauhaus Manifesto / Method Rail -->
+    <section class="manifesto-section">
+      <div class="manifesto-label-rail">
+        <span class="manifesto-word">METHOD</span>
+      </div>
+
+      <div class="manifesto-cols">
+        <div class="manifesto-col">
+          <div class="manifesto-num">01 / DETECTION</div>
+          <h4 class="manifesto-title">Spike Signal Analysis</h4>
+          <p class="manifesto-desc">
+            Monitors rolling 2-day demand vs. 14-day standard deviation thresholds ($z > 3.0$) to flag sudden volume spikes before manual audit.
+          </p>
+        </div>
+
+        <div class="manifesto-col">
+          <div class="manifesto-num">02 / SIMULATION</div>
+          <h4 class="manifesto-title">Dual Collision Vector</h4>
+          <p class="manifesto-desc">
+            Calculates exact stock depletion date against vendor delivery windows, demonstrating the failure trajectory if no action is taken.
+          </p>
+        </div>
+
+        <div class="manifesto-col">
+          <div class="manifesto-num">03 / EXECUTION</div>
+          <h4 class="manifesto-title">Surgical Replenishment</h4>
+          <p class="manifesto-desc">
+            Automatically generates purchase orders sized to cover lead time and safety buffer, preventing dead inventory when the festival ends.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Launch Card -->
+    <section class="card" style="border: 4px solid var(--c-cypress); margin-bottom: 2.5rem; background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; padding: 2rem 2.5rem;">
+      <div>
+        <h3 style="font-family: var(--font-primary-display); font-size: 1.5rem; font-weight: 900; color: var(--c-cypress); text-transform: uppercase;">
+          Ready to inspect the live apothecary?
+        </h3>
+        <p style="color: var(--c-muted); margin-top: 0.35rem; font-size: 0.95rem;">
+          Test both the surprise surge path and the 7-day advance festival announcement path with live Chart.js simulation.
+        </p>
+      </div>
+      <div>
+        <a href="dashboard.html" class="btn btn-primary" style="font-size: 0.95rem; padding: 0.8rem 1.6rem;">
+          [ENTER LIVE DASHBOARD →]
+        </a>
+      </div>
+    </section>
 
     <!-- Footer -->
     <footer class="main-footer">
-      <div class="footer-left">
-        <span class="footer-logo">Grim-More 🧪</span>
-        <p class="footer-desc">Track 01: Potion Pantry & Festival Inventory Prediction. Handcrafted for hackathon judges.</p>
+      <div>
+        <strong style="font-family: var(--font-primary-display); color: var(--c-cypress); font-size: 1rem; letter-spacing: 1px;">GRIM-MORE</strong>
+        <p style="font-size: 0.82rem; color: var(--c-muted); margin-top: 0.2rem;">Track 01: Potion Pantry & Festival Inventory Prediction • Hack-o-Lantern 2026</p>
       </div>
-      <div class="footer-links">
-        <a href="home.html">Home</a>
-        <a href="index.html">Dashboard</a>
-        <a href="slides.html">Pitch Deck</a>
-      </div>
-      <div class="footer-tagline">
-        <span>Hand-drawn with craft & precision ✏️</span>
+      <div class="footer-tags">
+        <a href="index.html" class="footer-tag" style="text-decoration: none;">Home</a>
+        <a href="dashboard.html" class="footer-tag" style="text-decoration: none;">Dashboard</a>
+        <a href="slides.html" class="footer-tag" style="text-decoration: none;">Pitch Deck</a>
       </div>
     </footer>
-  </div>
 
-  <script src="app.js"></script>
+  </div>
 </body>
 
 </html>

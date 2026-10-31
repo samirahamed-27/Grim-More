@@ -7,27 +7,25 @@
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Google Fonts: Kalam, Patrick Hand, Caveat, Architects Daughter, JetBrains Mono -->
+  <!-- Google Fonts: Jost, Marcellus, Syne, Inter, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Caveat:wght@400;600;700&family=Kalam:wght@300;400;700&family=Patrick+Hand&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;700;800;900&family=Marcellus&family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     body {
       padding: 0;
       margin: 0;
-      background: #FFF9F0;
-      color: #1C1917;
-      font-family: 'Patrick Hand', cursive, sans-serif;
-      font-size: 1.15rem;
+      background: #F8EBDD;
+      color: #022015;
+      font-family: var(--font-sans);
       overflow: hidden;
       height: 100vh;
       display: flex;
       flex-direction: column;
       background-image: 
-        radial-gradient(#d6d3cd 1px, transparent 1px),
-        radial-gradient(#d6d3cd 1px, #FFF9F0 1px);
-      background-size: 28px 28px;
-      background-position: 0 0, 14px 14px;
+        linear-gradient(rgba(2, 32, 21, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(2, 32, 21, 0.05) 1px, transparent 1px);
+      background-size: 36px 36px;
     }
 
     /* Deck Layout */
@@ -36,9 +34,9 @@
       justify-content: space-between;
       align-items: center;
       padding: 1rem 2rem;
-      border-bottom: 2.5px solid #1C1917;
+      border-bottom: 3px solid #022015;
       background: #FFFFFF;
-      box-shadow: 0 3px 0px #1C1917;
+      box-shadow: 0 2px 0px #022015;
       z-index: 100;
     }
 
@@ -49,26 +47,27 @@
     }
 
     .deck-title {
-      font-family: 'Kalam', cursive;
-      font-size: 1.45rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: #1C1917;
+      font-family: var(--font-primary-display);
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: #022015;
+      text-transform: uppercase;
     }
 
     .timer-pill {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
       font-weight: 700;
-      background: #FEF08A;
-      border: 2px solid #1C1917;
-      border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-      color: #1C1917;
-      padding: 0.35rem 0.85rem;
+      background: #F3D3B1;
+      border: 2px solid #022015;
+      color: #022015;
+      padding: 0.4rem 0.9rem;
+      border-radius: 0px;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      box-shadow: 2px 2px 0px #1C1917;
+      box-shadow: 2px 2px 0px #022015;
     }
 
     .slide-viewport {
@@ -87,131 +86,126 @@
       height: 80%;
       max-height: 640px;
       background: #FFFFFF;
-      border: 2.5px solid #1C1917;
-      border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-      box-shadow: 6px 7px 0px #1C1917;
-      padding: 2.5rem 3.5rem;
+      border: 3px solid #022015;
+      border-radius: 0px;
+      box-shadow: 6px 6px 0px #022015;
+      padding: 3rem 4rem;
       display: none;
       flex-direction: column;
       justify-content: space-between;
       box-sizing: border-box;
       opacity: 0;
-      transform: scale(0.97) rotate(-0.4deg);
+      transform: scale(0.97);
       transition: all 0.25s ease-out;
     }
 
     .slide.active {
       display: flex;
       opacity: 1;
-      transform: scale(1) rotate(-0.3deg);
+      transform: scale(1);
     }
 
     .slide-tag {
-      font-family: 'Kalam', cursive;
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #C2410C;
+      font-family: var(--font-rave);
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #A65600;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 0.3rem;
+      letter-spacing: 1.5px;
+      margin-bottom: 0.5rem;
       display: inline-block;
-      background: #FFEDD5;
-      padding: 0.2rem 0.6rem;
-      border: 1px dashed #C2410C;
-      border-radius: 4px;
-      transform: rotate(-1.5deg);
     }
 
     .slide-h1 {
-      font-family: 'Kalam', cursive;
+      font-family: var(--font-primary-display);
       font-size: 2.6rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      margin-bottom: 1rem;
-      line-height: 1.15;
-      color: #1C1917;
+      font-weight: 900;
+      letter-spacing: 1px;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+      color: #022015;
     }
 
     .slide-body {
-      font-size: 1.25rem;
-      line-height: 1.6;
-      color: #57534E;
+      font-size: 1.15rem;
+      line-height: 1.7;
+      color: #4A6256;
     }
 
     .slide-grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.75rem;
+      gap: 2rem;
       margin-top: 1rem;
     }
 
     .feature-card {
-      background: #FFFDF9;
-      border: 2px solid #1C1917;
-      border-radius: 20px 255px 20px 225px/225px 20px 255px 20px;
-      box-shadow: 3px 3px 0px #1C1917;
-      padding: 1.25rem 1.4rem;
+      background: #F8EBDD;
+      border: 2px solid #022015;
+      border-radius: 0px;
+      box-shadow: 2px 2px 0px #022015;
+      padding: 1.5rem;
     }
 
     .feature-card strong {
-      font-family: 'Kalam', cursive;
-      font-size: 1.3rem;
-      font-weight: 700;
+      font-family: var(--font-primary-display);
+      font-size: 1.25rem;
+      font-weight: 800;
       display: block;
-      color: #1C1917;
-      margin-bottom: 0.4rem;
+      color: #022015;
+      margin-bottom: 0.5rem;
     }
 
     .feature-card p {
-      font-size: 1.1rem;
-      color: #57534E;
+      font-size: 0.95rem;
+      color: #4A6256;
     }
 
     .slide-footer-nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-top: 2px dashed #D6D3CD;
-      padding-top: 0.85rem;
-      margin-top: 0.85rem;
+      border-top: 2px solid #022015;
+      padding-top: 1rem;
+      margin-top: 1rem;
     }
 
     .speaker-badge {
-      font-family: 'Kalam', cursive;
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #1C1917;
-      background: #FEF08A;
-      padding: 0.3rem 0.75rem;
-      border: 1.5px solid #1C1917;
-      border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-      letter-spacing: 0.5px;
-      box-shadow: 2px 2px 0px #1C1917;
+      font-family: var(--font-rave);
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      background: #A65600;
+      padding: 0.35rem 0.8rem;
+      border-radius: 0px;
+      border: 1px solid #022015;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .nav-controls {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 1rem;
     }
 
     .nav-btn {
       background: #FFFFFF;
-      border: 2px solid #1C1917;
-      color: #1C1917;
-      font-size: 1rem;
-      padding: 0.4rem 0.95rem;
-      border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+      border: 2px solid #022015;
+      color: #022015;
+      font-size: 0.9rem;
+      padding: 0.45rem 1rem;
+      border-radius: 0px;
       cursor: pointer;
-      font-family: 'Kalam', cursive;
-      font-weight: 700;
-      box-shadow: 2px 2px 0px #1C1917;
+      font-family: var(--font-rave);
+      font-weight: 800;
+      box-shadow: 2px 2px 0px #022015;
       transition: all 0.15s;
     }
 
     .nav-btn:hover {
-      background: #FEF08A;
-      transform: rotate(-1deg) scale(1.02);
+      background: #022015;
+      color: #FFFFFF;
     }
   </style>
 </head>
@@ -229,8 +223,9 @@
       <button id="btnToggleTimer" style="background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 0.9rem;">▶</button>
     </div>
     <div class="nav-controls">
-      <a href="index.html" class="nav-btn" style="text-decoration: none;">💻 Live Dashboard</a>
-      <span id="slideIndicator" style="font-family: var(--font-mono); color: #ff7675;">Slide 1 / 6</span>
+      <a href="index.html" class="nav-btn" style="text-decoration: none;">🏠 Home</a>
+      <a href="dashboard.html" class="nav-btn" style="text-decoration: none;">💻 Live Dashboard</a>
+      <span id="slideIndicator" style="font-family: var(--font-mono); color: #022015; font-weight: bold;">Slide 1 / 6</span>
     </div>
   </header>
 

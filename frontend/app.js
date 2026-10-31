@@ -467,63 +467,61 @@ async function renderChart(ingredientId) {
         {
           label: "Historical Daily Sales",
           data: historySeries,
-          borderColor: "#1C1917",
-          backgroundColor: "rgba(186, 230, 253, 0.4)",
+          borderColor: "#022015",
+          backgroundColor: "rgba(2, 32, 21, 0.08)",
           borderWidth: 2.5,
-          tension: 0.25,
-          pointRadius: 3,
-          pointBackgroundColor: "#1C1917",
+          tension: 0.2,
+          pointRadius: 2.5,
+          pointBackgroundColor: "#022015",
           pointHoverRadius: 5
         },
         {
           label: "Forecast Demand",
           data: forecastSeries,
-          borderColor: "#C2410C",
+          borderColor: "#A65600",
           backgroundColor: "transparent",
-          borderWidth: 3,
-          borderDash: [5, 4],
-          tension: 0.25,
+          borderWidth: 3.5,
+          borderDash: [6, 4],
+          tension: 0.2,
           pointRadius: 4.5,
-          pointBackgroundColor: "#C2410C",
-          pointHoverRadius: 6
+          pointBackgroundColor: "#A65600",
+          pointHoverRadius: 7
         },
         {
           label: "Uncertainty Upper Bound (+1σ)",
           data: upperSeries,
-          borderColor: "rgba(194, 65, 12, 0.35)",
-          borderWidth: 1.5,
-          borderDash: [3, 3],
+          borderColor: "rgba(166, 86, 0, 0.35)",
+          borderWidth: 1,
           pointRadius: 0,
           fill: "+1",
-          backgroundColor: "rgba(254, 240, 138, 0.45)"
+          backgroundColor: "rgba(243, 211, 177, 0.45)"
         },
         {
           label: "Uncertainty Lower Bound (-1σ)",
           data: lowerSeries,
-          borderColor: "rgba(194, 65, 12, 0.35)",
-          borderWidth: 1.5,
-          borderDash: [3, 3],
+          borderColor: "rgba(166, 86, 0, 0.35)",
+          borderWidth: 1,
           pointRadius: 0,
           fill: false
         },
         {
           label: "Stock Trajectory (No Reorder - CRASH)",
           data: simNoReorder,
-          borderColor: "#DC2626",
-          borderWidth: 2.5,
-          borderDash: [4, 4],
-          pointRadius: 3.5,
-          pointBackgroundColor: "#DC2626",
-          tension: 0.15
+          borderColor: "#872200",
+          borderWidth: 2,
+          borderDash: [3, 3],
+          pointRadius: 3,
+          pointBackgroundColor: "#872200",
+          tension: 0.1
         },
         {
           label: "Stock Trajectory (Protected With Reorder)",
           data: simWithReorder,
-          borderColor: "#15803D",
-          borderWidth: 3,
-          pointRadius: 4,
-          pointBackgroundColor: "#15803D",
-          tension: 0.15
+          borderColor: "#1B5E20",
+          borderWidth: 2.5,
+          pointRadius: 3.5,
+          pointBackgroundColor: "#1B5E20",
+          tension: 0.1
         }
       ]
     },
@@ -531,7 +529,7 @@ async function renderChart(ingredientId) {
       responsive: true,
       maintainAspectRatio: false,
       animation: {
-        duration: 250,
+        duration: 240,
         easing: 'easeOutQuart'
       },
       interaction: {
@@ -540,46 +538,42 @@ async function renderChart(ingredientId) {
       },
       plugins: {
         legend: {
-          display: false // Custom styled sketch chips used
+          display: false // Custom styled chips used
         },
         tooltip: {
-          backgroundColor: "#1C1917",
-          titleColor: "#FEF08A",
+          backgroundColor: "#022015",
+          titleColor: "#F3D3B1",
           bodyColor: "#FFFFFF",
-          borderColor: "#C2410C",
-          borderWidth: 2,
+          borderColor: "#A65600",
+          borderWidth: 1.5,
           padding: 10,
-          boxPadding: 4,
-          titleFont: { family: "'Kalam', cursive", size: 14 },
-          bodyFont: { family: "'Patrick Hand', cursive", size: 13 }
+          boxPadding: 4
         }
       },
       scales: {
         x: {
           grid: {
-            color: "#E7E5E4",
-            borderDash: [3, 3]
+            color: "rgba(2, 32, 21, 0.08)"
           },
           ticks: {
-            color: "#57534E",
+            color: "#4A6256",
             maxTicksLimit: 12,
-            font: { family: "'JetBrains Mono', monospace", size: 11 }
+            font: { family: "'JetBrains Mono', monospace", size: 10 }
           }
         },
         y: {
           grid: {
-            color: "#E7E5E4",
-            borderDash: [3, 3]
+            color: "rgba(2, 32, 21, 0.08)"
           },
           ticks: {
-            color: "#57534E",
+            color: "#4A6256",
             font: { family: "'JetBrains Mono', monospace", size: 11 }
           },
           title: {
             display: true,
             text: "Units (Sales & Stock)",
-            color: "#1C1917",
-            font: { family: "'Kalam', cursive", size: 13, weight: "bold" }
+            color: "#022015",
+            font: { size: 11, weight: "bold" }
           }
         }
       }
@@ -594,10 +588,9 @@ async function renderChart(ingredientId) {
 // Trigger Festival Spike (Surprise Path: POST /api/simulate-spike)
 async function handleTriggerFestival() {
   isFestivalActive = true;
-  elBtnTriggerSpike.innerHTML = `[SURGE ACTIVE ⚡]`;
-  elBtnTriggerSpike.style.background = `#FEE2E2`;
-  elBtnTriggerSpike.style.borderColor = `#C2410C`;
-  elBtnTriggerSpike.style.color = `#C2410C`;
+  elBtnTriggerSpike.innerHTML = `[SURGE ACTIVE]`;
+  elBtnTriggerSpike.style.background = `#A65600`;
+  elBtnTriggerSpike.style.boxShadow = `3px 3px 0px #022015`;
 
   if (isBackendLive) {
     try {
@@ -618,10 +611,9 @@ async function handleAnnounceEvent() {
   isAnnouncementActive = true;
   isFestivalActive = true;
   if (elBtnAnnounceEvent) {
-    elBtnAnnounceEvent.innerHTML = `[EVENT DECLARED 📅]`;
-    elBtnAnnounceEvent.style.borderColor = "#15803D";
-    elBtnAnnounceEvent.style.color = "#15803D";
-    elBtnAnnounceEvent.style.background = "#DCFCE7";
+    elBtnAnnounceEvent.innerHTML = `[EVENT DECLARED (3X)]`;
+    elBtnAnnounceEvent.style.borderColor = "#1B5E20";
+    elBtnAnnounceEvent.style.color = "#1B5E20";
   }
 
   if (isBackendLive) {
@@ -650,15 +642,13 @@ async function handleAnnounceEvent() {
 async function handleReset() {
   isFestivalActive = false;
   isAnnouncementActive = false;
-  elBtnTriggerSpike.innerHTML = `[SIMULATE SURGE ⚡]`;
+  elBtnTriggerSpike.innerHTML = `[SIMULATE SURGE]`;
   elBtnTriggerSpike.style.background = "";
-  elBtnTriggerSpike.style.borderColor = "";
-  elBtnTriggerSpike.style.color = "";
+  elBtnTriggerSpike.style.boxShadow = "";
   if (elBtnAnnounceEvent) {
-    elBtnAnnounceEvent.innerHTML = `[ADVANCE EVENT 📅]`;
+    elBtnAnnounceEvent.innerHTML = `[ADVANCE EVENT]`;
     elBtnAnnounceEvent.style.borderColor = "";
     elBtnAnnounceEvent.style.color = "";
-    elBtnAnnounceEvent.style.background = "";
   }
   elBtnTriggerSpike.style.background = "";
   elBtnTriggerSpike.style.boxShadow = "";
