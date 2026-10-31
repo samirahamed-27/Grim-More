@@ -72,7 +72,9 @@ This contract defines the shared database schema, API specification, and Python 
 ```
 
 #### `GET /api/forecast/{id}`
-- **Description**: History and forecast for one ingredient, plus spike detection metadata.
+- **Description**: History and 14-day forward forecast for one ingredient, plus spike detection metadata.
+- **Horizon**: Returns 14 days (first 7 remain identical to prior releases for backward compatibility).
+- **Event Tagging**: Each forecast day includes boolean `in_event_window` indicating active festival coverage.
 - **Returns**:
 ```json
 {
@@ -83,14 +85,15 @@ This contract defines the shared database schema, API specification, and Python 
     {"date": "2023-12-31", "units": 103}
   ],
   "forecast": [
-    {"date": "2024-01-02", "units": 300.0, "lower": 270.0, "upper": 330.0}
+    {"date": "2024-01-02", "units": 602.2, "lower": 365.7, "upper": 838.7, "in_event_window": false},
+    {"date": "2024-01-08", "units": 1488.1, "lower": 1251.6, "upper": 1724.6, "in_event_window": true}
   ],
   "spike": {
-    "is_spike": true,
-    "z_score": 18.5,
-    "baseline_avg": 100.2,
-    "baseline_std": 10.1,
-    "recent_avg": 287.0
+    "is_spike": false,
+    "z_score": -1.23,
+    "baseline_avg": 695.8,
+    "baseline_std": 236.5,
+    "recent_avg": 406.0
   }
 }
 ```
@@ -141,19 +144,25 @@ This contract defines the shared database schema, API specification, and Python 
 
 #### `GET /api/alerts`
 - **Description**: Active actionable alerts for ingredients in `critical` or `watch` status, ranked by urgency. Returns empty array `[]` when all ingredients are healthy.
+- **Round 4 Enhancements**:
+  - `days_of_cover`: Strictly floored down to 1 decimal place across all items and synchronized with message text.
+  - Festival alerts include `days_until_event`, `order_by_date` (start_date minus lead_time_days), and `display_status: "upcoming"`.
 - **Returns**: Array of alerts:
 ```json
 [
   {
     "ingredient_id": 1,
     "name": "Moonflower",
-    "status": "critical",
-    "priority": "high",
-    "days_of_cover": 2.0,
+    "status": "watch",
+    "priority": "medium",
+    "days_of_cover": 6.0,
     "lead_time_days": 2,
-    "order_qty": 6587,
-    "alert_type": "spike",
-    "message": "⚠️ UNANNOUNCED SPIKE DETECTED: Moonflower sales tripled recently. Stock will run out in 2.0 days. Supplier delivery takes 2 days. Order 6,587 units now to avoid a complete stockout."
+    "order_qty": 6641,
+    "alert_type": "festival",
+    "days_until_event": 6,
+    "order_by_date": "2024-01-06",
+    "display_status": "upcoming",
+    "message": "📅 FESTIVAL ANNOUNCEMENT: 'Solstice Gala' scheduled for 2024-01-08. Demand multiplier is 3.0x. Order 6,641 units by 2024-01-06 ahead of time so shipment arrives before the festival."
   }
 ]
 ```
@@ -255,6 +264,38 @@ This contract defines the shared database schema, API specification, and Python 
   ],
   "affected_ingredients": [ ... ]
 }
+```
+
+#### `GET /api/calendar/upcoming`
+- **Description**: Returns upcoming astronomical full moons within the given window (default: 30 days) from `demo_today`.
+- **Query Parameters**:
+  - `days`: Window length in days (default: 30).
+  - `today`: Optional ISO override date (`YYYY-MM-DD`). Defaults to `latest_sales_date + 1 day`.
+- **Returns**: Array of upcoming full moon advisories with prefilled `suggested_event` ready for `POST /api/event`:
+```json
+[
+  {
+    "date": "2024-01-25",
+    "days_until": 23,
+    "suggested_event": {
+      "name": "Full Moon Festival",
+      "ingredient_ids": [1, 2, 3],
+      "multiplier": 3.0,
+      "start_date": "2024-01-25",
+      "end_date": "2024-01-27"
+    },
+    "ingredients": [
+      {
+        "ingredient_id": 1,
+        "name": "Moonflower",
+        "lead_time_days": 2,
+        "order_by_date": "2024-01-23",
+        "message": "Full Moon on 2024-01-25 (in 23 days). Announce the Full Moon Festival (x3)? Order Moonflower by 2024-01-23 to avoid a stockout."
+      }
+    ],
+    "message": "Full Moon on 2024-01-25 (in 23 days). Announce the Full Moon Festival (x3)? Order Moonflower by 2024-01-23 to avoid a stockout."
+  }
+]
 ```
 
 #### `POST /api/reset`

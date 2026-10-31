@@ -464,6 +464,7 @@ def record_sale(
     """
     Inserts a new sale row or adds units to an existing row for (date, ingredient_id).
     Maintains one row per ingredient per calendar day.
+    Part 1F: Drains current_stock for the ingredient by units sold (floored at 0).
     """
     conn = get_connection(db_path)
     with conn:
@@ -487,8 +488,25 @@ def record_sale(
                 (date_str, ingredient_id, units),
             )
             action = "created"
+
+        # Drain inventory stock (floored at 0)
+        cursor.execute("SELECT current_stock FROM ingredients WHERE id = ?;", (ingredient_id,))
+        stock_row = cursor.fetchone()
+        current_stock = stock_row["current_stock"] if stock_row else 0
+        stock_floored = (current_stock - units) < 0
+        stock_after = max(0, current_stock - units)
+        cursor.execute(
+            "UPDATE ingredients SET current_stock = ? WHERE id = ?;",
+            (stock_after, ingredient_id),
+        )
     conn.close()
-    return {"action": action, "total_units": new_total, "added_units": units}
+    return {
+        "action": action,
+        "total_units": new_total,
+        "added_units": units,
+        "stock_after": stock_after,
+        "stock_floored": stock_floored,
+    }
 
 
 def record_sales_batch(
@@ -498,6 +516,7 @@ def record_sales_batch(
     """
     Records a batch of sales transactions inside a single atomic transaction.
     If any single transaction fails, all changes roll back completely (all-or-nothing).
+    Part 1F: Drains stock for each sold ingredient within the same atomic transaction.
     """
     conn = get_connection(db_path)
     results = []
@@ -528,6 +547,17 @@ def record_sales_batch(
                 )
                 action = "created"
 
+            # Drain inventory stock
+            cursor.execute("SELECT current_stock FROM ingredients WHERE id = ?;", (ing_id,))
+            stock_row = cursor.fetchone()
+            current_stock = stock_row["current_stock"] if stock_row else 0
+            stock_floored = (current_stock - u) < 0
+            stock_after = max(0, current_stock - u)
+            cursor.execute(
+                "UPDATE ingredients SET current_stock = ? WHERE id = ?;",
+                (stock_after, ing_id),
+            )
+
             results.append(
                 {
                     "ingredient_id": ing_id,
@@ -535,6 +565,8 @@ def record_sales_batch(
                     "action": action,
                     "total_units": new_total,
                     "added_units": u,
+                    "stock_after": stock_after,
+                    "stock_floored": stock_floored,
                 }
             )
     conn.close()

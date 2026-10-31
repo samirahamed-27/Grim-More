@@ -61,7 +61,7 @@ def test_get_forecast():
     assert "forecast" in data
     assert "spike" in data
     assert len(data["history"]) == 30
-    assert len(data["forecast"]) == 7
+    assert len(data["forecast"]) == 14
 
 def test_get_reorders():
     client.post("/api/simulate-spike")

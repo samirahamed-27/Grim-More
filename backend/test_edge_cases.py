@@ -212,3 +212,90 @@ def test_edge_case_all_six_ingredients_spiking_simultaneously():
     for ing in ings_reset:
         assert ing["status"] == "ok"
         assert ing["order_qty"] == 0
+
+
+def test_round4_consistent_order_quantities_during_surge():
+    """
+    Part 1A: simulate.order_now.order_qty must equal the reorders order_qty
+    for ingredient IDs 1, 2, and 3 during a surge, with routine deliveries marked routine=True.
+    """
+    client.post("/api/simulate-spike")
+    reorders = client.get("/api/reorders").json()
+    reorders_map = {r["ingredient_id"]: r["order_qty"] for r in reorders}
+
+    for ing_id in [1, 2, 3]:
+        sim = client.get(f"/api/simulate/{ing_id}").json()
+        order_now = sim["scenarios"]["order_now"]
+        expected_qty = reorders_map[ing_id]
+        # The primary reactive order quantity in simulation must match /api/reorders exactly
+        assert order_now["order_qty"] == expected_qty
+
+        # Verify any extra deliveries are flagged routine=True
+        for day in order_now["timeline"]:
+            if day["delivery"] > 0:
+                if day["day"] == order_now["arrival_day"]:
+                    assert day["routine"] is False
+                else:
+                    assert day["routine"] is True
+
+
+def test_round4_forecast_14_days_and_in_event_window():
+    """
+    Part 1C: /api/forecast/{id} returns 14 forecast days (first 7 identical),
+    with in_event_window=True strictly on event dates.
+    """
+    event_payload = {
+        "name": "Midwinter Gala",
+        "ingredient_ids": [1, 2, 3],
+        "multiplier": 3.0,
+        "start_date": "2024-01-08",
+        "end_date": "2024-01-10",
+    }
+    client.post("/api/event", json=event_payload)
+
+    fc_resp = client.get("/api/forecast/1").json()
+    forecast = fc_resp["forecast"]
+    assert len(forecast) == 14
+
+    for day in forecast:
+        if day["date"] in ["2024-01-08", "2024-01-09", "2024-01-10"]:
+            assert day["in_event_window"] is True
+            assert day["units"] > 1400  # Multiplied by 3x
+        else:
+            assert day["in_event_window"] is False
+
+
+def test_round4_festival_alert_fields_and_days_of_cover_consistency():
+    """
+    Part 1D & 1E: Festival alerts include days_until_event, order_by_date, and display_status='upcoming'.
+    Days of cover uses the shared floor-to-1-decimal rule and matches alert message text.
+    """
+    event_payload = {
+        "name": "Winter Gala",
+        "ingredient_ids": [1, 2, 3],
+        "multiplier": 3.0,
+        "start_date": "2024-01-08",
+        "end_date": "2024-01-10",
+    }
+    client.post("/api/event", json=event_payload)
+
+    alerts = client.get("/api/alerts").json()
+    assert len(alerts) >= 3
+
+    for alert in alerts:
+        if alert["alert_type"] == "festival":
+            assert "days_until_event" in alert
+            assert "order_by_date" in alert
+            assert alert["display_status"] == "upcoming"
+            assert alert["order_by_date"] < "2024-01-08"
+
+            # Check Wolfsbane order_by_date (2024-01-08 minus 3 days = 2024-01-05)
+            if alert["ingredient_id"] == 3:
+                assert alert["order_by_date"] == "2024-01-05"
+
+        # Shared rule for days of cover: value matches alert text
+        doc = alert["days_of_cover"]
+        doc_str = f"{doc:.1f} days"
+        if alert["alert_type"] != "festival":
+            assert doc_str in alert["message"] or f"{int(doc)} days" in alert["message"]
+

@@ -34,6 +34,7 @@ from backend.db import (
 from backend.forecasting import forecast_demand
 from backend.spike import detect_spike
 from backend.reorder import calculate_reorder
+from backend.moon_calendar import get_upcoming_full_moons
 from backend.routes.restock import router as restock_router
 
 
@@ -127,6 +128,18 @@ def get_event_multiplier_for_date(
             if start <= date_str <= end:
                 multiplier = max(multiplier, float(ev.get("multiplier", 1.0)))
     return multiplier
+
+
+def format_days_of_cover(raw_doc: float) -> float:
+    """
+    Rounds days of cover strictly DOWN to 1 decimal place (Part 1E).
+    Guarantees consistent reporting across all endpoints, simulation timelines, and alert messages.
+    """
+    if raw_doc >= 999.0 or math.isinf(raw_doc) or math.isnan(raw_doc):
+        return 999.0
+    if raw_doc <= 0.0:
+        return 0.0
+    return math.floor(float(raw_doc) * 10.0) / 10.0
 
 
 def compute_ingredient_state(
@@ -227,10 +240,7 @@ def compute_ingredient_state(
     # Status is strictly evaluated on unrounded days of cover (Task B3 contract rule)
     if daily_forecast_today > 0:
         raw_doc = stock / daily_forecast_today
-        doc_display = round(raw_doc, 1)
-        # Prevent misleading display where 1.998 rounds up to 2.0 while lead time is 2.0 and status is critical
-        if raw_doc < float(lead_time) and doc_display >= float(lead_time):
-            doc_display = round(float(lead_time) - 0.1, 1)
+        doc_display = format_days_of_cover(raw_doc)
     else:
         raw_doc = 999.0
         doc_display = 999.0
@@ -339,15 +349,22 @@ def get_forecast(ingredient_id: int):
     recent_30 = state["history_rows"][-30:] if len(state["history_rows"]) >= 30 else state["history_rows"]
     history_data = [{"date": r["date"], "units": r["units"]} for r in recent_30]
 
-    # Future 7 days forecast array with date-bounded festival multiplier applied
+    # Future 14 days forecast array with date-bounded festival multiplier applied (Part 1C)
+    # The first 7 days remain identical to ensure backward compatibility
     std = state["spike_info"]["baseline_std"]
     forecast_data = []
-    for day_date_str, fc_units in state["forecast_14"][:7]:
+    for day_date_str, fc_units in state["forecast_14"]:
+        in_event = any(
+            ev.get("start_date", "") <= day_date_str <= ev.get("end_date", "")
+            for ev in active_events
+            if target_ing["id"] in ev.get("ingredient_ids", [])
+        )
         forecast_data.append({
             "date": day_date_str,
             "units": fc_units,
             "lower": round(max(0.0, fc_units - std), 1),
             "upper": round(fc_units + std, 1),
+            "in_event_window": in_event,
         })
 
     return {
@@ -427,7 +444,8 @@ def get_alerts():
         # 3. Or an upcoming festival is announced for this ingredient
         if status in ["critical", "watch"] or spike["is_spike"] or scheduled_event is not None:
             lt_str = "1 day" if lt == 1 else f"{lt} days"
-            cover_str = "1 day" if cover == 1.0 else f"{cover:.1f} days"
+            cover_fmt = format_days_of_cover(cover)
+            cover_str = "1 day" if cover_fmt == 1.0 else f"{cover_fmt:.1f} days"
 
             if spike["is_spike"]:
                 alert_type = "spike"
@@ -444,10 +462,19 @@ def get_alerts():
                 fest_order_qty = qty if qty > 0 else int(round(state["daily_forecast"] * (lt + ing["cover_days"]) * (fest_mult - 1.0)))
                 alert_status = "watch" if status == "ok" else status
                 priority = "medium" if reorder["priority"] == "low" else reorder["priority"]
+
+                start_date_str = scheduled_event.get("start_date", "")
+                start_dt = datetime.strptime(start_date_str, "%Y-%m-%d")
+                latest_date_str = get_latest_sales_date()
+                demo_today_dt = datetime.strptime(latest_date_str, "%Y-%m-%d") + timedelta(days=1)
+                days_until_event = max(0, (start_dt - demo_today_dt).days)
+                order_by_dt = start_dt - timedelta(days=lt)
+                order_by_date = order_by_dt.strftime("%Y-%m-%d")
+
                 message = (
-                    f"📅 FESTIVAL ANNOUNCEMENT: '{scheduled_event['name']}' scheduled for {scheduled_event['start_date']}. "
+                    f"📅 FESTIVAL ANNOUNCEMENT: '{scheduled_event['name']}' scheduled for {start_date_str}. "
                     f"Demand multiplier is {fest_mult:.1f}x. "
-                    f"Order {fest_order_qty:,} units ahead of time so shipment arrives before the festival."
+                    f"Order {fest_order_qty:,} units by {order_by_date} ahead of time so shipment arrives before the festival."
                 )
                 qty = fest_order_qty
             else:
@@ -459,17 +486,23 @@ def get_alerts():
                     f"(approaching supplier lead time of {lt_str}). Order {qty:,} units now."
                 )
 
-            alerts.append({
+            alert_obj = {
                 "ingredient_id": ing["id"],
                 "name": ing["name"],
                 "status": alert_status,
                 "priority": priority,
-                "days_of_cover": cover,
+                "days_of_cover": cover_fmt,
                 "lead_time_days": lt,
                 "order_qty": qty,
                 "alert_type": alert_type,
                 "message": message,
-            })
+            }
+            if alert_type == "festival":
+                alert_obj["days_until_event"] = days_until_event
+                alert_obj["order_by_date"] = order_by_date
+                alert_obj["display_status"] = "upcoming"
+
+            alerts.append(alert_obj)
 
     # Sort alerts by urgency (critical first, lowest days of cover)
     alerts.sort(key=lambda a: (priority_weight.get(a["status"], 3), a["days_of_cover"]))
@@ -515,10 +548,20 @@ def simulate_ingredient_stock(ingredient_id: int):
         stockout_day = None
         total_shortage = 0
         deliveries = {delivery_day: delivery_amount} if delivery_day is not None else {}
+        routine_deliveries_total = 0
+        routine_orders_count = 0
 
         for day_num, (date_str, demand) in enumerate(forecast_14, start=1):
             morning_stock = current_level
             delivery = deliveries.get(day_num, 0)
+            is_routine = False
+            if delivery > 0:
+                if delivery_day is not None and day_num == delivery_day:
+                    is_routine = False
+                else:
+                    is_routine = True
+                    routine_deliveries_total += delivery
+                    routine_orders_count += 1
 
             # 1. Demand occurs first
             stock_after_demand = morning_stock - demand
@@ -557,13 +600,16 @@ def simulate_ingredient_stock(ingredient_id: int):
                 "morning_stock": round(morning_stock, 1),
                 "demand": round(demand, 1),
                 "delivery": delivery,
+                "routine": is_routine,
                 "evening_stock": round(evening_stock, 1),
                 "stockout": stock_after_demand < 0,
                 "unfilled_demand": round(unfilled, 1),
             })
 
         return {
-            "order_qty": sum(deliveries.values()),
+            "order_qty": delivery_amount if delivery_day is not None else 0,
+            "routine_order_qty": routine_deliveries_total,
+            "routine_orders_count": routine_orders_count,
             "arrival_day": delivery_day,
             "stockout_day": stockout_day,
             "units_short": int(round(total_shortage)),
@@ -599,6 +645,10 @@ def simulate_ingredient_stock(ingredient_id: int):
 
     # Build plain-English summary with exact numbers and plural fix
     lt_str = "1 day" if lead_time == 1 else f"{lead_time} days"
+    routine_text = ""
+    if scenario_order_now.get("routine_orders_count", 0) > 0:
+        routine_text = f" {scenario_order_now['routine_orders_count']} subsequent routine replenishments ({scenario_order_now['routine_order_qty']:,} units total) maintain coverage through day 14."
+
     if scenario_do_nothing["stockout_day"] is not None:
         so_day = scenario_do_nothing["stockout_day"]
         if scenario_order_now["stockout_day"] is not None:
@@ -608,21 +658,24 @@ def simulate_ingredient_stock(ingredient_id: int):
                 summary = (
                     f"Without reordering, {target_ing['name']} runs out on day {so_day} "
                     f"({scenario_do_nothing['units_short']:,} units lost). "
-                    f"Ordering reactively today still leaves a brief stockout gap on day {now_so_day} "
-                    f"({now_units_short:,} units short) because supplier delivery takes {lt_str}. "
+                    f"Ordering reactively today ({order_qty:,} units) still leaves a brief stockout gap on day {now_so_day} "
+                    f"({now_units_short:,} units short) because supplier delivery takes {lt_str}."
+                    f"{routine_text} "
                     f"If we had known about the surge in advance, proactive ordering would have completely eliminated the stockout."
                 )
             else:
                 summary = (
                     f"Without reordering, {target_ing['name']} runs out on day {so_day} "
                     f"({scenario_do_nothing['units_short']:,} units lost). "
-                    f"Ordering today leaves a gap before shipment arrives on day {arrival_day_now}. "
+                    f"Ordering today ({order_qty:,} units) leaves a gap before shipment arrives on day {arrival_day_now}."
+                    f"{routine_text} "
                     f"Proactively ordering ahead delivers replenishment before festival demand begins, ensuring zero stockouts."
                 )
         else:
             summary = (
                 f"Without reordering, {target_ing['name']} runs out on day {so_day}. "
                 f"With our replenishment order of {order_qty:,} units, inventory stays safely above zero."
+                f"{routine_text}"
             )
     else:
         summary = f"{target_ing['name']} current stock is sufficient for the next 14 days without reordering."
@@ -835,28 +888,30 @@ def create_sale(sale: SaleInput):
     state_dict = {
         "id": sale.ingredient_id,
         "name": ing_name,
-        "current_stock": target_raw["current_stock"] if target_raw else 0,
+        "current_stock": res["stock_after"],
         "lead_time_days": target_raw["lead_time_days"] if target_raw else 0,
         "daily_forecast": daily_forecast,
         "spike_info": spike_info,
-        "days_of_cover": days_of_cover,
+        "days_of_cover": format_days_of_cover(days_of_cover),
         "status": status,
         "order_qty": order_qty,
         "priority": priority,
     }
 
     return {
-        "message": f"Recorded {sale.units} units for {ing_name} on {sale.date} ({res['action']}). Day total: {res['total_units']} units.",
+        "message": f"Recorded {sale.units} units for {ing_name} on {sale.date} ({res['action']}). Day total: {res['total_units']} units. Stock remaining: {res['stock_after']}.",
         "action": res["action"],
         "ingredient_id": sale.ingredient_id,
         "name": ing_name,
         "date": sale.date,
         "units": res["total_units"],
         "added_units": sale.units,
+        "stock_after": res["stock_after"],
+        "stock_floored": res["stock_floored"],
         "current_forecast": daily_forecast,
         "daily_forecast": daily_forecast,
         "spike_info": spike_info,
-        "days_of_cover": days_of_cover,
+        "days_of_cover": format_days_of_cover(days_of_cover),
         "status": status,
         "order_qty": order_qty,
         "priority": priority,
@@ -940,3 +995,35 @@ def create_sales_batch(payload: Union[List[SaleInput], SalesBatchInput]):
         "results": batch_results,
         "affected_ingredients": updated_states,
     }
+
+
+# ---------------------------------------------------------------------------
+# Real Full-Moon Calendar (B8)
+# ---------------------------------------------------------------------------
+@app.get("/api/calendar/upcoming")
+def get_upcoming_calendar(
+    days: int = 30,
+    today: Optional[str] = None,
+):
+    """
+    Returns upcoming astronomical full moons within the next [days] from demo_today.
+    Prefills suggested_event for POST /api/event and per-ingredient order-by deadlines.
+    Pure evaluation: NEVER creates events or modifies database state.
+    """
+    if today:
+        try:
+            parsed = datetime.strptime(today, "%Y-%m-%d")
+            if parsed.strftime("%Y-%m-%d") != today:
+                raise ValueError()
+            demo_today_str = today
+        except (ValueError, TypeError):
+            raise HTTPException(
+                status_code=422,
+                detail=f"Invalid date format for 'today': '{today}'. Expected valid ISO date YYYY-MM-DD.",
+            )
+    else:
+        latest_date_str = get_latest_sales_date()
+        latest_dt = datetime.strptime(latest_date_str, "%Y-%m-%d")
+        demo_today_str = (latest_dt + timedelta(days=1)).strftime("%Y-%m-%d")
+
+    return get_upcoming_full_moons(start_date_str=demo_today_str, days=days)

@@ -192,3 +192,68 @@ def test_batch_all_or_nothing():
     cnt = cursor.fetchone()["cnt"]
     conn.close()
     assert cnt == 0
+
+
+def test_sales_reduce_stock_and_floor_at_zero():
+    """
+    Part 1F: Sales reduce stock; same-day add subtracts only added units;
+    overselling floors at 0 with stock_floored=True; batch failure leaves stock untouched.
+    """
+    client = TestClient(app)
+
+    # Moonflower initial green stock is 3,984
+    r1 = client.post("/api/sales", json={"ingredient_id": 1, "date": "2024-01-02", "units": 1000})
+    assert r1.status_code == 200
+    d1 = r1.json()
+    assert d1["stock_after"] == 2984
+    assert d1["stock_floored"] is False
+
+    # Adding 500 units to same day subtracts only the additional 500 units
+    r2 = client.post("/api/sales", json={"ingredient_id": 1, "date": "2024-01-02", "units": 500})
+    assert r2.status_code == 200
+    d2 = r2.json()
+    assert d2["action"] == "updated"
+    assert d2["units"] == 1500
+    assert d2["added_units"] == 500
+    assert d2["stock_after"] == 2484
+    assert d2["stock_floored"] is False
+
+    # Huge sale on next day (3,000 units > 2,484 stock): floors at 0 and sets stock_floored=True
+    r3 = client.post("/api/sales", json={"ingredient_id": 1, "date": "2024-01-03", "units": 3000})
+    assert r3.status_code == 200
+    d3 = r3.json()
+    assert d3["stock_after"] == 0
+    assert d3["stock_floored"] is True
+    assert d3["status"] == "critical"
+
+    # Restock restores inventory
+    r_restock = client.post("/api/purchases", json={"ingredient_id": 1, "quantity": 1000})
+    assert r_restock.status_code == 200
+    assert r_restock.json()["current_stock"] == 1000
+
+    # Reset restores exact seeded baseline stock (3,984)
+    client.post("/api/reset")
+    r_ings = client.get("/api/ingredients")
+    mf = next(i for i in r_ings.json() if i["id"] == 1)
+    assert mf["current_stock"] == 3984
+
+
+def test_two_day_surge_leaves_stock_near_zero_critical():
+    """
+    Part 1F: The two-day Moonflower surge (2,000 units on Day 1, 2,000 units on Day 2)
+    starting from 3,984 stock leaves stock floored at 0 and status critical.
+    """
+    client = TestClient(app)
+    r1 = client.post("/api/sales", json={"ingredient_id": 1, "date": "2024-01-02", "units": 2000})
+    assert r1.status_code == 200
+    assert r1.json()["stock_after"] == 1984
+
+    r2 = client.post("/api/sales", json={"ingredient_id": 1, "date": "2024-01-03", "units": 2000})
+    assert r2.status_code == 200
+    d2 = r2.json()
+    assert d2["stock_after"] == 0
+    assert d2["stock_floored"] is True
+    assert d2["status"] == "critical"
+    assert d2["priority"] == "high"
+
+
