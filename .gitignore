@@ -38,6 +38,11 @@ htmlcov/
 *.sqlite
 *.sqlite3
 
+# Raw datasets (do not commit to git)
+data/raw/
+*.csv.zip
+
+
 # Environment & credentials
 .env
 .env.local
