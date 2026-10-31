@@ -308,8 +308,10 @@ function renderAlertBanner(ingredients) {
       elAlertMessage.textContent = `Festival surge demands immediate emergency reorders. Select an ingredient below to inspect its trajectory and lead-time collision:`;
     } else {
       const item = alertItems[0];
-      elAlertTitle.textContent = `CRITICAL DEFICIT: ${item.name.toUpperCase()} RUNS OUT IN ${Number(item.days_of_cover).toFixed(1)} DAYS`;
-      elAlertMessage.textContent = `Supplier delivery takes ${item.lead_time_days} days! Reorder at least ${item.order_qty.toLocaleString()} units now to avoid a complete stockout.`;
+      const ltStr = item.lead_time_days === 1 ? "1 day" : `${item.lead_time_days} days`;
+      const coverStr = Number(item.days_of_cover) === 1 ? "1 day" : `${Number(item.days_of_cover).toFixed(1)} days`;
+      elAlertTitle.textContent = `CRITICAL DEFICIT: ${item.name.toUpperCase()} RUNS OUT IN ${coverStr.toUpperCase()}`;
+      elAlertMessage.textContent = `Supplier delivery takes ${ltStr}! Reorder at least ${item.order_qty.toLocaleString()} units now to avoid a complete stockout.`;
     }
     renderAlertQuickJump(alertItems);
     elAlertBanner.classList.remove("hidden");
@@ -623,8 +625,8 @@ async function handleAnnounceEvent() {
         name: "Full Moon Festival",
         ingredient_ids: [1, 2, 3],
         multiplier: 3.0,
-        start_date: "2026-11-08",
-        end_date: "2026-11-15"
+        start_date: "2024-01-08",
+        end_date: "2024-01-14"
       };
       await fetch(`${API_BASE}/api/event`, {
         method: "POST",

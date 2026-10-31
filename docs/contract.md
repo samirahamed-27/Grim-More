@@ -79,11 +79,11 @@ This contract defines the shared database schema, API specification, and Python 
   "ingredient_id": 1,
   "name": "Moonflower",
   "history": [
-    {"date": "2026-10-01", "units": 98},
-    {"date": "2026-10-02", "units": 103}
+    {"date": "2023-12-30", "units": 98},
+    {"date": "2023-12-31", "units": 103}
   ],
   "forecast": [
-    {"date": "2026-11-01", "units": 300.0, "lower": 270.0, "upper": 330.0}
+    {"date": "2024-01-02", "units": 300.0, "lower": 270.0, "upper": 330.0}
   ],
   "spike": {
     "is_spike": true,
@@ -103,8 +103,8 @@ This contract defines the shared database schema, API specification, and Python 
   "name": "Full Moon Festival",
   "ingredient_ids": [1, 2, 3],
   "multiplier": 3.0,
-  "start_date": "2026-11-08",
-  "end_date": "2026-11-14"
+  "start_date": "2024-01-08",
+  "end_date": "2024-01-14"
 }
 ```
 - **Returns**: Updated ingredients list or confirmation with new forecasts.

@@ -78,8 +78,8 @@ def test_announce_event():
         "name": "Full Moon Festival",
         "ingredient_ids": [1, 2, 3],
         "multiplier": 3.0,
-        "start_date": "2026-11-08",
-        "end_date": "2026-11-14"
+        "start_date": "2024-01-08",
+        "end_date": "2024-01-14"
     }
     resp = client.post("/api/event", json=payload)
     assert resp.status_code == 200
