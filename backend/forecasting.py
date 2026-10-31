@@ -1,4 +1,7 @@
+import math
+
 START_WEEKDAY = 0  # 0 = Monday, 6 = Sunday
+SPIKE_Z_THRESHOLD = 3
 
 
 def get_weekday_factors(history):
@@ -160,6 +163,55 @@ def backtest(history, holdout_days=14):
     }
 
 
+def detect_spike(history):
+    """Detect demand spikes by comparing recent sales against a historical baseline.
+
+    Args:
+        history (list[float | int]): Daily sales numbers in chronological order,
+            oldest first. Must contain at least 16 values (14 baseline days + 2 recent days).
+
+    Returns:
+        dict: A dictionary containing:
+            - "is_spike" (bool): Whether a demand spike is detected.
+            - "z_score" (float): Z-score measuring deviation from baseline.
+            - "baseline_avg" (float): Average daily sales over the 14-day baseline.
+            - "baseline_std" (float): Standard deviation of daily sales over the 14-day baseline.
+            - "recent_avg" (float): Average daily sales over the last 2 days.
+
+    Raises:
+        ValueError: If ``history`` contains fewer than 16 values.
+    """
+    if len(history) < 16:
+        raise ValueError(
+            f"'history' must contain at least 16 values (14 baseline days + 2 recent days), "
+            f"but got {len(history)}."
+        )
+
+    recent = history[-2:]
+    baseline = history[-16:-2]
+
+    baseline_avg = float(sum(baseline) / 14.0)
+    variance = sum((x - baseline_avg) ** 2 for x in baseline) / 13.0
+    baseline_std = float(math.sqrt(variance))
+
+    recent_avg = float(sum(recent) / 2.0)
+
+    if baseline_std > 0.0:
+        z_score = float((recent_avg - baseline_avg) / baseline_std)
+    else:
+        z_score = float("inf") if recent_avg > baseline_avg else 0.0
+
+    is_spike = bool(z_score > SPIKE_Z_THRESHOLD)
+
+    return {
+        "is_spike": is_spike,
+        "z_score": z_score,
+        "baseline_avg": baseline_avg,
+        "baseline_std": baseline_std,
+        "recent_avg": recent_avg,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Tests & Sample Demonstration
 # ---------------------------------------------------------------------------
@@ -265,7 +317,61 @@ def _run_tests():
         except ValueError:
             pass
 
+        # Test 7: detect_spike finalized calculation and types
+        flat_16 = [10.0] * 16
+        spike_res_flat = detect_spike(flat_16)
+        assert spike_res_flat["is_spike"] is False
+        assert type(spike_res_flat["is_spike"]) is bool
+        assert spike_res_flat["z_score"] == 0.0
+        assert type(spike_res_flat["z_score"]) is float
+        assert spike_res_flat["recent_avg"] == 10.0
+        assert type(spike_res_flat["recent_avg"]) is float
+        assert spike_res_flat["baseline_avg"] == 10.0
+        assert type(spike_res_flat["baseline_avg"]) is float
+        assert spike_res_flat["baseline_std"] == 0.0
+        assert type(spike_res_flat["baseline_std"]) is float
+
+        # Sample with known variance and a strong spike
+        sample_seq = list(range(1, 19)) + [100.0, 104.0]  # baseline [3..16], recent [100, 104] (avg 102)
+        spike_seq = detect_spike(sample_seq)
+        assert spike_seq["is_spike"] is True
+        assert type(spike_seq["is_spike"]) is bool
+        assert spike_seq["z_score"] > SPIKE_Z_THRESHOLD
+        assert spike_seq["recent_avg"] == 102.0
+
+        # Test 1 (normal data): 16 values varying between about 40 and 60
+        normal_history = [45, 52, 48, 55, 42, 58, 50, 47, 53, 49, 56, 44, 51, 46, 54, 48]
+        normal_result = detect_spike(normal_history)
+        assert normal_result["is_spike"] is False, f"Expected is_spike to be False for normal data, got {normal_result}"
+
+        # Test 2 (spike): same history with last 2 values multiplied by 3
+        spiked_history = normal_history[:-2] + [normal_history[-2] * 3, normal_history[-1] * 3]
+        spiked_result = detect_spike(spiked_history)
+        assert spiked_result["is_spike"] is True, f"Expected is_spike to be True for spiked data, got {spiked_result}"
+        assert spiked_result["z_score"] > 3, f"Expected z_score > 3, got {spiked_result['z_score']}"
+
+        try:
+            detect_spike([10.0] * 15)
+            assert False, "Expected ValueError when history < 16 for detect_spike"
+        except ValueError:
+            pass
+
         print("All tests passed.\n")
+
+        print("=== detect_spike Tests Output ===")
+        print("\n--- Test 1 (Normal Data) ---")
+        print(f"History (16 values): {normal_history}")
+        print("Returned Dictionary:")
+        print(normal_result)
+        for k, v in normal_result.items():
+            print(f"  {k}: {v}")
+
+        print("\n--- Test 2 (Spike: Recent Values x 3) ---")
+        print(f"History (16 values): {spiked_history}")
+        print("Returned Dictionary:")
+        print(spiked_result)
+        for k, v in spiked_result.items():
+            print(f"  {k}: {v}")
 
         # Sample demonstration
         sample_sales = [
@@ -289,6 +395,23 @@ def _run_tests():
         # Run backtest demonstration
         print("Running Backtest on 4-week sample dataset:")
         backtest(sample_sales, holdout_days=14)
+
+        # Baseline slice inspection for detect_spike
+        sample_check = [
+            10, 11, 12, 13,                                              # 4 older days (ignored)
+            14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,      # 14 baseline days
+            99, 105                                                      # 2 recent days
+        ]
+        print("\n--- detect_spike Baseline Slice Inspection ---")
+        print(f"Full input list (len={len(sample_check)}): {sample_check}")
+        print(f"Baseline slice (history[-16:-2], len={len(sample_check[-16:-2])}): {sample_check[-16:-2]}")
+        print(f"Recent slice   (history[-2:],    len={len(sample_check[-2:])}): {sample_check[-2:]}")
+        check_res = detect_spike(sample_check)
+        print(f"Computed baseline_avg: {check_res['baseline_avg']:.2f}")
+        print(f"Computed baseline_std (sample std, ddof=1): {check_res['baseline_std']:.4f}")
+        print(f"Computed recent_avg:   {check_res['recent_avg']:.2f}")
+        print(f"Computed z_score:      {check_res['z_score']:.2f}")
+        print(f"is_spike (z > {SPIKE_Z_THRESHOLD}):         {check_res['is_spike']}")
 
     finally:
         START_WEEKDAY = original_start_weekday

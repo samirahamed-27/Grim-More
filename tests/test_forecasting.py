@@ -1,7 +1,9 @@
 import pytest
 from backend.forecasting import (
+    SPIKE_Z_THRESHOLD,
     START_WEEKDAY,
     backtest,
+    detect_spike,
     forecast_demand,
     get_weekday_factors,
 )
@@ -92,3 +94,53 @@ def test_backtest():
     # holdout_days < 1 raises ValueError
     with pytest.raises(ValueError, match="'holdout_days' must be at least 1"):
         backtest([10.0] * 21, holdout_days=0)
+
+
+def test_detect_spike_and_validation():
+    # History with fewer than 16 values raises ValueError
+    with pytest.raises(ValueError, match="'history' must contain at least 16 values"):
+        detect_spike([10.0] * 15)
+
+    # Valid flat history
+    result = detect_spike([10.0] * 16)
+    assert result["is_spike"] is False
+    assert type(result["is_spike"]) is bool
+    assert result["z_score"] == 0.0
+    assert type(result["z_score"]) is float
+    assert result["recent_avg"] == 10.0
+    assert type(result["recent_avg"]) is float
+    assert result["baseline_avg"] == 10.0
+    assert type(result["baseline_avg"]) is float
+    assert result["baseline_std"] == 0.0
+    assert type(result["baseline_std"]) is float
+
+    # Sequence with known mean, std (sample std ddof=1), and a spike
+    seq_spike = list(range(1, 19)) + [100.0, 104.0]
+    res_spike = detect_spike(seq_spike)
+    assert res_spike["is_spike"] is True
+    assert type(res_spike["is_spike"]) is bool
+    assert res_spike["z_score"] > SPIKE_Z_THRESHOLD
+    assert res_spike["recent_avg"] == 102.0
+
+    # Sequence with no spike
+    seq_no_spike = list(range(1, 19)) + [10.0, 11.0]
+    res_no_spike = detect_spike(seq_no_spike)
+    assert res_no_spike["is_spike"] is False
+    assert res_no_spike["z_score"] <= SPIKE_Z_THRESHOLD
+
+
+def test_detect_spike_test1_normal_data():
+    normal_history = [45, 52, 48, 55, 42, 58, 50, 47, 53, 49, 56, 44, 51, 46, 54, 48]
+    result = detect_spike(normal_history)
+    assert result["is_spike"] is False
+
+
+def test_detect_spike_test2_spike_data():
+    normal_history = [45, 52, 48, 55, 42, 58, 50, 47, 53, 49, 56, 44, 51, 46, 54, 48]
+    spiked_history = normal_history[:-2] + [normal_history[-2] * 3, normal_history[-1] * 3]
+    result = detect_spike(spiked_history)
+    assert result["is_spike"] is True
+    assert result["z_score"] > 3
+
+
+
