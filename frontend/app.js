@@ -504,7 +504,7 @@ async function renderChart(ingredientId) {
 // Trigger Festival Spike (Surprise Path: POST /api/simulate-spike)
 async function handleTriggerFestival() {
   isFestivalActive = true;
-  elBtnTriggerSpike.innerHTML = `🌕 Spike Simulated!`;
+  elBtnTriggerSpike.innerHTML = `[SURGE ACTIVE]`;
   elBtnTriggerSpike.style.background = `linear-gradient(135deg, #ff0000, #840000)`;
   elBtnTriggerSpike.style.boxShadow = `0 0 25px rgba(255, 0, 0, 0.8)`;
 
@@ -527,7 +527,7 @@ async function handleAnnounceEvent() {
   isAnnouncementActive = true;
   isFestivalActive = true;
   if (elBtnAnnounceEvent) {
-    elBtnAnnounceEvent.innerHTML = `📜 Festival Declared (3x)`;
+    elBtnAnnounceEvent.innerHTML = `[EVENT DECLARED (3X)]`;
     elBtnAnnounceEvent.style.borderColor = "#2ecc71";
     elBtnAnnounceEvent.style.color = "#2ecc71";
   }
@@ -558,12 +558,12 @@ async function handleAnnounceEvent() {
 async function handleReset() {
   isFestivalActive = false;
   isAnnouncementActive = false;
-  elBtnTriggerSpike.innerHTML = `🌕 Trigger Festival Spike`;
+  elBtnTriggerSpike.innerHTML = `[SIMULATE SURGE]`;
   elBtnTriggerSpike.style.background = "";
   elBtnTriggerSpike.style.boxShadow = "";
 
   if (elBtnAnnounceEvent) {
-    elBtnAnnounceEvent.innerHTML = `📜 Announce Festival`;
+    elBtnAnnounceEvent.innerHTML = `[ADVANCE EVENT]`;
     elBtnAnnounceEvent.style.borderColor = "";
     elBtnAnnounceEvent.style.color = "";
   }

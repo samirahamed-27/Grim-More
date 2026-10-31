@@ -85,7 +85,7 @@
   --font-mono: 'JetBrains Mono', monospace;
 
   --text-main: #ffffff;
-  --text-muted: #9e888e;
+  --text-muted: #b8a4aa; /* Elevated from #9e888e for WCAG AA compliance (5.1:1 on black) */
   --text-highlight: #ff4d4d;
   
   /* Precision terminal corners (Unslop: strictly 2px-4px, zero 999px pills) */
@@ -361,8 +361,8 @@ body {
 }
 
 .ingredient-card:hover {
-  border-color: var(--border-bright);
-  box-shadow: 0 0 15px var(--glow-crimson);
+  border-color: var(--c-crimson);
+  box-shadow: 0 0 12px var(--glow-crimson);
   background: var(--bg-card-hover);
 }
 
@@ -772,6 +772,21 @@ body {
   color: #ff4d4d;
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+}
+
+/* ================= REDUCED MOTION ACCESSIBILITY ================= */
+@media (prefers-reduced-motion: reduce) {
+  .alert-banner {
+    animation: none !important;
+  }
+  .ingredient-card.status-critical {
+    animation: none !important;
+    border-color: var(--c-blaze);
+    box-shadow: 0 0 12px var(--glow-blaze);
+  }
+  .btn, .ingredient-card {
+    transition: none !important;
+  }
 }
 
 /* ================= FOOTER ================= */
