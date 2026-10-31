@@ -461,6 +461,66 @@
       });
     })();
   </script>
+
+  <!-- GSAP & ScrollTrigger for React Bits AnimatedContent Physics -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script>
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Hero content mount animation with subtle 3D tilt & smooth arrival
+      gsap.fromTo('.hero-bauhaus', 
+        { opacity: 0, y: 35, transformPerspective: 900, rotationX: 3 },
+        { opacity: 1, y: 0, rotationX: 0, duration: 0.9, ease: 'power3.out', delay: 0.1 }
+      );
+
+      // Feature Grid Bauhaus with stagger
+      const featureCells = document.querySelectorAll('.feature-grid-bauhaus .b-cell');
+      if (featureCells.length) {
+        ScrollTrigger.create({
+          trigger: '.feature-grid-bauhaus',
+          start: 'top 85%',
+          once: true,
+          onEnter: () => {
+            gsap.fromTo(featureCells,
+              { opacity: 0, y: 45 },
+              { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.12 }
+            );
+          }
+        });
+      }
+
+      // Manifesto section entrance
+      ScrollTrigger.create({
+        trigger: '.manifesto-section',
+        start: 'top 85%',
+        once: true,
+        onEnter: () => {
+          gsap.fromTo('.manifesto-section',
+            { opacity: 0, y: 50 },
+            { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out' }
+          );
+        }
+      });
+
+      // Quick glance cards with stagger
+      const glanceCards = document.querySelectorAll('.inventory-quick-glance .card');
+      if (glanceCards.length) {
+        ScrollTrigger.create({
+          trigger: '.inventory-quick-glance',
+          start: 'top 85%',
+          once: true,
+          onEnter: () => {
+            gsap.fromTo(glanceCards,
+              { opacity: 0, y: 40 },
+              { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.1 }
+            );
+          }
+        });
+      }
+    }
+  </script>
 </body>
 
 </html>

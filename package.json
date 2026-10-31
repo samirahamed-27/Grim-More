@@ -1,0 +1,33 @@
+{
+  "name": "grim-more",
+  "version": "1.0.0",
+  "description": "> **Track 01 | Inventory prediction for a sudden festival demand spike**   > 12-Hour Team Battle Plan (HACK-O-LANTERN)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samirahamed-27/Grim-More.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/samirahamed-27/Grim-More/issues"
+  },
+  "homepage": "https://github.com/samirahamed-27/Grim-More#readme",
+  "dependencies": {
+    "gsap": "^3.15.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^7.0.2"
+  }
+}
