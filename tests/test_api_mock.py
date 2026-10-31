@@ -1,8 +1,16 @@
 import pytest
 from fastapi.testclient import TestClient
 from backend.main import app
+from backend.db import init_db
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def setup_db():
+    init_db()
+    yield
+    client.post("/api/reset")
 
 def test_root_and_health():
     resp = client.get("/")

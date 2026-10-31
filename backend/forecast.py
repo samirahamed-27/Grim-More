@@ -5,16 +5,20 @@ with docs/contract.md specifications.
 """
 
 from backend.forecasting import (
+    SPIKE_Z_THRESHOLD,
     START_WEEKDAY,
     get_weekday_factors,
     forecast_demand,
     backtest,
+    detect_spike,
 )
 
 __all__ = [
+    "SPIKE_Z_THRESHOLD",
     "START_WEEKDAY",
     "get_weekday_factors",
     "forecast_demand",
     "backtest",
+    "detect_spike",
 ]
 

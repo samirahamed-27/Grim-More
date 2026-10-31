@@ -4,11 +4,13 @@ Identifies sudden anomalous demand surges using statistical Z-score analysis.
 Strictly adheres to docs/contract.md specifications.
 """
 
+from __future__ import annotations
+
 import math
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 
-def detect_spike(history: List[int | float]) -> Dict[str, Any]:
+def detect_spike(history: List[Union[int, float]]) -> Dict[str, Any]:
     """
     Detects whether recent demand represents an anomalous surge (spike) using Z-score.
 
