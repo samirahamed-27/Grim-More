@@ -1028,3 +1028,91 @@ def get_upcoming_calendar(
         demo_today_str = (latest_dt + timedelta(days=1)).strftime("%Y-%m-%d")
 
     return get_upcoming_full_moons(start_date_str=demo_today_str, days=days)
+
+
+# ---------------------------------------------------------------------------
+# The Alchemist Copilot Endpoints (Task C1)
+# ---------------------------------------------------------------------------
+class CopilotMessage(BaseModel):
+    role: str = Field(..., description="'user' or 'assistant'")
+    content: str = Field(..., description="Message text content")
+
+
+class CopilotChatInput(BaseModel):
+    messages: List[CopilotMessage] = Field(..., description="Conversation message history (max 12)")
+
+
+class CopilotConfirmInput(BaseModel):
+    token: str = Field(..., description="Single-use action confirmation token")
+    approve: bool = Field(..., description="True to execute action, False to cancel")
+
+
+@app.get("/api/copilot/status")
+def get_copilot_status():
+    """
+    Returns copilot operational mode and configured LLM status.
+    NEVER leaks API keys or credential secrets.
+    """
+    import os
+    from backend.copilot.tools import get_demo_today_str
+    api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    model = os.environ.get("COPILOT_MODEL", "gemini-2.5-flash")
+    return {
+        "llm_available": bool(api_key),
+        "mode": "llm" if bool(api_key) else "offline",
+        "demo_today": get_demo_today_str(),
+        "model": model,
+    }
+
+
+@app.post("/api/copilot/chat")
+async def copilot_chat(payload: CopilotChatInput, request: Request):
+    """
+    Main chat endpoint for the Alchemist Copilot.
+    Runs function-calling agent loop with guardrails, timeouts, rate limiting,
+    and automatic offline fallback.
+    """
+    from backend.copilot.agent import run_copilot_chat
+    client_ip = request.client.host if request.client else "127.0.0.1"
+    messages_dicts = [{"role": m.role, "content": m.content} for m in payload.messages]
+    return await run_copilot_chat(messages=messages_dicts, client_ip=client_ip)
+
+
+@app.post("/api/copilot/confirm")
+def copilot_confirm(payload: CopilotConfirmInput):
+    """
+    Executes or cancels a single-use pending action created by the copilot.
+    Single-use only; rejects expired, used, or invalid tokens.
+    """
+    from backend.copilot.agent import execute_confirmed_action
+    return execute_confirmed_action(token=payload.token, approve=payload.approve)
+
+
+@app.get("/api/copilot/tools/runout")
+def copilot_tool_runout(date: str):
+    """
+    Direct endpoint for the check_runout_before tool.
+    Evaluates forward day-by-day stock depletion against target date (YYYY-MM-DD).
+    """
+    from backend.copilot.tools import execute_check_runout_before
+    try:
+        return execute_check_runout_before(date_str=date)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+
+
+@app.get("/api/copilot/tools/delay")
+def copilot_tool_delay(ingredient_id: str = "all", extra_lead_days: int = 1):
+    """
+    Direct endpoint for the whatif_supplier_delay tool.
+    Simulates supplier delivery delay on lead times and stockout risk without DB writes.
+    """
+    from backend.copilot.tools import execute_whatif_supplier_delay
+    try:
+        return execute_whatif_supplier_delay(
+            ingredient_id=ingredient_id,
+            extra_lead_days=extra_lead_days,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+
