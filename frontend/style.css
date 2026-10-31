@@ -212,11 +212,20 @@ body {
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-maroon);
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: background-color 0.12s ease-out, border-color 0.12s ease-out, box-shadow 0.12s ease-out, transform 0.06s ease-out;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  transform: none !important; /* Unslop: Kill bouncy lifts */
+  outline: none;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--c-blaze);
+  outline-offset: 2px;
 }
 
 .btn-primary {
@@ -254,7 +263,7 @@ body {
   padding: 0.9rem 1.3rem;
   margin-bottom: 1.75rem;
   box-shadow: 0 0 25px rgba(255, 0, 0, 0.35);
-  animation: bannerShake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  animation: bannerEntrance 0.16s cubic-bezier(0, 0, 0.2, 1) both;
 }
 
 .alert-banner.hidden {
@@ -295,11 +304,15 @@ body {
   box-shadow: 0 0 10px var(--glow-blaze);
 }
 
-@keyframes bannerShake {
-  10%, 90% { transform: translate3d(-1px, 0, 0); }
-  20%, 80% { transform: translate3d(2px, 0, 0); }
-  30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
-  40%, 60% { transform: translate3d(3px, 0, 0); }
+@keyframes bannerEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ================= SECTIONS & CARDS ================= */
@@ -375,12 +388,7 @@ body {
 .ingredient-card.status-critical {
   border-color: var(--c-blaze);
   background: linear-gradient(180deg, var(--bg-card), rgba(255, 0, 0, 0.22));
-  animation: criticalPulse 2s infinite alternate;
-}
-
-@keyframes criticalPulse {
-  0% { box-shadow: 0 0 4px rgba(255, 0, 0, 0.3); }
-  100% { box-shadow: 0 0 18px rgba(255, 0, 0, 0.7); }
+  box-shadow: 0 0 12px var(--glow-blaze);
 }
 
 .card-top {

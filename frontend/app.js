@@ -448,6 +448,10 @@ async function renderChart(ingredientId) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: {
+        duration: 240,
+        easing: 'easeOutQuart'
+      },
       interaction: {
         intersect: false,
         mode: "index"
