@@ -1,23 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Potion Pantry | Smart Inventory Management</title>
+  <title>Grim-More — Inventory Intelligence</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts: Marcellus (OVR Demorny alternate), Grenze Gotisch & Instrument Serif (Archetype alternates), Syne & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;600;700;900&family=Instrument+Serif:ital@0;1&family=Marcellus&family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-  <header>
-    <h1>🧙‍♂️ Potion Pantry</h1>
-    <p>Track 01: Inventory Prediction for Sudden Festival Demand Spikes</p>
-  </header>
-  
-  <main id="app">
-    <p>Dashboard initializing...</p>
-  </main>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="main-header">
+      <div class="brand">
+        <div class="brand-icon">🧪</div>
+        <div>
+          <h1>GRIM-MORE</h1>
+          <p class="subtitle">Predictive Inventory & Festival Demand Surge Control</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="data-mode-badge" id="dataModeBadge">
+          <span class="status-dot mock-dot"></span>
+          <span id="dataModeText">Mock Data Mode</span>
+        </div>
+        <button id="btnTriggerSpike" class="btn btn-primary pulse-hover">
+          🌕 Trigger Full Moon Festival
+        </button>
+        <button id="btnReset" class="btn btn-secondary">
+          🔄 Reset Shop
+        </button>
+      </div>
+    </header>
+
+    <!-- Top Alert Banner (Hidden by default, activated on critical status) -->
+    <div id="alertBanner" class="alert-banner hidden">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-content">
+        <strong id="alertTitle">CRITICAL STOCKOUT RISK DETECTED</strong>
+        <p id="alertMessage">Moonflower stock will deplete in 1.3 days, but delivery takes 2.0 days! Urgent
+          replenishment required.</p>
+      </div>
+      <div class="alert-action">
+        <span class="alert-pill">Immediate Action Needed</span>
+      </div>
+    </div>
+
+    <!-- Main Content Layout -->
+    <main class="dashboard-grid">
+      <!-- Section 1: Ingredient Cards -->
+      <section class="section-container">
+        <div class="section-header">
+          <h2>Apothecary Inventory Status</h2>
+          <span class="section-hint">Click any ingredient card to inspect forecast curves</span>
+        </div>
+        <div class="cards-grid" id="ingredientsGrid">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </section>
+
+      <!-- Section 2: Deep Dive Analytics (Chart + Diagnostics) -->
+      <section class="section-container analytics-row">
+        <div class="chart-panel card">
+          <div class="chart-header">
+            <div>
+              <h3 id="chartTitle">Demand Trajectory: Moonflower (🌸)</h3>
+              <p class="chart-sub">30-day sales history vs 7-day predicted demand trajectory</p>
+            </div>
+            <div class="chart-legend-custom">
+              <span class="legend-chip history-chip">Historical Sales</span>
+              <span class="legend-chip forecast-chip">Predicted Spike</span>
+            </div>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="forecastChart"></canvas>
+          </div>
+        </div>
+
+        <div class="formula-panel card">
+          <div class="panel-header">
+            <h3>🧮 Inventory Logic Explainer</h3>
+            <span class="badge-pill">Judges Reference</span>
+          </div>
+          <div class="formula-list">
+            <div class="formula-item">
+              <span class="f-num">1</span>
+              <div class="f-body">
+                <strong>Spike Detection ($z > 3.0$)</strong>
+                <p>Compares recent 2-day demand to 14-day baseline standard deviations.</p>
+              </div>
+            </div>
+            <div class="formula-item">
+              <span class="f-num">2</span>
+              <div class="f-body">
+                <strong>Safety Stock (95% Service Level)</strong>
+                <code>1.65 × Std × √(Lead Time)</code>
+                <p>Protects against unpredictable supply delays and demand spikes.</p>
+              </div>
+            </div>
+            <div class="formula-item">
+              <span class="f-num">3</span>
+              <div class="f-body">
+                <strong>Target Stock & Order Quantity</strong>
+                <code>Forecast × (Lead + Cover) + Safety Stock</code>
+                <p>Guarantees zero stockouts with minimum idle holding cost.</p>
+              </div>
+            </div>
+          </div>
+          <div class="math-proof-box" id="workedExampleBox">
+            <h4>Worked Example (Moonflower During Festival)</h4>
+            <div class="proof-row"><span>Daily Forecast:</span> <strong>300 units/day (was 100)</strong></div>
+            <div class="proof-row"><span>Lead Time:</span> <strong>2 days (Cover buffer: 3 days)</strong></div>
+            <div class="proof-row"><span>Safety Stock:</span> <strong>70 units (was 23)</strong></div>
+            <div class="proof-row highlight-row"><span>Target Stock:</span> <strong>1,570 units</strong></div>
+            <div class="proof-row highlight-row"><span>Recommended Order:</span> <strong>1,170 units</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Prioritized Reorders Table -->
+      <section class="section-container">
+        <div class="section-header">
+          <h2>Automated Purchase Orders & Reorder Recommendations</h2>
+          <span class="section-hint">Ranked by urgency: stockout probability and lead-time safety window</span>
+        </div>
+        <div class="table-container card">
+          <table class="reorder-table">
+            <thead>
+              <tr>
+                <th>Priority</th>
+                <th>Ingredient</th>
+                <th>Current Stock</th>
+                <th>Forecast (Daily)</th>
+                <th>Days of Cover</th>
+                <th>Lead Time</th>
+                <th>Order Quantity</th>
+                <th>Stockout Risk</th>
+              </tr>
+            </thead>
+            <tbody id="reordersTableBody">
+              <!-- Populated dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+      <p>HACK-O-LANTERN 2026 • Track 01: Grim-More • Team Trio (Brain • Engine • Face)</p>
+    </footer>
+  </div>
 
   <script src="app.js"></script>
 </body>
-</html>
 
+</html>
