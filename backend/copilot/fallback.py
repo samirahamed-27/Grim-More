@@ -329,3 +329,4 @@ def route_offline_intent(
         "pending_action": None,
         "sources": ["ingredients", "alerts"],
     }
+

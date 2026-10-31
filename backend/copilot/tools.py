@@ -535,3 +535,4 @@ def execute_tool(name: str, args: Dict[str, Any]) -> Dict[str, Any]:
         return {"result": execute_whatif_supplier_delay(ingredient_id=ing_id, extra_lead_days=int(extra_days))}
     else:
         raise ValueError(f"Tool '{name}' dispatch not implemented.")
+

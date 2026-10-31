@@ -489,3 +489,4 @@ def execute_confirmed_action(token: str, approve: bool) -> Dict[str, Any]:
         "result": res,
         "reply": reply,
     }
+

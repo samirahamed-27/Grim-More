@@ -144,3 +144,4 @@ def test_calendar_never_writes_to_database():
 
     assert events_before == events_after
     assert sales_before == sales_after
+
