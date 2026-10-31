@@ -75,17 +75,15 @@
 }
 
 body {
-  background-color: var(--bg-body);
+  background-color: #021811;
   color: var(--text-main);
   font-family: var(--font-sans);
   line-height: 1.5;
   min-height: 100vh;
   padding: 1.5rem 2rem;
-  /* Bauhaus technical grid on linen */
+  /* Dark forest obsidian canvas */
   background-image: 
-    linear-gradient(rgba(2, 32, 21, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(2, 32, 21, 0.05) 1px, transparent 1px);
-  background-size: 36px 36px;
+    radial-gradient(ellipse at 50% 20%, #03271a 0%, #021811 60%, #010f0a 100%);
 }
 
 .app-container {
@@ -98,7 +96,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem 1.75rem;
+  padding: 1rem 1.75rem;
   border: 3px solid var(--c-cypress);
   border-bottom: 3px solid var(--c-cypress);
   margin-bottom: 0;
@@ -106,6 +104,7 @@ body {
   gap: 1rem;
   background: #FFFFFF;
   box-shadow: var(--shadow-flat);
+  position: relative;
 }
 
 .brand {
@@ -115,11 +114,21 @@ body {
 }
 
 .brand-icon {
-  font-size: 2rem;
   background: var(--c-buff);
   border: 2px solid var(--c-cypress);
-  padding: 0.35rem 0.65rem;
+  padding: 0.35rem 0.5rem;
   box-shadow: 2px 2px 0px var(--c-cypress);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+}
+
+.brand-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
 }
 
 .main-header h1 {
@@ -129,6 +138,12 @@ body {
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--c-cypress);
+  line-height: 1;
+}
+
+.bat-icon {
+  margin-left: 0.2rem;
+  display: inline-block;
 }
 
 .subtitle {
@@ -138,9 +153,17 @@ body {
   font-size: 0.95rem;
   font-weight: 500;
   letter-spacing: 0.5px;
+  margin-top: 0.25rem;
 }
 
-/* Navigation Links */
+/* Navigation Links & Howling Wolf */
+.header-nav-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  position: relative;
+}
+
 .nav-links {
   display: flex;
   align-items: center;
@@ -168,6 +191,13 @@ body {
 .nav-link.active {
   color: var(--c-cypress);
   border-bottom-color: var(--c-ochre);
+}
+
+.howling-wolf-header {
+  display: flex;
+  align-items: flex-end;
+  margin-left: 0.25rem;
+  margin-bottom: -1rem;
 }
 
 .header-actions {
@@ -297,7 +327,9 @@ body {
 }
 
 .hero-left-field {
-  background: var(--c-cypress);
+  background: radial-gradient(ellipse at 70% 30%, rgba(24, 100, 65, 0.6) 0%, transparent 65%),
+              radial-gradient(circle at 20% 80%, rgba(15, 75, 45, 0.5) 0%, transparent 60%),
+              #021a11;
   padding: 3.5rem 2.5rem;
   position: relative;
   overflow: hidden;
@@ -307,37 +339,49 @@ body {
   gap: 2rem;
 }
 
-.hero-left-field::before {
-  content: '';
+/* Ghost apparitions floating in the mist */
+.ghost {
   position: absolute;
-  width: 380px;
-  height: 380px;
-  border-radius: 50%;
-  background: rgba(243, 211, 177, 0.14); /* Warm buff geometric form */
-  bottom: -100px;
-  right: -70px;
   pointer-events: none;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.6));
 }
 
-.hero-left-field::after {
-  content: '';
-  position: absolute;
-  width: 180px;
-  height: 180px;
-  background: rgba(255, 255, 255, 0.08); /* White geometric square */
-  top: 30px;
-  right: 100px;
-  pointer-events: none;
+.ghost-top-left {
+  top: -15px;
+  left: -20px;
+  width: 135px;
+  height: 160px;
+  opacity: 0.85;
+  z-index: 1;
+}
+
+.ghost-bottom-main {
+  bottom: -15px;
+  right: 25px;
+  width: 170px;
+  height: 200px;
+  opacity: 0.9;
+  z-index: 2;
+}
+
+.ghost-bottom-sub {
+  bottom: 25px;
+  right: -25px;
+  width: 135px;
+  height: 160px;
+  opacity: 0.75;
+  z-index: 1;
 }
 
 .hero-eyebrow {
   font-family: var(--font-rave);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: rgba(248, 235, 221, 0.65);
-  z-index: 1;
+  color: rgba(248, 235, 221, 0.75);
+  z-index: 3;
+  position: relative;
 }
 
 .hero-h1-poster {
@@ -348,44 +392,99 @@ body {
   letter-spacing: -0.02em;
   text-transform: uppercase;
   color: #FFFFFF;
-  z-index: 1;
+  filter: url(#chalk-filter);
+  z-index: 3;
+  position: relative;
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
 .hero-h1-poster .accent {
-  color: var(--c-buff);
+  color: #E2A86E;
 }
 
 .hero-tagline-sub {
   font-family: var(--font-rave);
-  font-size: 0.76rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(248, 235, 221, 0.65);
-  z-index: 1;
+  color: rgba(248, 235, 221, 0.75);
+  z-index: 3;
+  position: relative;
 }
 
 .hero-right-field {
-  padding: 3.5rem 2.75rem;
+  padding: 3rem 2.5rem;
   border-left: 4px solid var(--c-cypress);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 2rem;
   background: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Spiderweb corners */
+.spiderweb-corner {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.spiderweb-corner.top-left {
+  top: -5px;
+  left: -5px;
+}
+
+.spiderweb-corner.top-right {
+  top: -5px;
+  right: -5px;
+  transform: scaleX(-1);
+}
+
+.spiderweb-corner.bottom-left {
+  bottom: -5px;
+  left: -5px;
+  transform: scaleY(-1);
+}
+
+.spiderweb-corner.bottom-right {
+  bottom: -5px;
+  right: -5px;
+  transform: scale(-1, -1);
+}
+
+.spiderweb-corner.watermark-web {
+  opacity: 0.22;
+}
+
+.hero-right-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  gap: 1.5rem;
 }
 
 .hero-desc-lead {
   font-size: 1.15rem;
-  line-height: 1.65;
-  color: #2A3A32;
+  line-height: 1.6;
+  color: #1A2820;
   font-weight: 400;
 }
 
+.hero-desc-lead strong {
+  font-weight: 700;
+  color: #0B120E;
+}
+
 .hero-desc-sub {
-  font-size: 0.96rem;
-  line-height: 1.6;
-  color: var(--c-muted);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #4A6256;
+  margin-top: 0.5rem;
 }
 
 .hero-cta-bar {
@@ -394,11 +493,16 @@ body {
   flex-wrap: wrap;
 }
 
+.hero-divider-rule {
+  border: none;
+  border-top: 1px solid #111111;
+  margin: 0.5rem 0 0.25rem;
+}
+
 .hero-stats-row {
   display: flex;
-  border-top: 2px solid var(--c-cypress);
-  padding-top: 1.5rem;
   gap: 0;
+  align-items: center;
 }
 
 .hero-stat-cell {
@@ -420,15 +524,35 @@ body {
   font-weight: 900;
   letter-spacing: -0.04em;
   line-height: 1;
-  color: var(--c-cypress);
+  color: #111111;
+  position: relative;
 }
 
 .hero-stat-num.accent-ochre {
-  color: var(--c-ochre);
+  color: #A65600;
 }
 
 .hero-stat-num.accent-green {
-  color: var(--status-ok);
+  color: #1E5A38;
+}
+
+.stat-smudge-spot {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(12, 28, 20, 0.75) 0%, rgba(12, 28, 20, 0.35) 45%, transparent 70%);
+  filter: blur(10px);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.stat-val {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-stat-lbl {
@@ -468,17 +592,37 @@ body {
 .b-cell-white {
   background: #FFFFFF;
   border-right: 4px solid var(--c-cypress);
+  position: relative;
+  overflow: hidden;
 }
 
-.b-cell-ochre {
-  background: var(--c-ochre);
-  color: #FFFFFF;
+.b-cell-fire {
+  background: radial-gradient(circle at 75% 65%, rgba(255, 120, 0, 0.45) 0%, transparent 60%),
+              linear-gradient(135deg, #7A2600 0%, #360E00 100%);
   border-right: 4px solid var(--c-cypress);
+  position: relative;
+  overflow: hidden;
+  color: #FFFFFF;
+}
+
+.eyebrow-gold {
+  color: #F5C800 !important;
+}
+
+.title-flame {
+  color: #FFA500 !important;
+  text-shadow: 0 0 12px rgba(255, 140, 0, 0.6);
+}
+
+.body-fire {
+  color: #F8EBDD !important;
 }
 
 .b-cell-buff {
   background: var(--c-buff);
   color: var(--c-cypress);
+  position: relative;
+  overflow: hidden;
 }
 
 .b-cell-eyebrow {
@@ -488,10 +632,11 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 2;
 }
 
 .b-cell-white .b-cell-eyebrow { color: var(--c-muted); }
-.b-cell-ochre .b-cell-eyebrow { color: rgba(255, 255, 255, 0.75); }
 .b-cell-buff .b-cell-eyebrow { color: var(--c-cypress); }
 
 .b-cell-title {
@@ -500,6 +645,8 @@ body {
   font-weight: 900;
   line-height: 1.1;
   margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 2;
 }
 
 .b-cell-white .b-cell-title { color: var(--c-cypress); }
@@ -507,10 +654,11 @@ body {
 .b-cell-body {
   font-size: 0.95rem;
   line-height: 1.55;
+  position: relative;
+  z-index: 2;
 }
 
 .b-cell-white .b-cell-body { color: #2A3A32; }
-.b-cell-ochre .b-cell-body { color: rgba(255, 255, 255, 0.9); }
 .b-cell-buff .b-cell-body { color: var(--c-cypress); }
 
 /* ================= BAUHAUS MANIFESTO / METHOD RAIL ================= */
@@ -595,6 +743,34 @@ body {
   font-size: 0.92rem;
   color: var(--c-muted);
   line-height: 1.6;
+}
+
+/* ================= INTERACTIVE LAUNCH CARD ================= */
+.launch-banner-card {
+  border: 4px solid var(--c-cypress);
+  margin-bottom: 2.5rem;
+  background: #FFFFFF;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 2rem 2.5rem;
+  box-shadow: var(--shadow-flat);
+}
+
+.launch-banner-title {
+  font-family: var(--font-primary-display);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--c-cypress);
+  text-transform: uppercase;
+}
+
+.launch-banner-sub {
+  color: var(--c-muted);
+  margin-top: 0.35rem;
+  font-size: 0.95rem;
 }
 
 /* ================= TOP ALERT BANNER ================= */

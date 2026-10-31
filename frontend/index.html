@@ -14,24 +14,58 @@
     rel="stylesheet">
 </head>
 
-<body>
+<body class="home-view">
+  <!-- SVG Filter Definitions for Chalk Texture and Spiderwebs -->
+  <svg width="0" height="0" style="position: absolute; overflow: hidden;" aria-hidden="true">
+    <defs>
+      <filter id="chalk-filter" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="4" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+        <feMerge>
+          <feMergeNode in="displaced" />
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
+
   <div class="app-container">
 
-    <!-- Header (Bauhaus Architectural Bar) -->
+    <!-- Header (Bauhaus Architectural Bar with Occult Motifs) -->
     <header class="main-header">
       <div class="brand">
-        <div class="brand-icon">🧪</div>
+        <div class="brand-icon" title="Grim-More Scribe">
+          <svg class="pencil-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" fill="#3D7D54" stroke="#022015" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="m15 5 4 4" stroke="#022015" stroke-width="1.8"/>
+            <path d="M2 22l3.5-1-2.5-2.5Z" fill="#022015"/>
+          </svg>
+        </div>
         <div>
-          <h1>GRIM-MORE</h1>
+          <div class="brand-title-row">
+            <h1>GRIM-MORE</h1>
+            <svg class="bat-icon" width="46" height="24" viewBox="0 0 64 36" fill="#0B120E" xmlns="http://www.w3.org/2000/svg" aria-label="Bat">
+              <path d="M32 14 C30 8, 25 2, 19 6 C15 9, 13 14, 8 13 C4 12, 1 15, 0 19 C4 18, 9 20, 11 25 C14 22, 18 23, 20 27 C22 23, 26 24, 28 29 C29 23, 31 19, 32 18 C33 19, 35 23, 36 29 C38 24, 42 23, 44 27 C46 23, 50 22, 53 25 C55 20, 60 18, 64 19 C63 15, 60 12, 56 13 C51 14, 49 9, 45 6 C39 2, 34 8, 32 14 Z"/>
+              <polygon points="30,12 28,6 31,10" fill="#0B120E"/>
+              <polygon points="34,12 36,6 33,10" fill="#0B120E"/>
+            </svg>
+          </div>
           <p class="subtitle">Predictive Inventory & Festival Demand Surge Control</p>
         </div>
       </div>
 
-      <nav class="nav-links">
-        <a href="index.html" class="nav-link active">Home</a>
-        <a href="dashboard.html" class="nav-link">Live Pantry</a>
-        <a href="slides.html" class="nav-link">Pitch Deck (5m)</a>
-      </nav>
+      <div class="header-nav-wrap">
+        <nav class="nav-links">
+          <a href="index.html" class="nav-link active">HOME</a>
+          <a href="dashboard.html" class="nav-link">LIVE PANTRY 🐺</a>
+          <a href="slides.html" class="nav-link">PITCH DECK (5M)</a>
+        </nav>
+        <div class="howling-wolf-header" title="Howling Wolf">
+          <svg viewBox="0 0 110 55" width="85" height="42" fill="#4A6256" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 0 55 L 35 44 L 70 42 L 110 55 Z" fill="#2E4035"/>
+            <path d="M 46 43 C 44 38, 45 33, 42 30 C 39 27, 36 24, 34 19 C 32 15, 29 10, 27 6 C 29 5, 32 8, 35 10 C 38 11, 40 13, 42 15 C 46 17, 49 17, 52 20 C 57 23, 61 28, 64 30 C 68 33, 71 35, 76 36 C 79 38, 82 43, 80 47 C 78 50, 74 46, 72 44 C 70 40, 67 42, 65 45 C 62 49, 58 44, 56 42 C 53 40, 49 42, 46 43 Z" fill="#4A6256"/>
+          </svg>
+        </div>
+      </div>
 
       <div class="header-actions">
         <a href="dashboard.html" class="btn btn-primary" title="Launch the live apothecary simulation">
@@ -49,91 +83,244 @@
       <div class="dna-band c5"></div>
     </div>
 
-    <!-- Bauhaus Asymmetric Hero Section (42% Deep Cypress / 58% White) -->
+    <!-- Bauhaus Asymmetric Hero Section (Emerald Ghost Nebula / Spiderweb Parchment) -->
     <section class="hero-bauhaus">
+      <!-- Left Hero: Dark Emerald Nebula with Floating Ghost Apparitions -->
       <div class="hero-left-field">
-        <div class="hero-eyebrow">Track 01 • Inventory Surge Control</div>
+        <!-- Ghost 1 (Top-Left) -->
+        <svg class="ghost ghost-top-left" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="ghostGrad1" cx="40%" cy="35%" r="65%">
+              <stop offset="0%" stop-color="#466052" stop-opacity="0.85"/>
+              <stop offset="60%" stop-color="#22362B" stop-opacity="0.65"/>
+              <stop offset="100%" stop-color="#0E1A14" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <path d="M 20 48 C 20 18, 80 18, 80 48 C 80 75, 85 96, 75 106 C 65 96, 55 110, 45 100 C 35 110, 25 96, 20 106 C 15 90, 20 68, 20 48 Z" fill="url(#ghostGrad1)"/>
+          <ellipse cx="38" cy="42" rx="4.5" ry="6.5" fill="#021811"/>
+          <ellipse cx="58" cy="42" rx="4.5" ry="6.5" fill="#021811"/>
+        </svg>
+
+        <!-- Ghost 2 & 3 (Bottom-Right Foreground & Background) -->
+        <svg class="ghost ghost-bottom-sub" viewBox="0 0 110 135" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="ghostGrad3" cx="40%" cy="35%" r="65%">
+              <stop offset="0%" stop-color="#3D5648" stop-opacity="0.8"/>
+              <stop offset="60%" stop-color="#1E3025" stop-opacity="0.55"/>
+              <stop offset="100%" stop-color="#09140D" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <path d="M 22 45 C 22 18, 82 18, 82 45 C 82 72, 90 98, 80 116 C 70 106, 60 120, 50 110 C 40 120, 30 106, 24 116 C 19 96, 22 68, 22 45 Z" fill="url(#ghostGrad3)"/>
+          <ellipse cx="44" cy="40" rx="4.5" ry="6.5" fill="#021811"/>
+          <ellipse cx="62" cy="40" rx="4.5" ry="6.5" fill="#021811"/>
+        </svg>
+
+        <svg class="ghost ghost-bottom-main" viewBox="0 0 140 170" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="ghostGrad2" cx="35%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="#557062" stop-opacity="0.95"/>
+              <stop offset="45%" stop-color="#30493D" stop-opacity="0.8"/>
+              <stop offset="90%" stop-color="#12231A" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#06120C" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <path d="M 38 52 C 38 20, 102 20, 102 52 C 102 68, 122 74, 132 82 C 124 90, 112 86, 105 90 C 103 116, 112 138, 102 156 C 92 142, 82 160, 70 148 C 60 160, 50 144, 40 156 C 28 138, 35 114, 32 90 C 24 86, 12 90, 4 82 C 14 74, 38 68, 38 52 Z" fill="url(#ghostGrad2)"/>
+          <ellipse cx="62" cy="50" rx="6" ry="8.5" fill="#021811"/>
+          <ellipse cx="84" cy="50" rx="6" ry="8.5" fill="#021811"/>
+          <ellipse cx="73" cy="68" rx="5" ry="8.5" fill="#021811"/>
+        </svg>
+
+        <div class="hero-eyebrow">TRACK 01 • INVENTORY SURGE CONTROL</div>
+        
         <h2 class="hero-h1-poster">
           THE POTION<br>PANTRY<br><span class="accent">SURGE.</span>
         </h2>
-        <div class="hero-tagline-sub">Explainable Mathematical Telemetry • Zero Stockouts</div>
+        
+        <div class="hero-tagline-sub">EXPLAINABLE MATHEMATICAL TELEMETRY • ZERO STOCKOUTS</div>
       </div>
 
+      <!-- Right Hero: Parchment with Spiderwebs in All 4 Corners -->
       <div class="hero-right-field">
-        <div>
+        <!-- Spiderweb Graphics in 4 Corners -->
+        <div class="spiderweb-corner top-left">
+          <svg class="spiderweb-svg" viewBox="0 0 160 160" width="145" height="145" xmlns="http://www.w3.org/2000/svg">
+            <line x1="0" y1="0" x2="160" y2="0" stroke="#111111" stroke-width="1.3"/>
+            <line x1="0" y1="0" x2="156" y2="36" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="144" y2="70" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="124" y2="101" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="98" y2="126" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="68" y2="145" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="33" y2="156" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="0" y2="160" stroke="#111111" stroke-width="1.3"/>
+            <path d="M 22 0 Q 19 2 21 5 Q 18 6 20 10 Q 16 10 17 14 Q 13 13 13 17 Q 10 16 9 20 Q 6 18 5 21 Q 2 19 0 22" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 44 0 Q 38 4 43 10 Q 36 13 40 19 Q 32 20 34 28 Q 26 27 27 35 Q 20 32 19 40 Q 12 36 9 43 Q 4 38 0 44" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 66 0 Q 56 6 64 15 Q 54 19 59 29 Q 48 30 51 42 Q 40 40 41 52 Q 30 48 28 60 Q 18 54 14 65 Q 6 56 0 66" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 88 0 Q 75 9 86 20 Q 71 25 79 39 Q 64 41 68 55 Q 53 54 54 69 Q 40 65 37 80 Q 24 72 18 86 Q 8 75 0 88" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 110 0 Q 94 11 107 25 Q 89 32 99 48 Q 80 51 86 69 Q 66 67 68 87 Q 49 81 46 100 Q 30 90 23 108 Q 10 94 0 110" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 132 0 Q 113 13 129 30 Q 107 38 119 58 Q 96 61 103 83 Q 80 81 81 104 Q 59 97 56 120 Q 36 108 27 129 Q 12 113 0 132" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 155 0 Q 132 15 151 35 Q 126 44 139 68 Q 112 72 120 98 Q 93 95 95 122 Q 70 114 66 140 Q 42 126 32 152 Q 14 133 0 155" fill="none" stroke="#111111" stroke-width="1.1"/>
+          </svg>
+        </div>
+        
+        <div class="spiderweb-corner top-right">
+          <svg class="spiderweb-svg" viewBox="0 0 160 160" width="145" height="145" xmlns="http://www.w3.org/2000/svg">
+            <line x1="0" y1="0" x2="160" y2="0" stroke="#111111" stroke-width="1.3"/>
+            <line x1="0" y1="0" x2="156" y2="36" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="144" y2="70" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="124" y2="101" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="98" y2="126" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="68" y2="145" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="33" y2="156" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="0" y2="160" stroke="#111111" stroke-width="1.3"/>
+            <path d="M 22 0 Q 19 2 21 5 Q 18 6 20 10 Q 16 10 17 14 Q 13 13 13 17 Q 10 16 9 20 Q 6 18 5 21 Q 2 19 0 22" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 44 0 Q 38 4 43 10 Q 36 13 40 19 Q 32 20 34 28 Q 26 27 27 35 Q 20 32 19 40 Q 12 36 9 43 Q 4 38 0 44" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 66 0 Q 56 6 64 15 Q 54 19 59 29 Q 48 30 51 42 Q 40 40 41 52 Q 30 48 28 60 Q 18 54 14 65 Q 6 56 0 66" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 88 0 Q 75 9 86 20 Q 71 25 79 39 Q 64 41 68 55 Q 53 54 54 69 Q 40 65 37 80 Q 24 72 18 86 Q 8 75 0 88" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 110 0 Q 94 11 107 25 Q 89 32 99 48 Q 80 51 86 69 Q 66 67 68 87 Q 49 81 46 100 Q 30 90 23 108 Q 10 94 0 110" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 132 0 Q 113 13 129 30 Q 107 38 119 58 Q 96 61 103 83 Q 80 81 81 104 Q 59 97 56 120 Q 36 108 27 129 Q 12 113 0 132" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 155 0 Q 132 15 151 35 Q 126 44 139 68 Q 112 72 120 98 Q 93 95 95 122 Q 70 114 66 140 Q 42 126 32 152 Q 14 133 0 155" fill="none" stroke="#111111" stroke-width="1.1"/>
+          </svg>
+        </div>
+
+        <div class="spiderweb-corner bottom-left">
+          <svg class="spiderweb-svg" viewBox="0 0 160 160" width="145" height="145" xmlns="http://www.w3.org/2000/svg">
+            <line x1="0" y1="0" x2="160" y2="0" stroke="#111111" stroke-width="1.3"/>
+            <line x1="0" y1="0" x2="156" y2="36" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="144" y2="70" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="124" y2="101" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="98" y2="126" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="68" y2="145" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="33" y2="156" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="0" y2="160" stroke="#111111" stroke-width="1.3"/>
+            <path d="M 22 0 Q 19 2 21 5 Q 18 6 20 10 Q 16 10 17 14 Q 13 13 13 17 Q 10 16 9 20 Q 6 18 5 21 Q 2 19 0 22" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 44 0 Q 38 4 43 10 Q 36 13 40 19 Q 32 20 34 28 Q 26 27 27 35 Q 20 32 19 40 Q 12 36 9 43 Q 4 38 0 44" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 66 0 Q 56 6 64 15 Q 54 19 59 29 Q 48 30 51 42 Q 40 40 41 52 Q 30 48 28 60 Q 18 54 14 65 Q 6 56 0 66" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 88 0 Q 75 9 86 20 Q 71 25 79 39 Q 64 41 68 55 Q 53 54 54 69 Q 40 65 37 80 Q 24 72 18 86 Q 8 75 0 88" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 110 0 Q 94 11 107 25 Q 89 32 99 48 Q 80 51 86 69 Q 66 67 68 87 Q 49 81 46 100 Q 30 90 23 108 Q 10 94 0 110" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 132 0 Q 113 13 129 30 Q 107 38 119 58 Q 96 61 103 83 Q 80 81 81 104 Q 59 97 56 120 Q 36 108 27 129 Q 12 113 0 132" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 155 0 Q 132 15 151 35 Q 126 44 139 68 Q 112 72 120 98 Q 93 95 95 122 Q 70 114 66 140 Q 42 126 32 152 Q 14 133 0 155" fill="none" stroke="#111111" stroke-width="1.1"/>
+          </svg>
+        </div>
+
+        <div class="spiderweb-corner bottom-right">
+          <svg class="spiderweb-svg" viewBox="0 0 160 160" width="145" height="145" xmlns="http://www.w3.org/2000/svg">
+            <line x1="0" y1="0" x2="160" y2="0" stroke="#111111" stroke-width="1.3"/>
+            <line x1="0" y1="0" x2="156" y2="36" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="144" y2="70" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="124" y2="101" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="98" y2="126" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="68" y2="145" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="33" y2="156" stroke="#111111" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="0" y2="160" stroke="#111111" stroke-width="1.3"/>
+            <path d="M 22 0 Q 19 2 21 5 Q 18 6 20 10 Q 16 10 17 14 Q 13 13 13 17 Q 10 16 9 20 Q 6 18 5 21 Q 2 19 0 22" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 44 0 Q 38 4 43 10 Q 36 13 40 19 Q 32 20 34 28 Q 26 27 27 35 Q 20 32 19 40 Q 12 36 9 43 Q 4 38 0 44" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 66 0 Q 56 6 64 15 Q 54 19 59 29 Q 48 30 51 42 Q 40 40 41 52 Q 30 48 28 60 Q 18 54 14 65 Q 6 56 0 66" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 88 0 Q 75 9 86 20 Q 71 25 79 39 Q 64 41 68 55 Q 53 54 54 69 Q 40 65 37 80 Q 24 72 18 86 Q 8 75 0 88" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 110 0 Q 94 11 107 25 Q 89 32 99 48 Q 80 51 86 69 Q 66 67 68 87 Q 49 81 46 100 Q 30 90 23 108 Q 10 94 0 110" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 132 0 Q 113 13 129 30 Q 107 38 119 58 Q 96 61 103 83 Q 80 81 81 104 Q 59 97 56 120 Q 36 108 27 129 Q 12 113 0 132" fill="none" stroke="#111111" stroke-width="1.1"/>
+            <path d="M 155 0 Q 132 15 151 35 Q 126 44 139 68 Q 112 72 120 98 Q 93 95 95 122 Q 70 114 66 140 Q 42 126 32 152 Q 14 133 0 155" fill="none" stroke="#111111" stroke-width="1.1"/>
+          </svg>
+        </div>
+
+        <div class="hero-right-content">
           <p class="hero-desc-lead">
-            Running an apothecary is predictable until the kingdom declares the <strong>Full Moon Festival</strong>.
+            <strong>Running an apothecary is predictable until the kingdom declares the Full Moon Festival.</strong>
             Demand instantly triples overnight, supplier delivery takes <strong>2.0 days</strong>, and inventory depletes in <strong>1.3 days</strong>.
           </p>
-          <p class="hero-desc-sub" style="margin-top: 0.85rem;">
+          <p class="hero-desc-sub">
             Grim-More calculates statistical safety stocks, predicts depletion crash curves, and recommends exact purchase orders before supply runs dry.
           </p>
-        </div>
 
-        <div class="hero-cta-bar">
-          <a href="dashboard.html" class="btn btn-primary">
-            [OPEN LIVE PANTRY DASHBOARD →]
-          </a>
-          <a href="slides.html" class="btn btn-secondary">
-            [VIEW 5-MINUTE PITCH DECK]
-          </a>
-        </div>
+          <div class="hero-cta-bar">
+            <a href="dashboard.html" class="btn btn-primary">
+              [OPEN LIVE PANTRY DASHBOARD →]
+            </a>
+            <a href="slides.html" class="btn btn-secondary">
+              [VIEW 5-MINUTE PITCH DECK]
+            </a>
+          </div>
 
-        <div class="hero-stats-row">
-          <div class="hero-stat-cell">
-            <div class="hero-stat-num accent-ochre">1.3d</div>
-            <div class="hero-stat-lbl">Stockout Collision</div>
-          </div>
-          <div class="hero-stat-cell">
-            <div class="hero-stat-num">2.0d</div>
-            <div class="hero-stat-lbl">Supplier Lead Time</div>
-          </div>
-          <div class="hero-stat-cell">
-            <div class="hero-stat-num accent-green">95%</div>
-            <div class="hero-stat-lbl">Service Level Math</div>
+          <hr class="hero-divider-rule">
+
+          <div class="hero-stats-row">
+            <div class="hero-stat-cell">
+              <div class="hero-stat-num accent-ochre">1.3d</div>
+              <div class="hero-stat-lbl">STOCKOUT COLLISION</div>
+            </div>
+            <div class="hero-stat-cell">
+              <div class="hero-stat-num">2.0d</div>
+              <div class="hero-stat-lbl">SUPPLIER LEAD TIME</div>
+            </div>
+            <div class="hero-stat-cell">
+              <div class="hero-stat-num accent-green">
+                <span class="stat-smudge-spot"></span>
+                <span class="stat-val">95%</span>
+              </div>
+              <div class="hero-stat-lbl">SERVICE LEVEL MATH</div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Bauhaus Asymmetric Feature Grid (2fr / 1fr / 1fr) -->
+    <!-- Bauhaus Asymmetric Feature Grid (Telemetry / Fire Deficit / Safety Stock) -->
     <section class="feature-grid-bauhaus">
+      <!-- Card 1: 2fr White Parchment with Corner Spiderweb -->
       <div class="b-cell b-cell-white">
+        <div class="spiderweb-corner top-right watermark-web">
+          <svg class="spiderweb-svg" viewBox="0 0 160 160" width="110" height="110" xmlns="http://www.w3.org/2000/svg">
+            <line x1="0" y1="0" x2="160" y2="0" stroke="#222" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="144" y2="70" stroke="#222" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="98" y2="126" stroke="#222" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="0" y2="160" stroke="#222" stroke-width="1.2"/>
+            <path d="M 30 0 Q 25 15 0 30" fill="none" stroke="#222" stroke-width="1"/>
+            <path d="M 60 0 Q 50 30 0 60" fill="none" stroke="#222" stroke-width="1"/>
+            <path d="M 90 0 Q 75 45 0 90" fill="none" stroke="#222" stroke-width="1"/>
+            <path d="M 120 0 Q 100 60 0 120" fill="none" stroke="#222" stroke-width="1"/>
+            <path d="M 150 0 Q 125 75 0 150" fill="none" stroke="#222" stroke-width="1"/>
+          </svg>
+        </div>
         <div>
-          <div class="b-cell-eyebrow">The 3-Second Perception</div>
+          <div class="b-cell-eyebrow">THE 3 SECOND PERCEPTION</div>
           <h3 class="b-cell-title">Real-Time Trajectory Telemetry</h3>
           <p class="b-cell-body">
             Detect demand shocks within 3 seconds of viewing the viewport. Solid curves track 30 days of sales history, while dashed vectors simulate the stockout crash curve vs. the protected replenishment curve.
           </p>
         </div>
-        <div style="margin-top: 1.5rem;">
-          <a href="dashboard.html" class="btn btn-secondary" style="font-size: 0.78rem;">[Inspect Curves →]</a>
-        </div>
       </div>
 
-      <div class="b-cell b-cell-ochre">
-        <div>
-          <div class="b-cell-eyebrow">Collision Warning</div>
-          <h3 class="b-cell-title" style="color: #FFFFFF;">Critical Deficit</h3>
-          <p class="b-cell-body">
+      <!-- Card 2: 1fr Radiant Fiery Gradient with Critical Deficit Flame -->
+      <div class="b-cell b-cell-fire">
+        <div class="fire-glow-bg"></div>
+        <div style="position: relative; z-index: 2;">
+          <div class="b-cell-eyebrow eyebrow-gold">COLLISION WARNING</div>
+          <h3 class="b-cell-title title-flame">Critical Deficit 🔥</h3>
+          <p class="b-cell-body body-fire">
             Supplier lead time exceeds remaining days of cover. Immediate emergency replenishment triggered for all festival ingredients.
           </p>
         </div>
-        <div style="margin-top: 1.5rem; font-family: var(--font-mono); font-size: 1.1rem; font-weight: 800;">
-          +1,170 UNITS
-        </div>
       </div>
 
+      <!-- Card 3: 1fr Warm Buff Parchment with Corner Spiderweb -->
       <div class="b-cell b-cell-buff">
+        <div class="spiderweb-corner top-right watermark-web">
+          <svg class="spiderweb-svg" viewBox="0 0 160 160" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+            <line x1="0" y1="0" x2="160" y2="0" stroke="#222" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="144" y2="70" stroke="#222" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="98" y2="126" stroke="#222" stroke-width="1.2"/>
+            <line x1="0" y1="0" x2="0" y2="160" stroke="#222" stroke-width="1.2"/>
+            <path d="M 30 0 Q 25 15 0 30" fill="none" stroke="#222" stroke-width="1"/>
+            <path d="M 60 0 Q 50 30 0 60" fill="none" stroke="#222" stroke-width="1"/>
+            <path d="M 90 0 Q 75 45 0 90" fill="none" stroke="#222" stroke-width="1"/>
+            <path d="M 120 0 Q 100 60 0 120" fill="none" stroke="#222" stroke-width="1"/>
+          </svg>
+        </div>
         <div>
-          <div class="b-cell-eyebrow">Explainable Math</div>
+          <div class="b-cell-eyebrow">EXPLAINABLE MATH</div>
           <h3 class="b-cell-title">Safety Stock Formula</h3>
           <p class="b-cell-body">
             No black-box guesses. Z-score standard deviation buffers protect against supplier variance with minimal working capital tied up.
           </p>
-        </div>
-        <div style="margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.88rem; font-weight: 700;">
-          Z = 1.65 (95% SL)
         </div>
       </div>
     </section>
@@ -149,7 +336,7 @@
           <div class="manifesto-num">01 / DETECTION</div>
           <h4 class="manifesto-title">Spike Signal Analysis</h4>
           <p class="manifesto-desc">
-            Monitors rolling 2-day demand vs. 14-day standard deviation thresholds ($z > 3.0$) to flag sudden volume spikes before manual audit.
+            Monitors rolling 2-day demand vs. 14-day standard deviation thresholds (z &gt; 3.0) to flag sudden volume spikes before manual audit.
           </p>
         </div>
 
@@ -172,13 +359,13 @@
     </section>
 
     <!-- Interactive Launch Card -->
-    <section class="card" style="border: 4px solid var(--c-cypress); margin-bottom: 2.5rem; background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; padding: 2rem 2.5rem;">
+    <section class="card launch-banner-card">
       <div>
-        <h3 style="font-family: var(--font-primary-display); font-size: 1.5rem; font-weight: 900; color: var(--c-cypress); text-transform: uppercase;">
+        <h3 class="launch-banner-title">
           Ready to inspect the live apothecary?
         </h3>
-        <p style="color: var(--c-muted); margin-top: 0.35rem; font-size: 0.95rem;">
-          Test both the surprise surge path and the 7-day advance festival announcement path with live Chart.js simulation.
+        <p class="launch-banner-sub">
+          Test both the surprise surge path and the 7-day advance festival announcement path with live telemetry simulation.
         </p>
       </div>
       <div>
