@@ -50,3 +50,4 @@ echo "Press [Ctrl+C] to stop all services."
 
 # Keep script running
 wait
+
