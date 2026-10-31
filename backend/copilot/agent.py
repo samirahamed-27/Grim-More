@@ -261,13 +261,21 @@ async def run_copilot_chat(
         raise HTTPException(status_code=422, detail="Too many messages. Maximum allowed conversation history is 12 messages.")
 
     max_chars = get_env_int("COPILOT_MAX_INPUT_CHARS", 500)
+    sanitized_messages = []
     for idx, msg in enumerate(messages):
+        role = msg.get("role", "user")
         content = msg.get("content", "")
-        if len(content) > max_chars:
+        # Only reject if a user input message exceeds max_chars; for assistant responses in history, auto-cap to max_chars
+        if role == "user" and len(content) > max_chars:
             raise HTTPException(
                 status_code=422,
                 detail=f"Message at index {idx} exceeds maximum length of {max_chars} characters.",
             )
+        sanitized_messages.append({
+            "role": role,
+            "content": content[:max_chars],
+        })
+    messages = sanitized_messages
 
     last_user_msg = next((m["content"] for m in reversed(messages) if m.get("role") == "user"), "")
     if not last_user_msg:

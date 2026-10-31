@@ -324,6 +324,21 @@ def test_input_validation_and_rate_limiting():
     assert "Rate limit exceeded" in r_limit.json()["error"]
 
 
+def test_multi_turn_history_with_long_assistant_reply_auto_caps_and_succeeds():
+    """Previous assistant responses longer than 500 chars are auto-capped and never trigger 422."""
+    long_assistant_reply = "A" * 900
+    res = client.post("/api/copilot/chat", json={
+        "messages": [
+            {"role": "user", "content": "Which ingredients will run out before Friday?"},
+            {"role": "assistant", "content": long_assistant_reply},
+            {"role": "user", "content": "Is there a festival coming up and when should I order?"},
+        ]
+    })
+    assert res.status_code == 200
+    assert "Full Moon" in res.json()["reply"]
+
+
+
 
 def test_missing_key_and_error_fallback_to_offline_mode():
     """Missing key or runtime error falls back to offline mode with HTTP 200."""

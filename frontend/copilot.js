@@ -321,10 +321,16 @@
     if (input) input.disabled = true;
 
     try {
+      // Strictly enforce max 500 characters per message in outgoing payload
+      const payloadMessages = conversationHistory.map((m) => ({
+        role: m.role,
+        content: m.content && m.content.length > 500 ? m.content.slice(0, 500) : m.content,
+      }));
+
       const res = await fetch(`${API_ROOT}/api/copilot/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: conversationHistory }),
+        body: JSON.stringify({ messages: payloadMessages }),
       });
 
       const typingEl = document.getElementById("copilotTyping");
@@ -339,15 +345,19 @@
           badge.textContent = copilotMode === "llm" ? "● AI mode" : "● Offline mode";
         }
 
-        // Append assistant reply
+        // Append assistant reply to UI (full reply shown to user)
         appendMessage("assistant", data.reply, data.sources);
-        conversationHistory.push({ role: "assistant", content: data.reply });
+
+        // Cap stored history reply to 500 chars to respect conversational context limit
+        const cappedReply = data.reply && data.reply.length > 500 ? data.reply.slice(0, 500) : (data.reply || "");
+        conversationHistory.push({ role: "assistant", content: cappedReply });
 
         // If mutating action proposed, show confirmation card
         if (data.pending_action) {
           appendActionCard(data.pending_action);
         }
       } else {
+
         const errData = await res.json().catch(() => ({}));
         appendMessage("assistant", `I encountered an issue: ${errData.error || "Unable to reach potion intelligence."}`);
       }
@@ -371,3 +381,4 @@
     buildCopilotUI();
   }
 })();
+
