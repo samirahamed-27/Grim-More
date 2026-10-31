@@ -63,3 +63,4 @@ python3 -m http.server 3000 --directory frontend
 ## Specifications & Contracts
 - [API & Schema Contract](docs/contract.md)
 - [Product & Ingredients Roster](docs/ingredients.md)
+

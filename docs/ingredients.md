@@ -18,3 +18,4 @@ This document defines the 6 shop ingredients, their baseline parameters, supplie
 ## Notes for the Team
 - **Spike Items (IDs 1, 2, 3)**: Experience an announced or surprise 3x surge during the Full Moon Festival.
 - **Lead Times vary from 1 to 4 days**: This creates realistic supply-chain pressure. For example, Moonflower stock lasts only 1.33 days under festival demand, but delivery takes 2 days, causing an immediate **CRITICAL** warning unless ordered in advance!
+
