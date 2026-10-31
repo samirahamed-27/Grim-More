@@ -139,6 +139,64 @@ This contract defines the shared database schema, API specification, and Python 
 ]
 ```
 
+#### `GET /api/alerts`
+- **Description**: Active actionable alerts for ingredients in `critical` or `watch` status, ranked by urgency. Returns empty array `[]` when all ingredients are healthy.
+- **Returns**: Array of alerts:
+```json
+[
+  {
+    "ingredient_id": 1,
+    "name": "Moonflower",
+    "status": "critical",
+    "priority": "high",
+    "days_of_cover": 2.0,
+    "lead_time_days": 2,
+    "order_qty": 6587,
+    "alert_type": "spike",
+    "message": "⚠️ UNANNOUNCED SPIKE DETECTED: Moonflower sales tripled recently. Stock will run out in 2.0 days. Supplier delivery takes 2 days. Order 6,587 units now to avoid a complete stockout."
+  }
+]
+```
+
+#### `GET /api/simulate/{id}`
+- **Description**: 14-day forward simulation comparing day-by-day inventory trajectories across 3 strategic scenarios:
+  1. `do_nothing`: No purchase orders placed; inventory depletes to 0 on stockout day.
+  2. `order_now`: Purchase order placed today; delivery arrives on day `lead_time`. If cover is less than lead time, reveals the temporary stockout gap.
+  3. `ordered_ahead`: Proactive purchase order placed in advance for an announced festival, completely avoiding stockouts.
+- **Evaluation Order**: Each day evaluates: Starting Morning Stock -> Demand Subtracted -> Delivery Added -> Evening Stock.
+- **Returns**:
+```json
+{
+  "ingredient_id": 1,
+  "name": "Moonflower",
+  "current_stock": 3984,
+  "lead_time_days": 2,
+  "daily_evaluation_order": "1. Morning Stock -> 2. Daily Demand Subtracted -> 3. Delivery Received -> 4. Evening Stock",
+  "scenarios": {
+    "do_nothing": {
+      "stockout_day": 2,
+      "units_short": 23876,
+      "timeline": [{"day": 1, "date": "2024-01-02", "demand": 1993, "delivery": 0, "end_stock": 1991, "stockout": false}, ...]
+    },
+    "order_now": {
+      "order_qty": 6587,
+      "arrival_day": 2,
+      "stockout_day": 2,
+      "units_short": 2,
+      "timeline": [{"day": 1, "date": "2024-01-02", "demand": 1993, "delivery": 0, "end_stock": 1991, "stockout": false}, ...]
+    },
+    "ordered_ahead": {
+      "order_qty": 6587,
+      "arrival_day": 1,
+      "stockout_day": null,
+      "units_short": 0,
+      "timeline": [{"day": 1, "date": "2024-01-02", "demand": 1993, "delivery": 6587, "end_stock": 8578, "stockout": false}, ...]
+    }
+  },
+  "summary": "Without reordering, Moonflower runs out on day 2. Ordering now still leaves a brief 2 unit shortage because lead time (2d) equals cover. Ordering ahead completely prevents stockout."
+}
+```
+
 #### `POST /api/reset`
 - **Description**: Restores clean baseline data and deletes simulated spikes and test events.
 - **Returns**:

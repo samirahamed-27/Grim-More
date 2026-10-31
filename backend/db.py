@@ -291,6 +291,32 @@ def record_reorder(
         conn.close()
 
 
+def get_latest_reorder(
+    ingredient_id: int, db_path: Optional[Union[str, Path]] = None
+) -> Optional[Dict[str, Any]]:
+    """
+    Fetches the most recent reorder recommendation recorded for an ingredient.
+    Used for audit deduplication to prevent redundant database writes.
+    """
+    conn = get_connection(db_path)
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT id, ingredient_id, order_qty, priority, created_at
+            FROM reorders
+            WHERE ingredient_id = ?
+            ORDER BY id DESC
+            LIMIT 1;
+            """,
+            (ingredient_id,),
+        )
+        row = cursor.fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
+
+
 def get_reorders(db_path: Optional[Union[str, Path]] = None) -> List[Dict[str, Any]]:
     """
     Retrieves stored reorder recommendations sorted with highest urgency first.

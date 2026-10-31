@@ -120,13 +120,13 @@ def test_post_event_raises_forecast_multiplier():
     base_moonflower = next(i for i in client.get("/api/ingredients").json() if i["id"] == 1)
     base_forecast = base_moonflower["daily_forecast"]
 
-    # Announce festival with 3.0x multiplier on Moonflower (ID 1)
+    # Announce festival starting today with 3.0x multiplier on Moonflower (ID 1)
     event_payload = {
         "name": "Full Moon Festival",
         "ingredient_ids": [1],
         "multiplier": 3.0,
-        "start_date": "2026-11-08",
-        "end_date": "2026-11-14",
+        "start_date": "2024-01-02",
+        "end_date": "2024-01-14",
     }
     event_resp = client.post("/api/event", json=event_payload)
     assert event_resp.status_code == 200
