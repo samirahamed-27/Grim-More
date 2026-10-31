@@ -8,7 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Grim-More — Potion Pantry Surge Intelligence</title>
-  <link rel="stylesheet" href="style.css?v=20261101_sky">
+  <link rel="stylesheet" href="style.css?v=20261101_singleline_sky">
   <!-- Google Fonts: Jost, Marcellus, Syne, Inter, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -441,6 +441,8 @@
 
         if (overlay) {
           overlay.className = goingNight ? 'wipe-to-dark' : 'wipe-to-light';
+
+          // Fluid left-to-right wave: blend the base canvas midway through the sweep
           setTimeout(() => {
             if (goingNight) {
               document.body.classList.remove('day-sky-theme');
@@ -449,11 +451,17 @@
               document.body.classList.add('day-sky-theme');
               localStorage.setItem('grim_more_sky_theme', 'day');
             }
-          }, 220);
+          }, 400);
 
+          // Gently dissolve the trailing overlay
+          setTimeout(() => {
+            overlay.classList.add('fade-out');
+          }, 950);
+
+          // Clear classes once fade concludes
           setTimeout(() => {
             overlay.className = '';
-          }, 700);
+          }, 1500);
         } else {
           if (goingNight) {
             document.body.classList.remove('day-sky-theme');

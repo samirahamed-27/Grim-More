@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Grim-More — Pitch Deck (5-Minute Hackathon Demo)</title>
-  <link rel="stylesheet" href="style.css?v=20261101_sky">
+  <link rel="stylesheet" href="style.css?v=20261101_singleline_sky">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Google Fonts: Jost, Marcellus, Syne, Inter, JetBrains Mono -->
@@ -32,18 +32,21 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.85rem 2rem;
+      padding: 0.65rem 1.5rem;
       border-bottom: 3px solid #022015;
       background: #FFFFFF;
       box-shadow: 0 3px 0px #022015;
       z-index: 100;
       position: relative;
+      flex-wrap: nowrap; /* Single line along the title */
+      gap: 0.75rem;
     }
 
     .deck-brand {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
+      flex-shrink: 0;
     }
 
     .deck-brand-icon {
@@ -292,15 +295,17 @@
     .nav-controls {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 0.55rem;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
     }
 
     .nav-btn {
       background: #FFFFFF;
       border: 2px solid #022015;
       color: #022015;
-      font-size: 0.88rem;
-      padding: 0.45rem 1rem;
+      font-size: 0.78rem;
+      padding: 0.4rem 0.8rem;
       border-radius: 0px;
       cursor: pointer;
       font-family: var(--font-rave);
@@ -313,6 +318,8 @@
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .nav-btn:hover {
@@ -766,6 +773,8 @@
 
         if (overlay) {
           overlay.className = goingNight ? "wipe-to-dark" : "wipe-to-light";
+
+          // Fluid left-to-right wave: blend the base canvas midway through the sweep
           setTimeout(() => {
             if (goingNight) {
               document.body.classList.remove("day-sky-theme");
@@ -774,11 +783,17 @@
               document.body.classList.add("day-sky-theme");
               localStorage.setItem("grim_more_sky_theme", "day");
             }
-          }, 220);
+          }, 400);
 
+          // Gently dissolve the trailing overlay
+          setTimeout(() => {
+            overlay.classList.add("fade-out");
+          }, 950);
+
+          // Clear classes once fade concludes
           setTimeout(() => {
             overlay.className = "";
-          }, 700);
+          }, 1500);
         } else {
           if (goingNight) {
             document.body.classList.remove("day-sky-theme");

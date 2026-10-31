@@ -75,6 +75,7 @@
 }
 
 body {
+  position: relative;
   background-color: #021811;
   color: var(--text-main);
   font-family: var(--font-sans);
@@ -84,11 +85,14 @@ body {
   /* Dark forest obsidian canvas */
   background-image: 
     radial-gradient(ellipse at 50% 20%, #03271a 0%, #021811 60%, #010f0a 100%);
+  transition: background-color 1.25s cubic-bezier(0.16, 1, 0.3, 1), background-image 1.25s ease;
 }
 
 .app-container {
   max-width: 1400px;
   margin: 0 auto;
+  position: relative;
+  z-index: 2; /* Content sits cleanly in front of smooth background transition overlay */
 }
 
 /* ================= HEADER (BAUHAUS ARCHITECTURAL BAR) ================= */
@@ -96,92 +100,102 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.75rem;
+  padding: 0.6rem 1.25rem;
   border: 3px solid var(--c-cypress);
   border-bottom: 3px solid var(--c-cypress);
   margin-bottom: 0;
-  flex-wrap: wrap;
-  gap: 1rem;
+  flex-wrap: nowrap; /* Single line along the title */
+  gap: 0.75rem;
   background: #FFFFFF;
   box-shadow: var(--shadow-flat);
   position: relative;
+  z-index: 10;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 1.1rem;
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .brand-icon {
   background: var(--c-buff);
   border: 2px solid var(--c-cypress);
-  padding: 0.35rem 0.5rem;
+  padding: 0.25rem 0.35rem;
   box-shadow: 2px 2px 0px var(--c-cypress);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
 }
 
 .brand-title-row {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.35rem;
 }
 
 .main-header h1 {
   font-family: var(--font-primary-display);
-  font-size: 2.3rem;
+  font-size: 1.65rem;
   font-weight: 900;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--c-cypress);
   line-height: 1;
+  white-space: nowrap;
 }
 
 .bat-icon {
-  margin-left: 0.2rem;
+  margin-left: 0.15rem;
   display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .subtitle {
   font-family: var(--font-secondary-display);
   font-style: normal;
   color: var(--c-muted);
-  font-size: 0.95rem;
+  font-size: 0.76rem;
   font-weight: 500;
-  letter-spacing: 0.5px;
-  margin-top: 0.25rem;
+  letter-spacing: 0.3px;
+  margin-top: 0.15rem;
+  white-space: nowrap;
 }
 
 /* Navigation Links & Howling Wolf */
 .header-nav-wrap {
   display: flex;
-  align-items: flex-end;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.35rem;
   position: relative;
+  flex-shrink: 0;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.15rem;
   list-style: none;
 }
 
 .nav-link {
   font-family: var(--font-rave);
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 800;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
   color: var(--c-muted);
   text-decoration: none;
-  padding: 0.45rem 1rem;
-  border-bottom: 3px solid transparent;
+  padding: 0.35rem 0.6rem;
+  border-bottom: 2px solid transparent;
   transition: color 0.12s, border-color 0.12s;
+  white-space: nowrap;
 }
 
 .nav-link:hover {
@@ -195,31 +209,48 @@ body {
 
 .howling-wolf-header {
   display: flex;
-  align-items: flex-end;
-  margin-left: 0.25rem;
-  margin-bottom: -1rem;
+  align-items: center;
+  margin-left: 0.2rem;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.howling-wolf-header svg {
+  width: 58px;
+  height: 28px;
+  display: block;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex-wrap: nowrap; /* Single line along the title */
+  flex-shrink: 0;
+}
+
+.header-actions .btn {
+  font-size: 0.74rem;
+  padding: 0.42rem 0.72rem;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .data-mode-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.85rem;
+  gap: 0.45rem;
+  padding: 0.35rem 0.65rem;
   background: var(--c-linen);
   border: 2px solid var(--c-cypress);
   font-family: var(--font-rave);
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 800;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
   color: var(--c-cypress);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .status-dot {
@@ -1805,27 +1836,46 @@ body {
   transform: translateY(-50%);
 }
 
-/* Full-Screen Smooth Right-To-Left Sweep Transition Overlay */
+/* Smooth Left-To-Right Fading Background Transition (Behind All Elements) */
 #modeTransitionOverlay {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 99999;
+  z-index: 1; /* Strictly behind all UI elements (.app-container is z-index: 2) */
   opacity: 0;
-  transform: translateX(100%);
-  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s ease;
+  transform: translateX(-100%);
+  transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s ease;
 }
 
 #modeTransitionOverlay.wipe-to-dark {
-  background: linear-gradient(to left, #021811 0%, rgba(2, 24, 17, 0.85) 60%, transparent 100%);
+  background: linear-gradient(
+    to right,
+    #021811 0%,
+    rgba(2, 24, 17, 0.95) 45%,
+    rgba(3, 39, 26, 0.85) 75%,
+    rgba(2, 24, 17, 0.35) 92%,
+    transparent 100%
+  );
   opacity: 1;
   transform: translateX(0%);
 }
 
 #modeTransitionOverlay.wipe-to-light {
-  background: linear-gradient(to left, #F8EBDD 0%, rgba(248, 235, 221, 0.85) 60%, transparent 100%);
+  background: linear-gradient(
+    to right,
+    #F8EBDD 0%,
+    rgba(248, 235, 221, 0.95) 45%,
+    rgba(232, 244, 253, 0.85) 75%,
+    rgba(248, 235, 221, 0.35) 92%,
+    transparent 100%
+  );
   opacity: 1;
   transform: translateX(0%);
+}
+
+#modeTransitionOverlay.fade-out {
+  opacity: 0;
+  transition: opacity 0.65s ease;
 }
 
 /* Day Mode Styling for Webpage when toggle is unchecked */

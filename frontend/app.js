@@ -151,6 +151,8 @@ function initSkyThemeToggle() {
 
     if (overlay) {
       overlay.className = goingNight ? "wipe-to-dark" : "wipe-to-light";
+
+      // Fluid left-to-right wave: blend the base canvas midway through the sweep
       setTimeout(() => {
         if (goingNight) {
           document.body.classList.remove("day-sky-theme");
@@ -159,11 +161,17 @@ function initSkyThemeToggle() {
           document.body.classList.add("day-sky-theme");
           localStorage.setItem("grim_more_sky_theme", "day");
         }
-      }, 220);
+      }, 400);
 
+      // Gently dissolve the trailing overlay
+      setTimeout(() => {
+        overlay.classList.add("fade-out");
+      }, 950);
+
+      // Clear classes once fade concludes
       setTimeout(() => {
         overlay.className = "";
-      }, 700);
+      }, 1500);
     } else {
       if (goingNight) {
         document.body.classList.remove("day-sky-theme");
