@@ -89,6 +89,17 @@ def init_db(db_path: Optional[Union[str, Path]] = None) -> None:
             );
         """)
 
+        # 5. purchases table (restock transactions)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS purchases (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ingredient_id INTEGER NOT NULL,
+                quantity INTEGER NOT NULL,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (ingredient_id) REFERENCES ingredients (id) ON DELETE CASCADE
+            );
+        """)
+
         # -------------------------------------------------------------------
         # Seeding ingredients skeleton (first, so sales FKs are satisfied)
         # -------------------------------------------------------------------
@@ -365,6 +376,7 @@ def reset_state(db_path: Optional[Union[str, Path]] = None) -> None:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM events;")
         cursor.execute("DELETE FROM reorders;")
+        cursor.execute("DELETE FROM purchases;")
 
         # Restore baseline green stock for each ingredient
         if INGREDIENTS_CSV.exists():
@@ -396,6 +408,36 @@ def reset_state(db_path: Optional[Union[str, Path]] = None) -> None:
                     (green_stock, ing_id),
                 )
     conn.close()
+
+
+def search_ingredients(
+    query: str, limit: int = 10, db_path: Optional[Union[str, Path]] = None
+) -> List[Dict[str, Any]]:
+    """Search ingredients by case-insensitive partial name with escaped wildcards."""
+    escaped = query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    conn = get_connection(db_path)
+    with conn:
+        cursor = conn.cursor()
+        sql = "SELECT id, name, current_stock FROM ingredients WHERE name LIKE ? ESCAPE '\\' ORDER BY name ASC LIMIT ?;"
+        cursor.execute(sql, (f"%{escaped}%", limit))
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def record_purchase(
+    ingredient_id: int, quantity: int, db_path: Optional[Union[str, Path]] = None
+) -> Optional[Dict[str, Any]]:
+    """Insert purchase record and increment stock in one atomic transaction."""
+    now_utc = datetime.now(timezone.utc).isoformat()
+    conn = get_connection(db_path)
+    with conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, name, current_stock FROM ingredients WHERE id = ?;", (ingredient_id,))
+        if not cursor.fetchone():
+            return None
+        cursor.execute("INSERT INTO purchases (ingredient_id, quantity, created_at) VALUES (?, ?, ?);", (ingredient_id, quantity, now_utc))
+        cursor.execute("UPDATE ingredients SET current_stock = current_stock + ? WHERE id = ?;", (quantity, ingredient_id))
+        cursor.execute("SELECT id, name, current_stock FROM ingredients WHERE id = ?;", (ingredient_id,))
+        return dict(cursor.fetchone())
 
 
 if __name__ == "__main__":

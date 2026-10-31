@@ -10,8 +10,10 @@ import math
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from backend.db import (
@@ -29,6 +31,7 @@ from backend.db import (
 from backend.forecasting import forecast_demand
 from backend.spike import detect_spike
 from backend.reorder import calculate_reorder
+from backend.routes.restock import router as restock_router
 
 
 @asynccontextmanager
@@ -46,16 +49,39 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Enable CORS so frontend (Person C) can connect from anywhere (localhost:3000, 127.0.0.1, or file://)
+# Restrict CORS to trusted frontend origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    """Format HTTP exceptions into standard error envelope."""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error": str(exc.detail)},
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    """Format input validation errors into standard error envelope."""
+    first_err = exc.errors()[0]
+    field = first_err.get("loc", ["parameter"])[-1]
+    msg = first_err.get("msg", "Invalid value")
+    return JSONResponse(
+        status_code=422,
+        content={"error": f"{field}: {msg}"},
+    )
+
+
+# Register modular routers
+app.include_router(restock_router)
 # ---------------------------------------------------------------------------
 # Pydantic Request Models
 # ---------------------------------------------------------------------------

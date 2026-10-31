@@ -129,6 +129,7 @@ function setupEventListeners() {
   if (elBtnTriggerSpike) elBtnTriggerSpike.addEventListener("click", handleTriggerFestival);
   if (elBtnAnnounceEvent) elBtnAnnounceEvent.addEventListener("click", handleAnnounceEvent);
   if (elBtnReset) elBtnReset.addEventListener("click", handleReset);
+  initRestockPanel();
 }
 
 // Check if FastAPI backend is reachable
@@ -668,4 +669,139 @@ async function handleReset() {
   }
 
   await renderApp();
+}
+
+// ==============================================================================
+// RESTOCK PANEL CONTROLLER (STAGE 2)
+// ==============================================================================
+
+let restockDebounceTimer = null;
+let selectedRestockIngredient = null;
+
+// Connect restock input and button event listeners
+function initRestockPanel() {
+  const input = document.getElementById("restockSearchInput");
+  const btn = document.getElementById("btnConfirmRestock");
+  if (input) input.addEventListener("input", handleRestockSearchInput);
+  if (btn) btn.addEventListener("click", handleConfirmRestock);
+  document.addEventListener("click", (e) => {
+    const box = document.getElementById("restockSearchResults");
+    if (box && !e.target.closest(".restock-group")) box.classList.add("hidden");
+  });
+}
+
+// Debounce search input keystrokes for 300ms before calling API
+function handleRestockSearchInput(event) {
+  clearTimeout(restockDebounceTimer);
+  const query = event.target.value.trim();
+  const dropdown = document.getElementById("restockSearchResults");
+  if (!query) {
+    if (dropdown) dropdown.classList.add("hidden");
+    return;
+  }
+  restockDebounceTimer = setTimeout(() => {
+    executeRestockSearch(query);
+  }, 300);
+}
+
+// Query search API and populate results dropdown using textContent
+async function executeRestockSearch(query) {
+  const dropdown = document.getElementById("restockSearchResults");
+  if (!dropdown) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/ingredients/search?q=${encodeURIComponent(query)}`);
+    const results = res.ok ? await res.json() : [];
+    renderSearchResults(results);
+  } catch (err) {
+    renderSearchResults([]);
+  }
+}
+
+// Populate search dropdown using pure textContent
+function renderSearchResults(results) {
+  const dropdown = document.getElementById("restockSearchResults");
+  if (!dropdown) return;
+  dropdown.replaceChildren(); // Safe DOM clear
+  dropdown.classList.remove("hidden");
+  if (!results.length) {
+    const empty = document.createElement("div");
+    empty.className = "search-result-empty";
+    empty.textContent = "No matching ingredients found.";
+    dropdown.appendChild(empty);
+    return;
+  }
+  results.forEach((item) => {
+    const row = document.createElement("div");
+    row.className = "search-result-item";
+    row.textContent = `${item.name} (Stock: ${item.current_stock})`;
+    row.addEventListener("click", () => selectRestockIngredient(item));
+    dropdown.appendChild(row);
+  });
+}
+
+// Select ingredient from dropdown and display preview with textContent
+function selectRestockIngredient(item) {
+  selectedRestockIngredient = item;
+  const input = document.getElementById("restockSearchInput");
+  const preview = document.getElementById("restockSelectedPreview");
+  const dropdown = document.getElementById("restockSearchResults");
+  if (input) input.value = item.name;
+  if (dropdown) dropdown.classList.add("hidden");
+  if (preview) {
+    preview.textContent = `Selected: ${item.name} (Current Stock: ${item.current_stock} units)`;
+  }
+}
+
+// Render user feedback banner using textContent
+function setRestockStatus(message, isError) {
+  const banner = document.getElementById("restockStatusMessage");
+  if (!banner) return;
+  banner.textContent = message; // Never innerHTML
+  banner.className = `restock-status-banner ${isError ? "error" : "success"}`;
+  banner.classList.remove("hidden");
+}
+
+// Validate quantity, post purchase, and refresh ingredient cards
+async function handleConfirmRestock() {
+  if (!selectedRestockIngredient) {
+    setRestockStatus("Please search and select an ingredient first.", true);
+    return;
+  }
+  const qtyInput = document.getElementById("restockQuantityInput");
+  const quantity = parseInt(qtyInput ? qtyInput.value : "0", 10);
+  if (!quantity || quantity < 1) {
+    setRestockStatus("Quantity must be an integer of at least 1.", true);
+    return;
+  }
+  await submitPurchase(selectedRestockIngredient.id, quantity);
+}
+
+// Send POST /api/purchases and refresh dashboard on success
+async function submitPurchase(ingredientId, quantity) {
+  try {
+    const res = await fetch(`${API_BASE}/api/purchases`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ingredient_id: ingredientId, quantity }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setRestockStatus(data.error || "Restock failed.", true);
+      return;
+    }
+    setRestockStatus(`Successfully restocked ${quantity} units of ${data.name}. New Stock: ${data.current_stock}.`, false);
+    resetRestockForm();
+    await renderApp(); // Refresh all ingredient cards and charts
+  } catch (err) {
+    setRestockStatus("Unable to reach backend server.", true);
+  }
+}
+
+// Reset selection and inputs after successful restock
+function resetRestockForm() {
+  selectedRestockIngredient = null;
+  const input = document.getElementById("restockSearchInput");
+  const preview = document.getElementById("restockSelectedPreview");
+  if (input) input.value = "";
+  if (preview) preview.textContent = "";
 }

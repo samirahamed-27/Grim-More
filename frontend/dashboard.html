@@ -87,6 +87,32 @@
         </div>
       </section>
 
+      <!-- Section: Restock Panel -->
+      <section class="section-container">
+        <div class="section-header">
+          <h2>Restock Apothecary Supplies</h2>
+          <span class="section-hint">Search an ingredient and log replenishment purchases</span>
+        </div>
+        <div class="restock-panel card">
+          <div class="restock-controls">
+            <div class="restock-group">
+              <label for="restockSearchInput" class="restock-label">Search Ingredient</label>
+              <input type="text" id="restockSearchInput" class="restock-input" placeholder="Type ingredient name (e.g. Moonflower)..." autocomplete="off">
+              <div id="restockSearchResults" class="search-results-dropdown hidden"></div>
+            </div>
+            <div class="restock-group restock-group-qty">
+              <label for="restockQuantityInput" class="restock-label">Quantity (Units)</label>
+              <input type="number" id="restockQuantityInput" class="restock-input" min="1" max="100000" value="50" placeholder="Min 1">
+            </div>
+            <div class="restock-group-btn">
+              <button id="btnConfirmRestock" class="btn btn-primary" type="button">[CONFIRM RESTOCK]</button>
+            </div>
+          </div>
+          <div id="restockSelectedPreview" class="restock-selection-hint"></div>
+          <div id="restockStatusMessage" class="restock-status-banner hidden"></div>
+        </div>
+      </section>
+
       <!-- Section 2: Deep Dive Analytics (Chart + Diagnostics) -->
       <section class="section-container analytics-row">
         <div class="chart-panel card">

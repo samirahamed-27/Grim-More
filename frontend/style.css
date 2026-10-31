@@ -1204,6 +1204,135 @@ body {
   color: var(--c-ochre);
 }
 
+/* ================= RESTOCK PANEL ================= */
+.restock-panel {
+  padding: 1.35rem 1.6rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-maroon);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.restock-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: flex-end;
+}
+
+.restock-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+}
+
+.restock-group-qty {
+  flex: 0 0 170px;
+  min-width: 140px;
+}
+
+.restock-group-btn {
+  display: flex;
+  align-items: flex-end;
+}
+
+.restock-label {
+  font-family: var(--font-rave);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+}
+
+.restock-input {
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  color: var(--text-main);
+  background: #000000;
+  border: 1px solid var(--border-maroon);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.9rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.restock-input:focus {
+  border-color: var(--c-blaze);
+  box-shadow: 0 0 10px var(--glow-crimson);
+}
+
+.search-results-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #0e0202;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-sm);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 99;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.95);
+}
+
+.search-result-item {
+  padding: 0.65rem 0.9rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-subtle);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  color: var(--text-main);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.1s ease;
+}
+
+.search-result-item:hover {
+  background: rgba(189, 0, 0, 0.35);
+  color: #ffffff;
+}
+
+.search-result-empty {
+  padding: 0.65rem 0.9rem;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.restock-selection-hint {
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  color: var(--status-ok);
+  min-height: 1.2rem;
+}
+
+.restock-status-banner {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+}
+
+.restock-status-banner.success {
+  background: var(--status-ok-bg);
+  border: 1px solid var(--status-ok);
+  color: #a3f7bf;
+}
+
+.restock-status-banner.error {
+  background: var(--status-critical-bg);
+  border: 1px solid var(--c-blaze);
+  color: #ff9999;
+}
+
 /* ================= FOOTER ================= */
 .main-footer {
   margin-top: 3rem;
