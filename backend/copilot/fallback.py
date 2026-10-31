@@ -149,14 +149,19 @@ def route_offline_intent(
             for ing in runout_res["ingredients"]:
                 if ing["runs_out_before"]:
                     lines.append(
-                        f"• {ing['name']}: runs out on {ing['runout_date']} (in {ing['days_until_runout']} days; cover is {ing['days_of_cover']}d)."
+                        f"• {ing['name']}: runs out on {ing['runout_date']} "
+                        f"(about {ing['days_of_cover']} to {ing['days_until_runout']} days depending on the weekday pattern; stock: {ing['current_stock']:,})."
                     )
         else:
             lines.append("Current days of cover for all ingredients:")
             for ing in runout_res["ingredients"]:
-                lines.append(f"• {ing['name']}: {ing['days_of_cover']} days of cover (stock: {ing['current_stock']:,}).")
+                lines.append(
+                    f"• {ing['name']}: about {ing['days_of_cover']:.0f} to {ing['days_until_runout']} days depending on the weekday pattern "
+                    f"(runs out ~{ing['runout_date']}; stock: {ing['current_stock']:,})."
+                )
 
         lines.append(f"\nBased on: check_runout_before, ingredients (Target: {resolved_date})")
+
 
         return {
             "reply": "\n".join(lines),

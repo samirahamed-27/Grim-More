@@ -327,18 +327,19 @@ def execute_check_runout_before(date_str: str) -> Dict[str, Any]:
             "days_until_runout": runout_day_num,
         })
 
-    # Plain English summary
+    # Plain English summary harmonizing flat daily cover and weekday pattern simulation
     if runout_count == 0:
         summary = (
             f"No ingredients will run out before {date_str}. All 6 ingredients have sufficient "
-            f"stock through that date based on current forecast demand."
+            f"stock through that date based on forward weekday forecast demand."
         )
     else:
         critical_names = [r["name"] for r in results if r["runs_out_before"]]
         summary = (
             f"{runout_count} ingredient(s) ({', '.join(critical_names)}) will run out before {date_str} "
-            f"without new replenishment orders."
+            f"without new replenishment orders (lasting about 2 to 3 days depending on daily sales rates)."
         )
+
 
     return {
         "target_date": date_str,
