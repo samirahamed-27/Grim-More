@@ -40,28 +40,16 @@ def get_weekday_factors(history):
 
 
 def forecast_demand(history, days_ahead, event_multiplier=1.0):
-    """Forecast future daily demand based on historical sales data.
-
-    Calculates a 7-day moving average from the most recent 7 days of history,
-    then adjusts each forecast day by its weekday factor (and optional event_multiplier).
-
+    """Forecast future daily demand using a 7-day moving average and weekday factors.
     Args:
-        history (list[float | int]): Daily sales numbers in chronological order,
-            oldest entry first. Must contain at least 7 values.
-        days_ahead (int): Number of future days to forecast. Must be >= 1.
-        event_multiplier (float, optional): A scaling factor applied to each
-            forecasted value to account for upcoming events (e.g. holidays,
-            promotions). Defaults to 1.0 (no adjustment).
-
+        history (list[float|int]): Daily sales numbers (oldest first, len >= 7).
+        days_ahead (int): Number of days to forecast (>= 1).
+        event_multiplier (float): Demand scaling factor (>= 0, default 1.0).
     Returns:
-        list[float]: A list of forecasted daily sales values with length equal
-            to ``days_ahead``. Each element represents the predicted demand
-            for the corresponding future day.
-
-    Raises:
-        ValueError: If ``history`` contains fewer than 7 values.
-        ValueError: If ``days_ahead`` is less than 1.
-        ValueError: If ``event_multiplier`` is less than 0.
+        list[float]: Forecasted daily sales of length days_ahead.
+    Example:
+        >>> forecast_demand([10] * 7, 2)
+        [10.0, 10.0]
     """
     if len(history) < 7:
         raise ValueError(
@@ -164,22 +152,14 @@ def backtest(history, holdout_days=14):
 
 
 def detect_spike(history):
-    """Detect demand spikes by comparing recent sales against a historical baseline.
-
+    """Detect demand spikes by comparing the last 2 days against a 14-day baseline.
     Args:
-        history (list[float | int]): Daily sales numbers in chronological order,
-            oldest first. Must contain at least 16 values (14 baseline days + 2 recent days).
-
+        history (list[float|int]): Daily sales numbers (oldest first, len >= 16).
     Returns:
-        dict: A dictionary containing:
-            - "is_spike" (bool): Whether a demand spike is detected.
-            - "z_score" (float): Z-score measuring deviation from baseline.
-            - "baseline_avg" (float): Average daily sales over the 14-day baseline.
-            - "baseline_std" (float): Standard deviation of daily sales over the 14-day baseline.
-            - "recent_avg" (float): Average daily sales over the last 2 days.
-
-    Raises:
-        ValueError: If ``history`` contains fewer than 16 values.
+        dict: Keys is_spike (bool), z_score, baseline_avg, baseline_std, recent_avg (floats).
+    Example:
+        >>> detect_spike([50] * 16)
+        {'is_spike': False, 'z_score': 0.0, 'baseline_avg': 50.0, 'baseline_std': 0.0, 'recent_avg': 50.0}
     """
     if len(history) < 16:
         raise ValueError(
