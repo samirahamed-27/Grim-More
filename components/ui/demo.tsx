@@ -156,3 +156,4 @@ const StatusBox = styled.div`
     background: #A65600;
   }
 `;
+
