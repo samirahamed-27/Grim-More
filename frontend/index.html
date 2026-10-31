@@ -93,19 +93,19 @@
 
         <div class="formula-panel card">
           <div class="panel-header">
-            <h3>🧮 Inventory Logic Explainer</h3>
+            <h3>Inventory Logic Explainer</h3>
             <span class="badge-pill">Judges Reference</span>
           </div>
           <div class="formula-list">
             <div class="formula-item">
-              <span class="f-num">1</span>
+              <span class="f-num">Z-SCORE</span>
               <div class="f-body">
                 <strong>Spike Detection ($z > 3.0$)</strong>
                 <p>Compares recent 2-day demand to 14-day baseline standard deviations.</p>
               </div>
             </div>
             <div class="formula-item">
-              <span class="f-num">2</span>
+              <span class="f-num">SAFETY</span>
               <div class="f-body">
                 <strong>Safety Stock (95% Service Level)</strong>
                 <code>1.65 × Std × √(Lead Time)</code>
@@ -113,7 +113,7 @@
               </div>
             </div>
             <div class="formula-item">
-              <span class="f-num">3</span>
+              <span class="f-num">TARGET</span>
               <div class="f-body">
                 <strong>Target Stock & Order Quantity</strong>
                 <code>Forecast × (Lead + Cover) + Safety Stock</code>
