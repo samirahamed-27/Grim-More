@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grim-More — Pitch Deck (5-Minute Hackathon Demo)</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;600;700;900&family=Instrument+Serif:ital@0;1&family=Marcellus&family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+      background: #000000;
+      color: #ffffff;
+      font-family: var(--font-sans);
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Deck Layout */
+    .deck-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border-maroon);
+      background: rgba(12, 2, 2, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+
+    .deck-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .deck-title {
+      font-family: var(--font-primary-display);
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #ff4d4d;
+    }
+
+    .timer-pill {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      background: #110303;
+      border: 1px solid var(--border-maroon);
+      color: #ff7675;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .slide-viewport {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .slide {
+      position: absolute;
+      width: 90%;
+      max-width: 1150px;
+      height: 80%;
+      max-height: 640px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-maroon);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(189, 0, 0, 0.25);
+      padding: 3rem 4rem;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+      opacity: 0;
+      transform: scale(0.97);
+      transition: all 0.35s ease-out;
+    }
+
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .slide-tag {
+      font-family: var(--font-rave);
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--c-blaze);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+
+    .slide-h1 {
+      font-family: var(--font-primary-display);
+      font-size: 2.6rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 40%, #ff4d4d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-body {
+      font-size: 1.15rem;
+      line-height: 1.7;
+      color: #e5c9ce;
+    }
+
+    .slide-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    .feature-card {
+      background: #000000;
+      border: 1px solid var(--border-maroon);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+    }
+
+    .feature-card strong {
+      font-family: var(--font-secondary-display);
+      font-size: 1.3rem;
+      display: block;
+      color: #ff4d4d;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+      font-size: 0.95rem;
+      color: #b09ba0;
+    }
+
+    .slide-footer-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 1rem;
+      margin-top: 1rem;
+    }
+
+    .speaker-badge {
+      font-family: var(--font-rave);
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #ffffff;
+      background: var(--c-maroon);
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-maroon);
+      color: #fff;
+      font-size: 1rem;
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: var(--font-rave);
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      border-color: var(--c-blaze);
+      background: var(--c-maroon);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <header class="deck-topbar">
+    <div class="deck-brand">
+      <span style="font-size: 1.5rem;">🧪</span>
+      <span class="deck-title">GRIM-MORE // JUDGES PITCH</span>
+    </div>
+    <div class="timer-pill">
+      <span>⏱️ PITCH TIMER:</span>
+      <span id="timerDisplay">04:30</span>
+      <button id="btnToggleTimer" style="background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 0.9rem;">▶</button>
+    </div>
+    <div class="nav-controls">
+      <a href="index.html" class="nav-btn" style="text-decoration: none;">💻 Live Dashboard</a>
+      <span id="slideIndicator" style="font-family: var(--font-mono); color: #ff7675;">Slide 1 / 6</span>
+    </div>
+  </header>
+
+  <!-- Viewport -->
+  <main class="slide-viewport">
+    
+    <!-- Slide 1 -->
+    <section class="slide active" id="slide-1">
+      <div>
+        <span class="slide-tag">Track 01 • Inventory Surge Control</span>
+        <h1 class="slide-h1">The Potion Shop Dilemma</h1>
+        <div class="slide-body">
+          <p>Running a successful apothecary relies on steady, predictable daily transactions. Then, the kingdom announces the <strong>Full Moon Festival</strong>.</p>
+          <div class="slide-grid-2">
+            <div class="feature-card">
+              <strong>The Stockout Catastrophe</strong>
+              <p>Demand for sacred ingredients triples overnight. Existing stock depletes in <strong>1.3 days</strong>, but supplier delivery takes <strong>2.0 days</strong>. The shop is blind and out of stock.</p>
+            </div>
+            <div class="feature-card">
+              <strong>The Over-Ordering Trap</strong>
+              <p>Naive systems blindly triple purchase orders, tying up thousands in working capital that sits as dead inventory once the festival ends.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer-nav">
+        <span class="speaker-badge">Speaker: Person C (The Face)</span>
+        <span style="font-size: 0.85rem; color: #b09ba0;">Use [← / →] arrows to navigate</span>
+      </div>
+    </section>
+
+    <!-- Slide 2 -->
+    <section class="slide" id="slide-2">
+      <div>
+        <span class="slide-tag">Core Innovation</span>
+        <h1 class="slide-h1">Dual-Path Spike Intelligence</h1>
+        <div class="slide-body">
+          <p>Unlike simplistic solutions with hard-coded multipliers, Grim-More learns about demand surges through two distinct operational paths:</p>
+          <div class="slide-grid-2">
+            <div class="feature-card">
+              <strong>Pathway 1: The Surprise Surge</strong>
+              <p>No prior announcement was made. Our z-score anomaly detector catches deviations exceeding <strong>3.0 standard deviations</strong> directly from live daily transaction volume.</p>
+            </div>
+            <div class="feature-card">
+              <strong>Pathway 2: Advance Announcement</strong>
+              <p>The festival is declared 7 days prior. Grim-More schedules advance purchase orders so new shipments land <em>before</em> crowds arrive.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer-nav">
+        <span class="speaker-badge">Speaker: Person C (The Face)</span>
+        <span style="font-size: 0.85rem; color: #b09ba0;">Proves our system is explainable, not hard-coded</span>
+      </div>
+    </section>
+
+    <!-- Slide 3 -->
+    <section class="slide" id="slide-3">
+      <div>
+        <span class="slide-tag">Under the Hood</span>
+        <h1 class="slide-h1">System Architecture & Math Engine</h1>
+        <div class="slide-body">
+          <div class="slide-grid-2">
+            <div class="feature-card">
+              <strong>Person A: The Brain (Forecasting)</strong>
+              <p>• 90 days synthetic transaction series with weekday variance.<br>
+              • Z-score anomaly detector: <code>z = (recent - μ) / σ > 3.0</code><br>
+              • Moving average with seasonality & exponential smoothing.</p>
+            </div>
+            <div class="feature-card">
+              <strong>Person B: The Engine (Reorder Logic)</strong>
+              <p>• SQLite relational database + FastAPI endpoints.<br>
+              • Safety Stock: <code>1.65 × σ × √(Lead Time)</code> (95% cycle service level).<br>
+              • Target Stock: <code>Forecast × (Lead + Cover) + Safety Stock</code>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer-nav">
+        <span class="speaker-badge">Speakers: Person A (The Brain) & Person B (The Engine)</span>
+        <span style="font-size: 0.85rem; color: #b09ba0;">Transparent, statistically defensible formulas</span>
+      </div>
+    </section>
+
+    <!-- Slide 4 -->
+    <section class="slide" id="slide-4">
+      <div>
+        <span class="slide-tag">Action Phase</span>
+        <h1 class="slide-h1">Live Demonstration Walkthrough</h1>
+        <div class="slide-body">
+          <p>Watch Grim-More avert an inventory blackout live in 6 simple steps:</p>
+          <div style="background: #000; border: 1px solid var(--border-maroon); border-radius: 8px; padding: 1rem 1.5rem; font-size: 0.95rem; line-height: 1.8;">
+            1. <strong>Calm Baseline</strong>: Moonflower stock lasts 4.0 days; lead time is 2 days; status is green (<code>ok</code>).<br>
+            2. <strong>Festival Trigger</strong>: Click <code>🌕 Trigger Festival Spike</code>.<br>
+            3. <strong>Instant Detection</strong>: Moonflower daily forecast leaps from 100 to 300 units/day.<br>
+            4. <strong>Critical Alarm</strong>: Days of cover drops to 1.3 days (delivery takes 2.0 days!). Glowing red alert flashes.<br>
+            5. <strong>Automated Order</strong>: Grim-More prescribes ordering <strong>+1,170 units</strong> immediately.<br>
+            6. <strong>Simulation Proof</strong>: Stock trajectory avoids 0 and recovers safely above safety thresholds.
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer-nav">
+        <span class="speaker-badge">Speaker: Person C (The Face)</span>
+        <a href="index.html" target="_blank" class="nav-btn" style="color: #ff4d4d; text-decoration: none;">Open Live Screen →</a>
+      </div>
+    </section>
+
+    <!-- Slide 5 -->
+    <section class="slide" id="slide-5">
+      <div>
+        <span class="slide-tag">Quantified Impact</span>
+        <h1 class="slide-h1">Results & Verification</h1>
+        <div class="slide-body">
+          <div class="slide-grid-2">
+            <div class="feature-card">
+              <strong>Zero Stockouts Achieved</strong>
+              <p>Simulated inventory curves demonstrate 100% service continuity across the festival duration, eliminating the 0.7-day blackout window.</p>
+            </div>
+            <div class="feature-card">
+              <strong>Capital Efficiency</strong>
+              <p>Safety stock cushions statistical variance without bloat. Once the festival ends, target quantities contract back to baseline holding costs.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer-nav">
+        <span class="speaker-badge">Speakers: Person A & Person C</span>
+        <span style="font-size: 0.85rem; color: #b09ba0;">Tested against edge cases (zero stock, extreme lead time)</span>
+      </div>
+    </section>
+
+    <!-- Slide 6 -->
+    <section class="slide" id="slide-6">
+      <div>
+        <span class="slide-tag">Future Roadmap</span>
+        <h1 class="slide-h1">Honest Limitations & Next Steps</h1>
+        <div class="slide-body">
+          <div class="slide-grid-2">
+            <div class="feature-card">
+              <strong>Real-World Constraints Today</strong>
+              <p>• Does not yet model perishable ingredient spoilage dates.<br>
+              • Assumes infinite supplier stock with zero batch MOQ limits.<br>
+              • Does not account for cannibalization/substitutions between potions.</p>
+            </div>
+            <div class="feature-card">
+              <strong>Next Steps With More Time</strong>
+              <p>• Learned neural forecasting (Prophet / Temporal Fusion Transformers).<br>
+              • Multi-supplier automated RFQ purchase order webhooks.<br>
+              • Automated WhatsApp/SMS alerts for apothecary managers.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer-nav">
+        <span class="speaker-badge">Speaker: Person C (The Face)</span>
+        <span style="font-size: 0.85rem; color: #2ecc71;">Ready for Judges Q&A</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Keyboard & Timer Controller -->
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 6;
+    const slides = document.querySelectorAll(".slide");
+    const indicator = document.getElementById("slideIndicator");
+
+    function showSlide(index) {
+      if (index < 1) index = 1;
+      if (index > totalSlides) index = totalSlides;
+      currentSlide = index;
+
+      slides.forEach((s, idx) => {
+        s.classList.remove("active");
+        if (idx + 1 === currentSlide) {
+          s.classList.add("active");
+        }
+      });
+
+      indicator.textContent = `Slide ${currentSlide} / ${totalSlides}`;
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+        showSlide(currentSlide + 1);
+      } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        showSlide(currentSlide - 1);
+      }
+    });
+
+    // 4:30 countdown timer
+    let remainingSeconds = 270;
+    let timerRunning = false;
+    let timerInterval = null;
+    const timerDisplay = document.getElementById("timerDisplay");
+    const btnToggle = document.getElementById("btnToggleTimer");
+
+    btnToggle.addEventListener("click", () => {
+      if (timerRunning) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        btnToggle.textContent = "▶";
+      } else {
+        timerRunning = true;
+        btnToggle.textContent = "⏸";
+        timerInterval = setInterval(() => {
+          if (remainingSeconds > 0) {
+            remainingSeconds--;
+            const mins = String(Math.floor(remainingSeconds / 60)).padStart(2, "0");
+            const secs = String(remainingSeconds % 60).padStart(2, "0");
+            timerDisplay.textContent = `${mins}:${secs}`;
+          } else {
+            clearInterval(timerInterval);
+            timerDisplay.style.color = "#ff0000";
+            timerDisplay.textContent = "00:00 (TIME)";
+          }
+        }, 1000);
+      }
+    });
+  </script>
+</body>
+</html>
