@@ -284,8 +284,8 @@ function renderReorderTable(ingredients) {
       <td class="order-qty-cell">+${ing.order_qty.toLocaleString()}</td>
       <td>
         ${ing.days_of_cover < ing.lead_time_days 
-          ? `<span style="color: #ff4d4d; font-weight: 700;">⚠️ Depletes Before Delivery</span>` 
-          : `<span style="color: #2ecc71;">✓ Covered</span>`}
+          ? `<span style="color: #991B1B; font-weight: 800; background: #FEE2E2; padding: 0.2rem 0.55rem; border: 1px solid #DC2626; display: inline-block;">⚠️ Depletes Before Delivery</span>` 
+          : `<span style="color: #14532D; font-weight: 800; background: #DCFCE7; padding: 0.2rem 0.55rem; border: 1px solid #16A34A; display: inline-block;">✓ Covered</span>`}
       </td>
     `;
 
