@@ -1,19 +1,24 @@
 /**
  * ==============================================================================
  * GRIM-MORE — FRONTEND CONTROLLER (PERSON C - THE FACE)
- * Implements Phase 1 (Mock Data & Chart) + Phase 2 (Seamless Live API Connector)
+ * Implements:
+ * - Phase 1: Mock Data Fallback
+ * - Phase 2: Live Backend Integration (FastAPI: /api/ingredients, /api/forecast, /api/reorders)
+ * - Phase 3: Advanced Visuals (Uncertainty Envelope, Stock Depletion Simulation, Shaded Window)
  * ==============================================================================
  */
 
-// Global API Endpoint Configuration
+// Global Configuration & State
 const API_BASE = "http://127.0.0.1:8000";
 let isBackendLive = false;
 let isFestivalActive = false;
+let isAnnouncementActive = false;
 let selectedIngredientId = 1; // Default to Moonflower (ID: 1)
 let chartInstance = null;
+let currentIngredientsData = [];
 
 // ==============================================================================
-// CONTRACT MOCK DATA (Phase 1 Baseline & Spiked States)
+// CONTRACT MOCK DATA (Fallback if backend is offline)
 // ==============================================================================
 
 const INGREDIENT_ICONS = {
@@ -28,26 +33,26 @@ const INGREDIENT_ICONS = {
 // Baseline normal state
 const MOCK_BASELINE_INGREDIENTS = [
   { id: 1, name: "Moonflower", current_stock: 400, lead_time_days: 2, daily_forecast: 100, days_of_cover: 4.0, status: "ok", order_qty: 123, priority: "low" },
-  { id: 2, name: "Silver Dew", current_stock: 500, lead_time_days: 3, daily_forecast: 200, days_of_cover: 2.5, status: "watch", order_qty: 730, priority: "medium" },
-  { id: 3, name: "Wolfsbane", current_stock: 150, lead_time_days: 1, daily_forecast: 50, days_of_cover: 3.0, status: "ok", order_qty: 60, priority: "low" },
-  { id: 4, name: "Dragon Resin", current_stock: 320, lead_time_days: 4, daily_forecast: 80, days_of_cover: 4.0, status: "ok", order_qty: 265, priority: "low" },
-  { id: 5, name: "Nightshade", current_stock: 360, lead_time_days: 2, daily_forecast: 120, days_of_cover: 3.0, status: "ok", order_qty: 280, priority: "low" },
-  { id: 6, name: "Mandrake Root", current_stock: 240, lead_time_days: 3, daily_forecast: 60, days_of_cover: 4.0, status: "ok", order_qty: 140, priority: "low" }
+  { id: 2, name: "Silver Dew", current_stock: 800, lead_time_days: 1, daily_forecast: 200, days_of_cover: 4.0, status: "ok", order_qty: 146, priority: "low" },
+  { id: 3, name: "Wolfsbane", current_stock: 200, lead_time_days: 3, daily_forecast: 50, days_of_cover: 4.0, status: "ok", order_qty: 123, priority: "low" },
+  { id: 4, name: "Dragon Resin", current_stock: 300, lead_time_days: 4, daily_forecast: 60, days_of_cover: 5.0, status: "ok", order_qty: 208, priority: "low" },
+  { id: 5, name: "Nightshade", current_stock: 500, lead_time_days: 2, daily_forecast: 120, days_of_cover: 4.2, status: "ok", order_qty: 130, priority: "low" },
+  { id: 6, name: "Mandrake Root", current_stock: 150, lead_time_days: 3, daily_forecast: 40, days_of_cover: 3.75, status: "ok", order_qty: 102, priority: "low" }
 ];
 
-// Festival Spiked state (IDs 1, 2, 3 demand tripled!)
+// Festival Spiked state (IDs 1, 2, 3 demand tripled)
 const MOCK_SPIKED_INGREDIENTS = [
   { id: 1, name: "Moonflower", current_stock: 400, lead_time_days: 2, daily_forecast: 300, days_of_cover: 1.3, status: "critical", order_qty: 1170, priority: "high" },
-  { id: 2, name: "Silver Dew", current_stock: 500, lead_time_days: 3, daily_forecast: 600, days_of_cover: 0.8, status: "critical", order_qty: 3250, priority: "high" },
-  { id: 3, name: "Wolfsbane", current_stock: 150, lead_time_days: 1, daily_forecast: 150, days_of_cover: 1.0, status: "critical", order_qty: 480, priority: "high" },
-  { id: 4, name: "Dragon Resin", current_stock: 320, lead_time_days: 4, daily_forecast: 80, days_of_cover: 4.0, status: "ok", order_qty: 265, priority: "low" },
-  { id: 5, name: "Nightshade", current_stock: 360, lead_time_days: 2, daily_forecast: 120, days_of_cover: 3.0, status: "ok", order_qty: 280, priority: "low" },
-  { id: 6, name: "Mandrake Root", current_stock: 240, lead_time_days: 3, daily_forecast: 60, days_of_cover: 4.0, status: "ok", order_qty: 140, priority: "low" }
+  { id: 2, name: "Silver Dew", current_stock: 800, lead_time_days: 1, daily_forecast: 600, days_of_cover: 1.3, status: "watch", order_qty: 1700, priority: "high" },
+  { id: 3, name: "Wolfsbane", current_stock: 200, lead_time_days: 3, daily_forecast: 150, days_of_cover: 1.3, status: "critical", order_qty: 780, priority: "high" },
+  { id: 4, name: "Dragon Resin", current_stock: 300, lead_time_days: 4, daily_forecast: 60, days_of_cover: 5.0, status: "ok", order_qty: 208, priority: "low" },
+  { id: 5, name: "Nightshade", current_stock: 500, lead_time_days: 2, daily_forecast: 120, days_of_cover: 4.2, status: "ok", order_qty: 130, priority: "low" },
+  { id: 6, name: "Mandrake Root", current_stock: 150, lead_time_days: 3, daily_forecast: 40, days_of_cover: 3.75, status: "ok", order_qty: 102, priority: "low" }
 ];
 
 // Helper to generate 30 days history + 7 days forecast
 function generateMockHistoryAndForecast(ingredientId, spiked) {
-  const baseAvg = ingredientId === 1 ? 100 : ingredientId === 2 ? 200 : ingredientId === 3 ? 50 : 80;
+  const baseAvg = ingredientId === 1 ? 100 : ingredientId === 2 ? 200 : (ingredientId === 3 ? 50 : 60);
   const history = [];
   const forecast = [];
   
@@ -56,25 +61,27 @@ function generateMockHistoryAndForecast(ingredientId, spiked) {
     const d = new Date();
     d.setDate(d.getDate() - i);
     const dateStr = d.toISOString().split('T')[0];
-    const noise = (Math.random() - 0.5) * (baseAvg * 0.15);
-    history.push({
-      date: dateStr,
-      units: Math.max(10, Math.round(baseAvg + noise))
-    });
+    const noise = ((i % 5) - 2) * 4;
+    let units = Math.max(10, Math.round(baseAvg + noise));
+    if (spiked && [1, 2, 3].includes(ingredientId) && i <= 2) {
+      units = units * 3; // Recent spike detected
+    }
+    history.push({ date: dateStr, units });
   }
 
-  // 7 days forecast
+  // 7 days forecast with uncertainty envelope
   const multiplier = (spiked && [1, 2, 3].includes(ingredientId)) ? 3.0 : 1.0;
   for (let i = 0; i < 7; i++) {
     const d = new Date();
-    d.setDate(d.getDate() + i);
+    d.setDate(d.getDate() + i + 1);
     const dateStr = d.toISOString().split('T')[0];
     const expected = Math.round(baseAvg * multiplier);
+    const std = Math.round(10 * multiplier);
     forecast.push({
       date: dateStr,
       units: expected,
-      lower: Math.round(expected * 0.9),
-      upper: Math.round(expected * 1.1)
+      lower: Math.max(0, expected - std),
+      upper: expected + std
     });
   }
 
@@ -92,10 +99,11 @@ const elAlertTitle = document.getElementById("alertTitle");
 const elAlertMessage = document.getElementById("alertMessage");
 const elChartTitle = document.getElementById("chartTitle");
 const elBtnTriggerSpike = document.getElementById("btnTriggerSpike");
+const elBtnAnnounceEvent = document.getElementById("btnAnnounceEvent");
 const elBtnReset = document.getElementById("btnReset");
 const elDataModeBadge = document.getElementById("dataModeBadge");
-const elDataModeText = document.getElementById("dataModeText");
 const elForecastCanvas = document.getElementById("forecastChart");
+const elWorkedExampleBox = document.getElementById("workedExampleBox");
 
 // ==============================================================================
 // INITIALIZATION & EVENT LISTENERS
@@ -104,27 +112,27 @@ const elForecastCanvas = document.getElementById("forecastChart");
 document.addEventListener("DOMContentLoaded", async () => {
   setupEventListeners();
   await checkBackendConnection();
-  renderApp();
+  await renderApp();
 });
 
 function setupEventListeners() {
-  elBtnTriggerSpike.addEventListener("click", handleTriggerFestival);
-  elBtnReset.addEventListener("click", handleReset);
+  if (elBtnTriggerSpike) elBtnTriggerSpike.addEventListener("click", handleTriggerFestival);
+  if (elBtnAnnounceEvent) elBtnAnnounceEvent.addEventListener("click", handleAnnounceEvent);
+  if (elBtnReset) elBtnReset.addEventListener("click", handleReset);
 }
 
-// Check if FastAPI backend is running
+// Check if FastAPI backend is reachable
 async function checkBackendConnection() {
   try {
-    const res = await fetch(`${API_BASE}/api/ingredients`, { method: "GET", headers: { "Accept": "application/json" } });
+    const res = await fetch(`${API_BASE}/health`, { method: "GET" });
     if (res.ok) {
       isBackendLive = true;
-      elDataModeBadge.innerHTML = `<span class="status-dot live-dot"></span><span>Live Backend (FastAPI)</span>`;
+      elDataModeBadge.innerHTML = `<span class="status-dot live-dot"></span><span>Live Backend (FastAPI :8000)</span>`;
       return;
     }
   } catch (e) {
-    // Backend offline; default to Mock Data Mode
     isBackendLive = false;
-    elDataModeBadge.innerHTML = `<span class="status-dot mock-dot"></span><span>Mock Data Mode</span>`;
+    elDataModeBadge.innerHTML = `<span class="status-dot mock-dot"></span><span>Mock Standalone Mode</span>`;
   }
 }
 
@@ -138,7 +146,9 @@ async function renderApp() {
   if (isBackendLive) {
     try {
       const res = await fetch(`${API_BASE}/api/ingredients`);
-      ingredients = await res.json();
+      if (res.ok) {
+        ingredients = await res.json();
+      }
     } catch (err) {
       console.warn("Backend fetch failed, falling back to mock:", err);
       ingredients = isFestivalActive ? MOCK_SPIKED_INGREDIENTS : MOCK_BASELINE_INGREDIENTS;
@@ -147,10 +157,12 @@ async function renderApp() {
     ingredients = isFestivalActive ? MOCK_SPIKED_INGREDIENTS : MOCK_BASELINE_INGREDIENTS;
   }
 
+  currentIngredientsData = ingredients;
   renderCards(ingredients);
   renderReorderTable(ingredients);
   renderAlertBanner(ingredients);
-  renderChart(selectedIngredientId);
+  await renderChart(selectedIngredientId);
+  renderWorkedExample(selectedIngredientId);
 }
 
 // Render 6 Ingredient Cards
@@ -200,13 +212,14 @@ function renderCards(ingredients) {
       document.querySelectorAll(".ingredient-card").forEach(c => c.classList.remove("selected"));
       card.classList.add("selected");
       renderChart(ing.id);
+      renderWorkedExample(ing.id);
     });
 
     elIngredientsGrid.appendChild(card);
   });
 }
 
-// Render Reorders Table (Urgency Sorted)
+// Render Reorders Table (Urgency Ranked)
 function renderReorderTable(ingredients) {
   elReordersTableBody.innerHTML = "";
 
@@ -234,7 +247,7 @@ function renderReorderTable(ingredients) {
       <td class="order-qty-cell">+${ing.order_qty.toLocaleString()}</td>
       <td>
         ${ing.days_of_cover < ing.lead_time_days 
-          ? `<span style="color: #ff7675; font-weight: 700;">⚠️ Depletes Before Delivery</span>` 
+          ? `<span style="color: #ff4d4d; font-weight: 700;">⚠️ Depletes Before Delivery</span>` 
           : `<span style="color: #2ecc71;">✓ Covered</span>`}
       </td>
     `;
@@ -248,14 +261,35 @@ function renderAlertBanner(ingredients) {
   if (criticalItems.length > 0) {
     const item = criticalItems[0];
     elAlertTitle.textContent = `CRITICAL DEFICIT: ${item.name.toUpperCase()} RUNS OUT IN ${Number(item.days_of_cover).toFixed(1)} DAYS`;
-    elAlertMessage.textContent = `Supplier delivery takes ${item.lead_time_days} days! Reorder at least ${item.order_qty.toLocaleString()} units now to avoid an inventory blackout.`;
+    elAlertMessage.textContent = `Supplier delivery takes ${item.lead_time_days} days! Reorder at least ${item.order_qty.toLocaleString()} units now to avoid a complete stockout.`;
     elAlertBanner.classList.remove("hidden");
   } else {
     elAlertBanner.classList.add("hidden");
   }
 }
 
-// Render Chart.js Forecast Line Chart
+// Render Dynamic Worked Example for Judges
+function renderWorkedExample(ingredientId) {
+  const item = currentIngredientsData.find(i => i.id === ingredientId) || currentIngredientsData[0];
+  if (!item || !elWorkedExampleBox) return;
+
+  const icon = INGREDIENT_ICONS[item.id] || "🌿";
+  const std = Math.round(item.daily_forecast * 0.1);
+  const safetyStock = Math.round(1.65 * std * Math.sqrt(item.lead_time_days));
+  const coverDays = 3;
+  const targetStock = Math.round(item.daily_forecast * (item.lead_time_days + coverDays) + safetyStock);
+
+  elWorkedExampleBox.innerHTML = `
+    <h4>Proof Calculation: ${item.name} (${icon})</h4>
+    <div class="proof-row"><span>Daily Forecast:</span> <strong>${Math.round(item.daily_forecast)} units/day</strong></div>
+    <div class="proof-row"><span>Lead Time:</span> <strong>${item.lead_time_days} days (Buffer: ${coverDays}d)</strong></div>
+    <div class="proof-row"><span>Safety Stock (95% SL):</span> <strong>${safetyStock} units</strong></div>
+    <div class="proof-row highlight-row"><span>Target Stock:</span> <strong>${targetStock.toLocaleString()} units</strong></div>
+    <div class="proof-row highlight-row"><span>Recommended Order:</span> <strong>+${item.order_qty.toLocaleString()} units</strong></div>
+  `;
+}
+
+// Render Chart.js Forecast Line Chart with Uncertainty Bands & Stock Simulation (Phase 3)
 async function renderChart(ingredientId) {
   let historyData = [];
   let forecastData = [];
@@ -271,7 +305,7 @@ async function renderChart(ingredientId) {
         ingName = data.name;
       }
     } catch (e) {
-      console.warn("API forecast fetch failed, using mock:", e);
+      console.warn("API forecast fetch failed, using fallback:", e);
     }
   }
 
@@ -280,32 +314,65 @@ async function renderChart(ingredientId) {
     const mockRes = generateMockHistoryAndForecast(ingredientId, isFestivalActive);
     historyData = mockRes.history;
     forecastData = mockRes.forecast;
-    const ingObj = MOCK_BASELINE_INGREDIENTS.find(i => i.id === ingredientId);
+    const ingObj = currentIngredientsData.find(i => i.id === ingredientId);
     ingName = ingObj ? ingObj.name : "Ingredient";
   }
 
   const icon = INGREDIENT_ICONS[ingredientId] || "🌿";
-  elChartTitle.textContent = `Demand Trajectory: ${ingName} (${icon})`;
+  elChartTitle.textContent = `Demand & Inventory Simulation: ${ingName} (${icon})`;
 
-  // Assemble labels & continuous line series
+  // Assemble labels
   const labels = [
     ...historyData.map(h => h.date.slice(5)), // MM-DD
     ...forecastData.map(f => f.date.slice(5))
   ];
 
-  // History dataset: values for history, nulls for forecast
+  // 1. History series (values for history, null for forecast)
   const historySeries = [
     ...historyData.map(h => h.units),
     ...forecastData.map(() => null)
   ];
 
-  // Forecast dataset: connects from the last history point
+  // 2. Forecast series (connects from last history point)
   const lastHistoryPoint = historyData[historyData.length - 1].units;
   const forecastSeries = [
     ...historyData.slice(0, -1).map(() => null),
     lastHistoryPoint,
     ...forecastData.map(f => f.units)
   ];
+
+  // 3. Uncertainty Envelope (Upper & Lower bounds)
+  const upperSeries = [
+    ...historyData.slice(0, -1).map(() => null),
+    lastHistoryPoint,
+    ...forecastData.map(f => f.upper || Math.round(f.units * 1.15))
+  ];
+
+  const lowerSeries = [
+    ...historyData.slice(0, -1).map(() => null),
+    lastHistoryPoint,
+    ...forecastData.map(f => f.lower || Math.round(f.units * 0.85))
+  ];
+
+  // 4. Stock Trajectory Simulation (Phase 3 A6 requirement: What happens if we do nothing?)
+  const targetItem = currentIngredientsData.find(i => i.id === ingredientId) || { current_stock: 400, lead_time_days: 2, order_qty: 1170 };
+  let stockNoReorder = targetItem.current_stock;
+  let stockWithReorder = targetItem.current_stock;
+  const simNoReorder = [...historyData.slice(0, -1).map(() => null), targetItem.current_stock];
+  const simWithReorder = [...historyData.slice(0, -1).map(() => null), targetItem.current_stock];
+
+  forecastData.forEach((f, idx) => {
+    // Depletion without order
+    stockNoReorder = Math.max(0, stockNoReorder - f.units);
+    simNoReorder.push(stockNoReorder);
+
+    // Replenishment with order (arrives at lead time)
+    stockWithReorder -= f.units;
+    if (idx + 1 === targetItem.lead_time_days) {
+      stockWithReorder += targetItem.order_qty; // Shipment arrived!
+    }
+    simWithReorder.push(Math.max(0, stockWithReorder));
+  });
 
   if (chartInstance) {
     chartInstance.destroy();
@@ -329,16 +396,52 @@ async function renderChart(ingredientId) {
           pointHoverRadius: 5
         },
         {
-          label: "Projected Festival Demand",
+          label: "Forecast Demand",
           data: forecastSeries,
           borderColor: "#ff0000",
-          backgroundColor: "rgba(255, 0, 0, 0.22)",
+          backgroundColor: "transparent",
           borderWidth: 3.5,
           borderDash: [6, 4],
           tension: 0.2,
           pointRadius: 4.5,
           pointBackgroundColor: "#ff0000",
           pointHoverRadius: 7
+        },
+        {
+          label: "Uncertainty Upper Bound (+1σ)",
+          data: upperSeries,
+          borderColor: "rgba(255, 255, 255, 0.15)",
+          borderWidth: 1,
+          pointRadius: 0,
+          fill: "+1",
+          backgroundColor: "rgba(255, 0, 0, 0.08)"
+        },
+        {
+          label: "Uncertainty Lower Bound (-1σ)",
+          data: lowerSeries,
+          borderColor: "rgba(255, 255, 255, 0.15)",
+          borderWidth: 1,
+          pointRadius: 0,
+          fill: false
+        },
+        {
+          label: "Stock Trajectory (No Reorder - CRASH)",
+          data: simNoReorder,
+          borderColor: "#e74c3c",
+          borderWidth: 2,
+          borderDash: [3, 3],
+          pointRadius: 3,
+          pointBackgroundColor: "#e74c3c",
+          tension: 0.1
+        },
+        {
+          label: "Stock Trajectory (Protected With Reorder)",
+          data: simWithReorder,
+          borderColor: "#2ecc71",
+          borderWidth: 2.5,
+          pointRadius: 3.5,
+          pointBackgroundColor: "#2ecc71",
+          tension: 0.1
         }
       ]
     },
@@ -384,7 +487,7 @@ async function renderChart(ingredientId) {
           },
           title: {
             display: true,
-            text: "Units Sold / Day",
+            text: "Units (Sales & Stock)",
             color: "#b09ba0",
             font: { size: 11 }
           }
@@ -395,39 +498,83 @@ async function renderChart(ingredientId) {
 }
 
 // ==============================================================================
-// BUTTON HANDLERS (Simulate Spike & Reset)
+// BUTTON HANDLERS (Live API Connection)
 // ==============================================================================
 
+// Trigger Festival Spike (Surprise Path: POST /api/simulate-spike)
 async function handleTriggerFestival() {
   isFestivalActive = true;
-  elBtnTriggerSpike.innerHTML = `🌕 Festival Active!`;
+  elBtnTriggerSpike.innerHTML = `🌕 Spike Simulated!`;
   elBtnTriggerSpike.style.background = `linear-gradient(135deg, #ff0000, #840000)`;
   elBtnTriggerSpike.style.boxShadow = `0 0 25px rgba(255, 0, 0, 0.8)`;
 
   if (isBackendLive) {
     try {
-      await fetch(`${API_BASE}/api/simulate-spike`, { method: "POST" });
+      const res = await fetch(`${API_BASE}/api/simulate-spike`, { method: "POST" });
+      if (res.ok) {
+        console.log("Festival spike simulated via backend API");
+      }
     } catch (e) {
-      console.warn("POST /api/simulate-spike failed, using mock:", e);
+      console.warn("POST /api/simulate-spike failed:", e);
     }
   }
 
   await renderApp();
 }
 
+// Announce Event 7 Days in Advance (Announcement Path: POST /api/event)
+async function handleAnnounceEvent() {
+  isAnnouncementActive = true;
+  isFestivalActive = true;
+  if (elBtnAnnounceEvent) {
+    elBtnAnnounceEvent.innerHTML = `📜 Festival Declared (3x)`;
+    elBtnAnnounceEvent.style.borderColor = "#2ecc71";
+    elBtnAnnounceEvent.style.color = "#2ecc71";
+  }
+
+  if (isBackendLive) {
+    try {
+      const payload = {
+        name: "Full Moon Festival",
+        ingredient_ids: [1, 2, 3],
+        multiplier: 3.0,
+        start_date: "2026-11-08",
+        end_date: "2026-11-15"
+      };
+      await fetch(`${API_BASE}/api/event`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    } catch (e) {
+      console.warn("POST /api/event failed:", e);
+    }
+  }
+
+  await renderApp();
+}
+
+// Reset Shop Back to Baseline (POST /api/reset)
 async function handleReset() {
   isFestivalActive = false;
-  elBtnTriggerSpike.innerHTML = `🌕 Trigger Full Moon Festival`;
+  isAnnouncementActive = false;
+  elBtnTriggerSpike.innerHTML = `🌕 Trigger Festival Spike`;
   elBtnTriggerSpike.style.background = "";
+  elBtnTriggerSpike.style.boxShadow = "";
+
+  if (elBtnAnnounceEvent) {
+    elBtnAnnounceEvent.innerHTML = `📜 Announce Festival`;
+    elBtnAnnounceEvent.style.borderColor = "";
+    elBtnAnnounceEvent.style.color = "";
+  }
 
   if (isBackendLive) {
     try {
       await fetch(`${API_BASE}/api/reset`, { method: "POST" });
     } catch (e) {
-      console.warn("POST /api/reset failed, using mock:", e);
+      console.warn("POST /api/reset failed:", e);
     }
   }
 
   await renderApp();
 }
-

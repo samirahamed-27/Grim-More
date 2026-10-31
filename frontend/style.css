@@ -547,6 +547,24 @@ body {
   box-shadow: 0 0 10px rgba(255, 0, 0, 0.4);
 }
 
+.uncertainty-chip {
+  background: rgba(255, 255, 255, 0.08);
+  color: #d1c4c7;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+}
+
+.depletion-chip {
+  background: rgba(255, 0, 0, 0.2);
+  color: #ff7675;
+  border: 1px solid #ff0000;
+}
+
+.protected-chip {
+  background: rgba(46, 204, 113, 0.2);
+  color: #2ecc71;
+  border: 1px solid #2ecc71;
+}
+
 .chart-wrapper {
   position: relative;
   height: 320px;

@@ -32,8 +32,11 @@
           <span class="status-dot mock-dot"></span>
           <span id="dataModeText">Mock Data Mode</span>
         </div>
-        <button id="btnTriggerSpike" class="btn btn-primary pulse-hover">
-          🌕 Trigger Full Moon Festival
+        <button id="btnTriggerSpike" class="btn btn-primary pulse-hover" title="Surprise Path: Instant demand surge detected from data">
+          🌕 Trigger Festival Spike
+        </button>
+        <button id="btnAnnounceEvent" class="btn btn-secondary" title="Announcement Path: Festival declared 7 days in advance">
+          📜 Announce Festival
         </button>
         <button id="btnReset" class="btn btn-secondary">
           🔄 Reset Shop
@@ -77,7 +80,10 @@
             </div>
             <div class="chart-legend-custom">
               <span class="legend-chip history-chip">Historical Sales</span>
-              <span class="legend-chip forecast-chip">Predicted Spike</span>
+              <span class="legend-chip forecast-chip">Forecast Demand</span>
+              <span class="legend-chip uncertainty-chip">±1σ Uncertainty</span>
+              <span class="legend-chip depletion-chip">No Reorder (Crash)</span>
+              <span class="legend-chip protected-chip">Protected Stock</span>
             </div>
           </div>
           <div class="chart-wrapper">
