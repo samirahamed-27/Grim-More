@@ -197,6 +197,66 @@ This contract defines the shared database schema, API specification, and Python 
 }
 ```
 
+#### `POST /api/sales`
+- **Description**: Records daily sales for an ingredient, keeping contiguous history and returning real-time updated forecast, spike, and reorder state.
+- **Production Note**: Requires API key authentication (`X-API-Key` or Bearer token) in production deployments.
+- **Request Body**:
+```json
+{
+  "ingredient_id": 1,
+  "date": "2024-01-02",
+  "units": 500
+}
+```
+- **Returns**:
+```json
+{
+  "message": "Recorded 500 units for Moonflower on 2024-01-02 (created). Day total: 500 units.",
+  "action": "created",
+  "ingredient_id": 1,
+  "name": "Moonflower",
+  "date": "2024-01-02",
+  "units": 500,
+  "added_units": 500,
+  "current_forecast": 664.1,
+  "daily_forecast": 664.1,
+  "spike_info": {
+    "is_spike": false,
+    "z_score": -0.85,
+    "baseline_avg": 695.8,
+    "baseline_std": 236.5,
+    "recent_avg": 481.5
+  },
+  "days_of_cover": 6.0,
+  "status": "ok",
+  "order_qty": 0,
+  "priority": "low",
+  "state": { ... }
+}
+```
+
+#### `POST /api/sales/batch`
+- **Description**: Ingests multiple daily sales records in an atomic, all-or-nothing transaction in chronological order.
+- **Request Body**: Array of sale objects (or `{"sales": [...]}`):
+```json
+[
+  {"ingredient_id": 1, "date": "2024-01-02", "units": 500},
+  {"ingredient_id": 2, "date": "2024-01-02", "units": 600}
+]
+```
+- **Returns**:
+```json
+{
+  "message": "Successfully processed 2 sales records in atomic batch.",
+  "records_processed": 2,
+  "results": [
+    {"ingredient_id": 1, "date": "2024-01-02", "action": "created", "total_units": 500, "added_units": 500},
+    {"ingredient_id": 2, "date": "2024-01-02", "action": "created", "total_units": 600, "added_units": 600}
+  ],
+  "affected_ingredients": [ ... ]
+}
+```
+
 #### `POST /api/reset`
 - **Description**: Restores clean baseline data and deletes simulated spikes and test events.
 - **Returns**:

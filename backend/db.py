@@ -440,6 +440,107 @@ def record_purchase(
         return dict(cursor.fetchone())
 
 
+def get_latest_sales_date(db_path: Optional[Union[str, Path]] = None) -> str:
+    """
+    Returns the latest sales date recorded in the sales table.
+    Defaults to '2024-01-01' (the baseline historical cutoff) if no sales exist.
+    """
+    conn = get_connection(db_path)
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT MAX(date) AS max_date FROM sales;")
+        row = cursor.fetchone()
+        return row["max_date"] if (row and row["max_date"]) else "2024-01-01"
+    finally:
+        conn.close()
+
+
+def record_sale(
+    ingredient_id: int,
+    date_str: str,
+    units: int,
+    db_path: Optional[Union[str, Path]] = None,
+) -> Dict[str, Any]:
+    """
+    Inserts a new sale row or adds units to an existing row for (date, ingredient_id).
+    Maintains one row per ingredient per calendar day.
+    """
+    conn = get_connection(db_path)
+    with conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT units FROM sales WHERE date = ? AND ingredient_id = ?;",
+            (date_str, ingredient_id),
+        )
+        existing = cursor.fetchone()
+        if existing:
+            new_total = existing["units"] + units
+            cursor.execute(
+                "UPDATE sales SET units = ? WHERE date = ? AND ingredient_id = ?;",
+                (new_total, date_str, ingredient_id),
+            )
+            action = "updated"
+        else:
+            new_total = units
+            cursor.execute(
+                "INSERT INTO sales (date, ingredient_id, units) VALUES (?, ?, ?);",
+                (date_str, ingredient_id, units),
+            )
+            action = "created"
+    conn.close()
+    return {"action": action, "total_units": new_total, "added_units": units}
+
+
+def record_sales_batch(
+    sales: List[Dict[str, Any]],
+    db_path: Optional[Union[str, Path]] = None,
+) -> List[Dict[str, Any]]:
+    """
+    Records a batch of sales transactions inside a single atomic transaction.
+    If any single transaction fails, all changes roll back completely (all-or-nothing).
+    """
+    conn = get_connection(db_path)
+    results = []
+    with conn:
+        cursor = conn.cursor()
+        for item in sales:
+            ing_id = int(item["ingredient_id"])
+            d_str = str(item["date"])
+            u = int(item["units"])
+
+            cursor.execute(
+                "SELECT units FROM sales WHERE date = ? AND ingredient_id = ?;",
+                (d_str, ing_id),
+            )
+            existing = cursor.fetchone()
+            if existing:
+                new_total = existing["units"] + u
+                cursor.execute(
+                    "UPDATE sales SET units = ? WHERE date = ? AND ingredient_id = ?;",
+                    (new_total, d_str, ing_id),
+                )
+                action = "updated"
+            else:
+                new_total = u
+                cursor.execute(
+                    "INSERT INTO sales (date, ingredient_id, units) VALUES (?, ?, ?);",
+                    (d_str, ing_id, u),
+                )
+                action = "created"
+
+            results.append(
+                {
+                    "ingredient_id": ing_id,
+                    "date": d_str,
+                    "action": action,
+                    "total_units": new_total,
+                    "added_units": u,
+                }
+            )
+    conn.close()
+    return results
+
+
 if __name__ == "__main__":
     print(f"Initializing Potion Pantry database at {DB_PATH}...")
     init_db()

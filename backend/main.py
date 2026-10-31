@@ -9,7 +9,7 @@ day-by-day stockout simulation, and smart deduplicated reorder history tracking.
 import math
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -27,6 +27,9 @@ from backend.db import (
     get_latest_reorder,
     get_reorders,
     reset_state,
+    get_latest_sales_date,
+    record_sale,
+    record_sales_batch,
 )
 from backend.forecasting import forecast_demand
 from backend.spike import detect_spike
@@ -91,6 +94,16 @@ class EventAnnouncement(BaseModel):
     multiplier: float = Field(..., description="Demand multiplier during the event")
     start_date: str = Field(..., description="Start date (YYYY-MM-DD)")
     end_date: str = Field(..., description="End date (YYYY-MM-DD)")
+
+
+class SaleInput(BaseModel):
+    ingredient_id: int = Field(..., description="Ingredient ID (1-6)")
+    date: str = Field(..., description="Sales date (YYYY-MM-DD)")
+    units: int = Field(..., description="Units sold (non-negative integer)")
+
+
+class SalesBatchInput(BaseModel):
+    sales: List[SaleInput] = Field(..., description="List of sales records")
 
 
 # ---------------------------------------------------------------------------
@@ -733,4 +746,197 @@ def reset_demo():
     return {
         "status": "ok",
         "message": "Demo data reset to baseline",
+    }
+
+
+# ---------------------------------------------------------------------------
+# Sales Input Door (B7)
+# ---------------------------------------------------------------------------
+# NOTE: In a production deployment, these sales ingestion endpoints MUST be authenticated
+# using an API key (e.g. X-API-Key header or Bearer token) and rate-limited to prevent
+# unauthorized mutations of historical and operational inventory records.
+# Omitted here for local hackathon demo and pairing workflow.
+
+def _validate_sale_fields(ing_id: Any, date_str: Any, units: Any) -> None:
+    """Helper to validate types, bounds, ISO date formatting, and baseline protection."""
+    if not isinstance(ing_id, int) or ing_id < 1 or ing_id > 6:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Unknown ingredient_id {ing_id}. Valid ingredient IDs are 1 through 6.",
+        )
+    if not isinstance(units, int) or units < 0:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Units must be a non-negative integer (>= 0). Got {units}.",
+        )
+    if not isinstance(date_str, str):
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid date format '{date_str}'. Expected valid ISO date YYYY-MM-DD.",
+        )
+    try:
+        parsed = datetime.strptime(date_str, "%Y-%m-%d")
+        if parsed.strftime("%Y-%m-%d") != date_str:
+            raise ValueError()
+    except (ValueError, TypeError):
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid date format '{date_str}'. Expected valid ISO date YYYY-MM-DD.",
+        )
+    if date_str <= "2024-01-01":
+        raise HTTPException(
+            status_code=422,
+            detail=f"Date '{date_str}' is on or before baseline cutoff 2024-01-01. Baseline history is read-only.",
+        )
+
+
+@app.post("/api/sales")
+def create_sale(sale: SaleInput):
+    """
+    Sales input door: records daily sales for an ingredient, maintaining contiguous history
+    and updating forecasts, spike detection, and reorder urgency in real time.
+    """
+    _validate_sale_fields(sale.ingredient_id, sale.date, sale.units)
+
+    latest_date = get_latest_sales_date()
+    latest_dt = datetime.strptime(latest_date, "%Y-%m-%d")
+    next_expected_date = (latest_dt + timedelta(days=1)).strftime("%Y-%m-%d")
+
+    # Keep history contiguous: date must be an already-added new date (<= latest_date)
+    # or exactly one day after latest_date.
+    if sale.date > latest_date and sale.date != next_expected_date:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Date '{sale.date}' creates a gap in sales history. Next expected date is {next_expected_date}.",
+        )
+
+    # Record sale (creates new row or adds to existing day total)
+    res = record_sale(
+        ingredient_id=sale.ingredient_id,
+        date_str=sale.date,
+        units=sale.units,
+    )
+
+    # Compute updated state for that ingredient
+    all_raw_ings = get_ingredients()
+    target_raw = next((i for i in all_raw_ings if i["id"] == sale.ingredient_id), None)
+    active_events = get_active_events()
+    updated_state = compute_ingredient_state(target_raw, active_events) if target_raw else {}
+
+    ing_name = target_raw["name"] if target_raw else ""
+    reorder_res = updated_state.get("reorder_res", {})
+    spike_info = updated_state.get("spike_info", {})
+    daily_forecast = updated_state.get("daily_forecast", 0.0)
+    days_of_cover = reorder_res.get("days_of_cover", 0.0)
+    status = reorder_res.get("status", "ok")
+    priority = reorder_res.get("priority", "low")
+    order_qty = reorder_res.get("order_qty", 0)
+
+    state_dict = {
+        "id": sale.ingredient_id,
+        "name": ing_name,
+        "current_stock": target_raw["current_stock"] if target_raw else 0,
+        "lead_time_days": target_raw["lead_time_days"] if target_raw else 0,
+        "daily_forecast": daily_forecast,
+        "spike_info": spike_info,
+        "days_of_cover": days_of_cover,
+        "status": status,
+        "order_qty": order_qty,
+        "priority": priority,
+    }
+
+    return {
+        "message": f"Recorded {sale.units} units for {ing_name} on {sale.date} ({res['action']}). Day total: {res['total_units']} units.",
+        "action": res["action"],
+        "ingredient_id": sale.ingredient_id,
+        "name": ing_name,
+        "date": sale.date,
+        "units": res["total_units"],
+        "added_units": sale.units,
+        "current_forecast": daily_forecast,
+        "daily_forecast": daily_forecast,
+        "spike_info": spike_info,
+        "days_of_cover": days_of_cover,
+        "status": status,
+        "order_qty": order_qty,
+        "priority": priority,
+        "state": state_dict,
+    }
+
+
+@app.post("/api/sales/batch")
+def create_sales_batch(payload: Union[List[SaleInput], SalesBatchInput]):
+    """
+    All-or-nothing batch sales ingestion.
+    Applies sales in chronological order. If any item is invalid or causes a date gap,
+    zero changes are committed and the failing item is reported.
+    """
+    raw_list = payload if isinstance(payload, list) else payload.sales
+    if not raw_list:
+        raise HTTPException(status_code=422, detail="Sales batch cannot be empty.")
+
+    # Pair with original index to accurately report which item failed
+    indexed_items = list(enumerate(raw_list))
+
+    # Basic field validation on all items
+    for orig_idx, item in indexed_items:
+        try:
+            _validate_sale_fields(item.ingredient_id, item.date, item.units)
+        except HTTPException as exc:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Batch rejected at item {orig_idx} (ingredient {getattr(item, 'ingredient_id', '?')}, date {getattr(item, 'date', '?')}): {exc.detail}. No changes applied.",
+            )
+
+    # Sort items chronologically by date
+    sorted_indexed = sorted(indexed_items, key=lambda x: x[1].date)
+
+    # Simulate chronological date progression to verify contiguity
+    simulated_latest = get_latest_sales_date()
+    for orig_idx, item in sorted_indexed:
+        sim_dt = datetime.strptime(simulated_latest, "%Y-%m-%d")
+        expected_next = (sim_dt + timedelta(days=1)).strftime("%Y-%m-%d")
+
+        if item.date > simulated_latest:
+            if item.date != expected_next:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"Batch rejected at item {orig_idx} (date '{item.date}'): Date creates a gap in sales history. Next expected date is {expected_next}. No changes applied.",
+                )
+            simulated_latest = item.date
+
+    # All items are valid and contiguous! Execute atomic transaction in SQLite
+    dict_items = [
+        {"ingredient_id": it.ingredient_id, "date": it.date, "units": it.units}
+        for _, it in sorted_indexed
+    ]
+    batch_results = record_sales_batch(dict_items)
+
+    # Compute updated state for all affected ingredients
+    affected_ids = sorted(list({it.ingredient_id for it in raw_list}))
+    all_raw_ings = get_ingredients()
+    active_events = get_active_events()
+    updated_states = []
+    for ing in all_raw_ings:
+        if ing["id"] in affected_ids:
+            st = compute_ingredient_state(ing, active_events)
+            r = st.get("reorder_res", {})
+            updated_states.append({
+                "id": ing["id"],
+                "name": ing["name"],
+                "current_stock": ing["current_stock"],
+                "lead_time_days": ing["lead_time_days"],
+                "daily_forecast": st.get("daily_forecast", 0.0),
+                "spike_info": st.get("spike_info", {}),
+                "days_of_cover": r.get("days_of_cover", 0.0),
+                "status": r.get("status", "ok"),
+                "order_qty": r.get("order_qty", 0),
+                "priority": r.get("priority", "low"),
+            })
+
+    return {
+        "message": f"Successfully processed {len(batch_results)} sales records in atomic batch.",
+        "records_processed": len(batch_results),
+        "results": batch_results,
+        "affected_ingredients": updated_states,
     }
