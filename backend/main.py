@@ -32,6 +32,7 @@ from backend.db import (
     record_sales_batch,
 )
 from backend.forecasting import forecast_demand
+from backend.ml_forecast import ml_forecast
 from backend.spike import detect_spike
 from backend.reorder import calculate_reorder
 from backend.moon_calendar import get_upcoming_full_moons
@@ -183,7 +184,7 @@ def compute_ingredient_state(
     # Basing the forecast on the recent 2-day surge average allows the system to react instantly.
     # If no spike, we use Person A's baseline engine and apply festival multipliers on event dates only.
     std = spike_info["baseline_std"] if spike_info["baseline_std"] > 0 else 10.0
-    base_forecast_7 = forecast_demand(history_units, days_ahead=7) if len(history_units) >= 7 else [mean_14d] * 7
+    base_forecast_7 = ml_forecast(history_units, days_ahead=7, ingredient_id=ing_id) if len(history_units) >= 7 else [mean_14d] * 7
 
     forecast_14 = []
     for day_offset in range(1, 15):
