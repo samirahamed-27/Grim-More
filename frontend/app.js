@@ -130,6 +130,50 @@ function setupEventListeners() {
   if (elBtnAnnounceEvent) elBtnAnnounceEvent.addEventListener("click", handleAnnounceEvent);
   if (elBtnReset) elBtnReset.addEventListener("click", handleReset);
   initRestockPanel();
+  initSkyThemeToggle();
+}
+
+// Sky theme toggle with right-to-left sweep transition
+function initSkyThemeToggle() {
+  const toggle = document.getElementById("skyThemeToggle");
+  const overlay = document.getElementById("modeTransitionOverlay");
+  if (!toggle) return;
+
+  const savedTheme = localStorage.getItem("grim_more_sky_theme") || "night";
+  const isNight = savedTheme === "night";
+  toggle.checked = isNight;
+  if (!isNight) {
+    document.body.classList.add("day-sky-theme");
+  }
+
+  toggle.addEventListener("change", () => {
+    const goingNight = toggle.checked;
+
+    if (overlay) {
+      overlay.className = goingNight ? "wipe-to-dark" : "wipe-to-light";
+      setTimeout(() => {
+        if (goingNight) {
+          document.body.classList.remove("day-sky-theme");
+          localStorage.setItem("grim_more_sky_theme", "night");
+        } else {
+          document.body.classList.add("day-sky-theme");
+          localStorage.setItem("grim_more_sky_theme", "day");
+        }
+      }, 220);
+
+      setTimeout(() => {
+        overlay.className = "";
+      }, 700);
+    } else {
+      if (goingNight) {
+        document.body.classList.remove("day-sky-theme");
+        localStorage.setItem("grim_more_sky_theme", "night");
+      } else {
+        document.body.classList.add("day-sky-theme");
+        localStorage.setItem("grim_more_sky_theme", "day");
+      }
+    }
+  });
 }
 
 // Check if FastAPI backend is reachable
