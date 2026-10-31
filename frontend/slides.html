@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Grim-More — Pitch Deck (5-Minute Hackathon Demo)</title>
-  <link rel="stylesheet" href="style.css?v=20261101_singleline_sky">
+  <link rel="stylesheet" href="style.css?v=20261101_pure_toggle">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Google Fonts: Jost, Marcellus, Syne, Inter, JetBrains Mono -->
@@ -374,9 +374,7 @@
       </div>
       <div class="nav-controls">
         <!-- Day/Night Sky Theme Toggle -->
-        <div class="sky-toggle-wrapper" title="Switch between Night (Dark Forest Obsidian) and Day (Sunlit Parchment)">
-          <span class="sky-toggle-label">SKY:</span>
-          <label class="theme-switch" title="Toggle Day / Night Sky Theme">
+        <label class="theme-switch" title="Toggle Day / Night Sky Theme">
           <input type="checkbox" class="theme-switch__checkbox" id="skyThemeToggle" checked />
           <div class="theme-switch__container">
             <div class="theme-switch__clouds"></div>
@@ -396,7 +394,6 @@
             </div>
           </div>
         </label>
-        </div>
 
         <a href="index.html" class="nav-btn">🏠 HOME</a>
         <a href="dashboard.html" class="nav-btn">💻 LIVE PANTRY 🐺</a>
@@ -771,37 +768,27 @@
       toggle.addEventListener("change", () => {
         const goingNight = toggle.checked;
 
+        // Smoothly cross-fade base body canvas in harmony with the wave
+        if (goingNight) {
+          document.body.classList.remove("day-sky-theme");
+          localStorage.setItem("grim_more_sky_theme", "night");
+        } else {
+          document.body.classList.add("day-sky-theme");
+          localStorage.setItem("grim_more_sky_theme", "day");
+        }
+
         if (overlay) {
           overlay.className = goingNight ? "wipe-to-dark" : "wipe-to-light";
 
-          // Fluid left-to-right wave: blend the base canvas midway through the sweep
-          setTimeout(() => {
-            if (goingNight) {
-              document.body.classList.remove("day-sky-theme");
-              localStorage.setItem("grim_more_sky_theme", "night");
-            } else {
-              document.body.classList.add("day-sky-theme");
-              localStorage.setItem("grim_more_sky_theme", "day");
-            }
-          }, 400);
-
-          // Gently dissolve the trailing overlay
+          // Gently dissolve the wave overlay as it reaches full width
           setTimeout(() => {
             overlay.classList.add("fade-out");
-          }, 950);
+          }, 850);
 
           // Clear classes once fade concludes
           setTimeout(() => {
             overlay.className = "";
-          }, 1500);
-        } else {
-          if (goingNight) {
-            document.body.classList.remove("day-sky-theme");
-            localStorage.setItem("grim_more_sky_theme", "night");
-          } else {
-            document.body.classList.add("day-sky-theme");
-            localStorage.setItem("grim_more_sky_theme", "day");
-          }
+          }, 1750);
         }
       });
     })();

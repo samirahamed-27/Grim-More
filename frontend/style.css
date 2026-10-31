@@ -85,7 +85,7 @@ body {
   /* Dark forest obsidian canvas */
   background-image: 
     radial-gradient(ellipse at 50% 20%, #03271a 0%, #021811 60%, #010f0a 100%);
-  transition: background-color 1.25s cubic-bezier(0.16, 1, 0.3, 1), background-image 1.25s ease;
+  transition: background-color 1.35s cubic-bezier(0.33, 1, 0.68, 1), background-image 1.35s ease;
 }
 
 .app-container {
@@ -1635,31 +1635,6 @@ body {
 }
 
 /* ================= SKY THEME TOGGLE (DAY/NIGHT) ================= */
-.sky-toggle-wrapper {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: var(--c-buff);
-  border: 2px solid var(--c-cypress);
-  box-shadow: 2px 2px 0px var(--c-cypress);
-  padding: 0.25rem 0.55rem;
-  flex-shrink: 0;
-  cursor: pointer;
-  user-select: none;
-}
-
-.sky-toggle-label {
-  font-family: var(--font-rave);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: var(--c-cypress);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
 .theme-switch {
   --toggle-size: 15px;
   --container-width: 5.625em;
@@ -1839,43 +1814,47 @@ body {
 /* Smooth Left-To-Right Fading Background Transition (Behind All Elements) */
 #modeTransitionOverlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 170vw;
+  height: 100vh;
   pointer-events: none;
   z-index: 1; /* Strictly behind all UI elements (.app-container is z-index: 2) */
   opacity: 0;
-  transform: translateX(-100%);
-  transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s ease;
+  transform: translate3d(-100%, 0, 0);
+  will-change: transform, opacity;
+  transition: transform 1.35s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.6s ease;
 }
 
 #modeTransitionOverlay.wipe-to-dark {
   background: linear-gradient(
     to right,
     #021811 0%,
-    rgba(2, 24, 17, 0.95) 45%,
-    rgba(3, 39, 26, 0.85) 75%,
-    rgba(2, 24, 17, 0.35) 92%,
+    #021811 60%,
+    rgba(2, 24, 17, 0.85) 75%,
+    rgba(3, 39, 26, 0.5) 88%,
     transparent 100%
   );
   opacity: 1;
-  transform: translateX(0%);
+  transform: translate3d(0%, 0, 0);
 }
 
 #modeTransitionOverlay.wipe-to-light {
   background: linear-gradient(
     to right,
     #F8EBDD 0%,
-    rgba(248, 235, 221, 0.95) 45%,
-    rgba(232, 244, 253, 0.85) 75%,
-    rgba(248, 235, 221, 0.35) 92%,
+    #F8EBDD 60%,
+    rgba(248, 235, 221, 0.85) 75%,
+    rgba(232, 244, 253, 0.5) 88%,
     transparent 100%
   );
   opacity: 1;
-  transform: translateX(0%);
+  transform: translate3d(0%, 0, 0);
 }
 
 #modeTransitionOverlay.fade-out {
   opacity: 0;
-  transition: opacity 0.65s ease;
+  transition: opacity 0.85s ease-out;
 }
 
 /* Day Mode Styling for Webpage when toggle is unchecked */

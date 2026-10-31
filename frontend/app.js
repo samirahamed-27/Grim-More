@@ -149,37 +149,27 @@ function initSkyThemeToggle() {
   toggle.addEventListener("change", () => {
     const goingNight = toggle.checked;
 
+    // Smoothly cross-fade base body canvas in harmony with the wave
+    if (goingNight) {
+      document.body.classList.remove("day-sky-theme");
+      localStorage.setItem("grim_more_sky_theme", "night");
+    } else {
+      document.body.classList.add("day-sky-theme");
+      localStorage.setItem("grim_more_sky_theme", "day");
+    }
+
     if (overlay) {
       overlay.className = goingNight ? "wipe-to-dark" : "wipe-to-light";
 
-      // Fluid left-to-right wave: blend the base canvas midway through the sweep
-      setTimeout(() => {
-        if (goingNight) {
-          document.body.classList.remove("day-sky-theme");
-          localStorage.setItem("grim_more_sky_theme", "night");
-        } else {
-          document.body.classList.add("day-sky-theme");
-          localStorage.setItem("grim_more_sky_theme", "day");
-        }
-      }, 400);
-
-      // Gently dissolve the trailing overlay
+      // Gently dissolve the wave overlay as it reaches full width
       setTimeout(() => {
         overlay.classList.add("fade-out");
-      }, 950);
+      }, 850);
 
       // Clear classes once fade concludes
       setTimeout(() => {
         overlay.className = "";
-      }, 1500);
-    } else {
-      if (goingNight) {
-        document.body.classList.remove("day-sky-theme");
-        localStorage.setItem("grim_more_sky_theme", "night");
-      } else {
-        document.body.classList.add("day-sky-theme");
-        localStorage.setItem("grim_more_sky_theme", "day");
-      }
+      }, 1750);
     }
   });
 }

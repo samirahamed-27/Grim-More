@@ -8,7 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Grim-More — Inventory Intelligence</title>
-  <link rel="stylesheet" href="style.css?v=20261101_singleline_sky">
+  <link rel="stylesheet" href="style.css?v=20261101_pure_toggle">
   <!-- Google Fonts: Jost, Marcellus, Syne, Inter, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -63,9 +63,7 @@
 
       <div class="header-actions">
         <!-- Day/Night Sky Theme Toggle -->
-        <div class="sky-toggle-wrapper" title="Switch between Night (Dark Forest Obsidian) and Day (Sunlit Parchment)">
-          <span class="sky-toggle-label">SKY MODE:</span>
-          <label class="theme-switch" title="Toggle Day / Night Sky Theme">
+        <label class="theme-switch" title="Toggle Day / Night Sky Theme">
             <input type="checkbox" class="theme-switch__checkbox" id="skyThemeToggle" checked />
             <div class="theme-switch__container">
               <div class="theme-switch__clouds"></div>
@@ -85,7 +83,6 @@
               </div>
             </div>
           </label>
-        </div>
 
         <div class="data-mode-badge" id="dataModeBadge">
           <span class="status-dot mock-dot"></span>
