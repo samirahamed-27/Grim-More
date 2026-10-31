@@ -1604,8 +1604,33 @@ body {
 }
 
 /* ================= SKY THEME TOGGLE (DAY/NIGHT) ================= */
+.sky-toggle-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--c-buff);
+  border: 2px solid var(--c-cypress);
+  box-shadow: 2px 2px 0px var(--c-cypress);
+  padding: 0.25rem 0.55rem;
+  flex-shrink: 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sky-toggle-label {
+  font-family: var(--font-rave);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--c-cypress);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .theme-switch {
-  --toggle-size: 16px;
+  --toggle-size: 15px;
   --container-width: 5.625em;
   --container-height: 2.5em;
   --container-radius: 6.25em;
@@ -1627,6 +1652,7 @@ body {
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
+  flex-shrink: 0;
 }
 
 .theme-switch, .theme-switch *, .theme-switch *::before, .theme-switch *::after {

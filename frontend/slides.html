@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Grim-More — Pitch Deck (5-Minute Hackathon Demo)</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261101_sky">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Google Fonts: Jost, Marcellus, Syne, Inter, JetBrains Mono -->
@@ -364,7 +367,9 @@
       </div>
       <div class="nav-controls">
         <!-- Day/Night Sky Theme Toggle -->
-        <label class="theme-switch" title="Toggle Day / Night Sky Theme">
+        <div class="sky-toggle-wrapper" title="Switch between Night (Dark Forest Obsidian) and Day (Sunlit Parchment)">
+          <span class="sky-toggle-label">SKY:</span>
+          <label class="theme-switch" title="Toggle Day / Night Sky Theme">
           <input type="checkbox" class="theme-switch__checkbox" id="skyThemeToggle" checked />
           <div class="theme-switch__container">
             <div class="theme-switch__clouds"></div>
@@ -384,6 +389,7 @@
             </div>
           </div>
         </label>
+        </div>
 
         <a href="index.html" class="nav-btn">🏠 HOME</a>
         <a href="dashboard.html" class="nav-btn">💻 LIVE PANTRY 🐺</a>
