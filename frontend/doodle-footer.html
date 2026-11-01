@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doodle Crew Footer — Live Component Preview</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="style.css?v=20261101_doodle">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #fbf7ee;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .preview-header {
+      padding: 1.25rem 2rem;
+      background: #0B1410;
+      color: #FFFFFF;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid #1D382B;
+    }
+    .preview-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .preview-title a {
+      color: #FFA500;
+      text-decoration: none;
+    }
+    .preview-nav {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .preview-nav a {
+      color: #FFFFFF;
+      text-decoration: none;
+      padding: 0.4rem 0.8rem;
+      border: 1.5px solid #2F4237;
+      font-size: 0.82rem;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+    .preview-nav a:hover {
+      background: #FFA500;
+      color: #000000;
+      border-color: #FFA500;
+    }
+    .preview-canvas {
+      flex: 1;
+      padding: 3.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .preview-canvas h1 {
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: #1a2820;
+      margin-bottom: 0.75rem;
+    }
+    .preview-canvas p {
+      max-width: 620px;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #4a6256;
+      margin: 0 auto 1.5rem auto;
+    }
+    #footer-root {
+      width: 100%;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+  <header class="preview-header">
+    <div class="preview-title">
+      <span>🎨 Doodle Crew Footer Sunny Component</span>
+      <span style="font-size: 0.75rem; background: #1E3D2F; color: #4ADE80; padding: 2px 8px; border-radius: 4px;">Live React Demo</span>
+    </div>
+    <nav class="preview-nav">
+      <a href="index.html">← Back to Home</a>
+      <a href="dashboard.html">Apothecary Dashboard</a>
+    </nav>
+  </header>
+
+  <main class="preview-canvas">
+    <h1>Sketchbook Storyboard Footer</h1>
+    <p>
+      Scroll into view to trigger the storyboard: the ground line draws, letters stamp down with an ink puff, the doodle crew pops up, and drifting doodles scatter away from your cursor! Click any crew member to make them hop and speak.
+    </p>
+  </main>
+
+  <div id="footer-root"></div>
+
+  <script src="mount-doodle-footer.bundle.js"></script>
+</body>
+</html>
