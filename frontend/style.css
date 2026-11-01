@@ -493,38 +493,12 @@ body {
   overflow: hidden;
 }
 
-/* Spiderweb corners */
+/* Spiderweb corners - Subtle atmospheric watermark */
 .spiderweb-corner {
   position: absolute;
   pointer-events: none;
   z-index: 1;
-}
-
-.spiderweb-corner.top-left {
-  top: -5px;
-  left: -5px;
-}
-
-.spiderweb-corner.top-right {
-  top: -5px;
-  right: -5px;
-  transform: scaleX(-1);
-}
-
-.spiderweb-corner.bottom-left {
-  bottom: -5px;
-  left: -5px;
-  transform: scaleY(-1);
-}
-
-.spiderweb-corner.bottom-right {
-  bottom: -5px;
-  right: -5px;
-  transform: scale(-1, -1);
-}
-
-.spiderweb-corner.watermark-web {
-  opacity: 0.22;
+  opacity: 0.05 !important;
 }
 
 .hero-right-content {
@@ -606,17 +580,7 @@ body {
 }
 
 .stat-smudge-spot {
-  position: absolute;
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(12, 28, 20, 0.75) 0%, rgba(12, 28, 20, 0.35) 45%, transparent 70%);
-  filter: blur(10px);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 0;
-  pointer-events: none;
+  display: none !important;
 }
 
 .stat-val {
@@ -2509,18 +2473,77 @@ body.day-sky-theme .section-header h2 {
 }
 
 body.day-sky-theme .section-hint {
-  color: #4A6256;
+  color: #3F5E4F;
+  font-weight: 600;
+}
+
+body.day-sky-theme .hero-bauhaus {
+  background: #FCFAF6;
+  border-color: var(--c-cypress);
+  box-shadow: var(--shadow-flat);
 }
 
 body.day-sky-theme .hero-left-field {
-  background: radial-gradient(ellipse at 70% 30%, rgba(61, 126, 174, 0.7) 0%, transparent 65%),
-              radial-gradient(circle at 20% 80%, rgba(30, 90, 140, 0.5) 0%, transparent 60%),
-              #1A3D54;
+  background: radial-gradient(ellipse at 70% 30%, rgba(20, 52, 38, 0.92) 0%, rgba(10, 32, 22, 0.98) 70%), #061810;
 }
 
 body.day-sky-theme .hero-eyebrow,
 body.day-sky-theme .hero-tagline-sub {
-  color: #E0F2FE;
+  color: #E2ECE6;
+}
+
+body.day-sky-theme .hero-right-field {
+  background: #FCFAF6;
+  border-left-color: var(--c-cypress);
+}
+
+body.day-sky-theme .hero-desc-lead {
+  color: #12281D !important;
+  font-weight: 500;
+  font-size: 1.15rem;
+  line-height: 1.65;
+}
+
+body.day-sky-theme .hero-desc-lead strong {
+  color: #022015 !important;
+  font-weight: 800;
+}
+
+body.day-sky-theme .hero-desc-sub {
+  color: #315241 !important;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+body.day-sky-theme .hero-stat-cell {
+  border-right-color: #D3E0D8;
+}
+
+body.day-sky-theme .hero-divider-rule {
+  border-top-color: #D3E0D8;
+}
+
+body.day-sky-theme .hero-stat-num {
+  color: #022015 !important;
+  font-weight: 900;
+}
+
+body.day-sky-theme .hero-stat-num.accent-ochre {
+  color: #B25900 !important;
+}
+
+body.day-sky-theme .hero-stat-num.accent-green {
+  color: #1B663E !important;
+}
+
+body.day-sky-theme .hero-stat-lbl {
+  color: #4A6E5B !important;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+body.day-sky-theme .spiderweb-corner {
+  display: none !important; /* Hide intrusive spiderwebs in day mode for a clean look */
 }
 
 
