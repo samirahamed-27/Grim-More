@@ -78,6 +78,11 @@
         </button>
       </form>
 
+      <!-- Instant 1-Click Demo Bypass for Mobile & Judges -->
+      <button type="button" id="demoBypassBtn" class="btn-demo-bypass">
+        <span>✨ Quick Demo Sign In (Lead Alchemist)</span>
+      </button>
+
       <!-- Status & Error Feedback Message Box -->
       <div id="authStatusMessage" class="auth-status-message" style="display: none;"></div>
 
@@ -169,6 +174,34 @@
           emailSubmitBtn.disabled = false;
         }
       });
+
+      // Quick 1-Click Demo Login
+      const demoBtn = document.getElementById('demoBypassBtn');
+      if (demoBtn) {
+        demoBtn.addEventListener('click', async () => {
+          demoBtn.disabled = true;
+          showStatus('Entering as Lead Alchemist demo session...', false);
+          try {
+            const res = await fetch(`${PotionAuth.AUTH_CONFIG.API_BASE}/api/auth/email`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ email: 'alchemist@potionpantry.io' }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+              completeLogin(data);
+            } else {
+              showStatus(data.error || 'Demo sign-in failed.', true);
+              demoBtn.disabled = false;
+            }
+          } catch (err) {
+            console.error('Demo login error:', err);
+            showStatus('Unable to reach backend server.', true);
+            demoBtn.disabled = false;
+          }
+        });
+      }
 
       /**
        * Callback triggered by Google Identity Services on successful account selection

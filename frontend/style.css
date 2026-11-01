@@ -3048,6 +3048,41 @@ body.day-sky-theme .spiderweb-corner {
   transform: translateX(3px);
 }
 
+.btn-demo-bypass {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(255, 121, 63, 0.12);
+  border: 1px solid rgba(255, 121, 63, 0.5);
+  color: #ff9f43;
+  padding: 0.8rem 1.25rem;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  margin-top: 0.75rem;
+}
+
+.btn-demo-bypass:hover:not(:disabled) {
+  background: rgba(255, 121, 63, 0.25);
+  border-color: #ff793f;
+  color: #ffffff;
+  box-shadow: 0 4px 18px rgba(255, 121, 63, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-demo-bypass:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .config-notice-title {
   font-weight: 600;
   font-size: 0.85rem;
