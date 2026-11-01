@@ -5,7 +5,9 @@
 
 const AUTH_CONFIG = {
   SESSION_KEY: 'grim_user_session',
-  API_BASE: 'http://127.0.0.1:8000',
+  API_BASE: (window.location.hostname && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1")
+    ? `http://${window.location.hostname}:8000`
+    : 'http://127.0.0.1:8000',
   LOGIN_PAGE: 'login.html',
   HOME_PAGE: 'index.html',
 };
