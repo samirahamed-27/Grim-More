@@ -210,12 +210,18 @@ async function renderApp() {
       const res = await fetch(`${API_BASE}/api/ingredients`);
       if (res.ok) {
         ingredients = await res.json();
+      } else {
+        ingredients = isFestivalActive ? MOCK_SPIKED_INGREDIENTS : MOCK_BASELINE_INGREDIENTS;
       }
     } catch (err) {
       console.warn("Backend fetch failed, falling back to mock:", err);
       ingredients = isFestivalActive ? MOCK_SPIKED_INGREDIENTS : MOCK_BASELINE_INGREDIENTS;
     }
   } else {
+    ingredients = isFestivalActive ? MOCK_SPIKED_INGREDIENTS : MOCK_BASELINE_INGREDIENTS;
+  }
+
+  if (!ingredients || ingredients.length === 0) {
     ingredients = isFestivalActive ? MOCK_SPIKED_INGREDIENTS : MOCK_BASELINE_INGREDIENTS;
   }
 

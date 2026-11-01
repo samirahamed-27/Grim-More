@@ -74,6 +74,13 @@
   padding: 0;
 }
 
+html {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
 body {
   position: relative;
   background-color: #020302;
@@ -83,7 +90,9 @@ body {
   min-height: 100vh;
   padding: 0.75rem 1.25rem;
   width: 100%;
+  max-width: 100vw;
   overflow-x: hidden;
+  box-sizing: border-box;
   /* Deep abyssal obsidian canvas */
   background-image: 
     radial-gradient(ellipse at 50% 15%, #050806 0%, #020302 50%, #000000 100%);
@@ -116,22 +125,26 @@ body {
   width: 100%;
 }
 
-@media (max-width: 1240px) {
+@media (max-width: 1380px) {
   .howling-wolf-header {
+    display: none;
+  }
+  .subtitle {
     display: none;
   }
 }
 
-@media (max-width: 1100px) {
-  .subtitle {
-    display: none;
-  }
+@media (max-width: 1180px) {
   .nav-link {
     font-size: 0.72rem;
     padding: 0.28rem 0.38rem;
   }
   .header-actions {
     gap: 0.35rem;
+  }
+  .header-actions .btn {
+    font-size: 0.68rem;
+    padding: 0.32rem 0.5rem;
   }
 }
 
@@ -1831,7 +1844,8 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 170vw;
+  width: 100vw;
+  max-width: 100vw;
   height: 100vh;
   pointer-events: none;
   z-index: 1; /* Strictly behind all UI elements (.app-container is z-index: 2) */
@@ -1839,6 +1853,7 @@ body {
   transform: translate3d(-100%, 0, 0);
   will-change: transform, opacity;
   transition: transform 1.35s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.6s ease;
+  overflow: hidden;
 }
 
 #modeTransitionOverlay.wipe-to-dark {
