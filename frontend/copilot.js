@@ -147,12 +147,27 @@
     });
   }
 
-  // Toggle Panel open/close
+  // Adjust base color according to environment (day theme, surge/festival active, or night mode)
+  function updateEnvironmentStyle() {
+    const panel = document.getElementById("copilotPanel");
+    if (!panel) return;
+    const isSurge =
+      (typeof isFestivalActive !== "undefined" && isFestivalActive) ||
+      document.querySelector(".badge-critical, .status-critical") !== null;
+    if (isSurge) {
+      panel.classList.add("surge-environment");
+    } else {
+      panel.classList.remove("surge-environment");
+    }
+  }
+
+  // Toggle Panel open/close with spooky apparition animation
   function togglePanel() {
     const panel = document.getElementById("copilotPanel");
     if (!panel) return;
     isOpen = !isOpen;
     if (isOpen) {
+      updateEnvironmentStyle();
       panel.classList.add("open");
       fetchCopilotStatus();
       const input = document.getElementById("copilotInput");
@@ -161,6 +176,7 @@
       panel.classList.remove("open");
     }
   }
+
 
   // Query /api/copilot/status
   async function fetchCopilotStatus() {
