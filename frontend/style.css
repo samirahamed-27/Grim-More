@@ -2200,14 +2200,98 @@ body:not(.day-sky-theme) .ingredient-card:hover {
 }
 
 body:not(.day-sky-theme) .ingredient-card.selected {
-  border-color: #FFA500;
-  background: #172a20;
+  border-color: #FFA500 !important;
+  background: #14281e !important;
   box-shadow: 4px 4px 0px #FFA500;
+}
+
+body:not(.day-sky-theme) .ingredient-card.status-critical {
+  border-left: 6px solid #FF5A5A !important;
 }
 
 body:not(.day-sky-theme) .card-name {
   color: #FFFFFF !important;
   font-weight: 800 !important;
+  font-size: 1.15rem !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+body:not(.day-sky-theme) .card-stats {
+  border-top: 1px solid #1d382b !important;
+}
+
+body:not(.day-sky-theme) .stat-label {
+  color: #A0C4B4 !important; /* Luminous soft sage */
+  font-weight: 800 !important;
+  font-size: 0.74rem !important;
+  letter-spacing: 0.7px !important;
+  text-transform: uppercase !important;
+}
+
+body:not(.day-sky-theme) .stat-val {
+  color: #FFFFFF !important; /* Pure radiant white - MAXIMUM VISIBILITY */
+  font-weight: 900 !important;
+  font-size: 1.15rem !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+body:not(.day-sky-theme) .stat-val.text-critical {
+  color: #FF6B6B !important; /* Vivid neon warning coral/red */
+  font-weight: 900 !important;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.6);
+}
+
+body:not(.day-sky-theme) .badge-ok {
+  background: #0d2818 !important;
+  color: #4ADE80 !important;
+  border: 1.5px solid #22c55e !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 6px rgba(74, 222, 128, 0.4);
+}
+
+body:not(.day-sky-theme) .badge-watch {
+  background: #362208 !important;
+  color: #FCD34D !important;
+  border: 1.5px solid #F59E0B !important;
+  font-weight: 800 !important;
+}
+
+body:not(.day-sky-theme) .badge-critical {
+  background: #4a1212 !important;
+  color: #FCA5A5 !important;
+  border: 1.5px solid #EF4444 !important;
+  font-weight: 900 !important;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+body:not(.day-sky-theme) .legend-chip.history-chip {
+  background: #183326 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #3b7356 !important;
+}
+
+body:not(.day-sky-theme) .legend-chip.forecast-chip {
+  background: #A65600 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #FFA500 !important;
+}
+
+body:not(.day-sky-theme) .legend-chip.uncertainty-chip {
+  background: #2E220A !important;
+  color: #FCD34D !important;
+  border: 1px dashed #F59E0B !important;
+}
+
+body:not(.day-sky-theme) .legend-chip.depletion-chip {
+  background: #421111 !important;
+  color: #FCA5A5 !important;
+  border: 1px solid #EF4444 !important;
+}
+
+body:not(.day-sky-theme) .legend-chip.protected-chip {
+  background: #0B2917 !important;
+  color: #4ADE80 !important;
+  border: 1px solid #22C55E !important;
 }
 
 body:not(.day-sky-theme) .card-qty-num {

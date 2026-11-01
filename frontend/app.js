@@ -510,10 +510,10 @@ async function renderChart(ingredientId) {
 
   const isNight = !document.body.classList.contains("day-sky-theme");
   const historyBorder = isNight ? "#48BB78" : "#022015";
-  const historyBg = isNight ? "rgba(72, 187, 120, 0.12)" : "rgba(2, 32, 21, 0.08)";
-  const gridColor = isNight ? "rgba(255, 255, 255, 0.08)" : "rgba(2, 32, 21, 0.08)";
-  const tickColor = isNight ? "#8EABA0" : "#4A6256";
-  const axisTitleColor = isNight ? "#D8E8DF" : "#022015";
+  const historyBg = isNight ? "rgba(72, 187, 120, 0.16)" : "rgba(2, 32, 21, 0.08)";
+  const gridColor = isNight ? "rgba(255, 255, 255, 0.12)" : "rgba(2, 32, 21, 0.08)";
+  const tickColor = isNight ? "#E2ECE6" : "#4A6256";
+  const axisTitleColor = isNight ? "#FFFFFF" : "#022015";
 
   const ctx = elForecastCanvas.getContext("2d");
   chartInstance = new Chart(ctx, {
