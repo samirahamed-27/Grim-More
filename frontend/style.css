@@ -81,7 +81,9 @@ body {
   font-family: var(--font-sans);
   line-height: 1.5;
   min-height: 100vh;
-  padding: 1.5rem 2rem;
+  padding: 0.75rem 1.25rem;
+  width: 100%;
+  overflow-x: hidden;
   /* Deep abyssal obsidian canvas */
   background-image: 
     radial-gradient(ellipse at 50% 15%, #050806 0%, #020302 50%, #000000 100%);
@@ -89,8 +91,9 @@ body {
 }
 
 .app-container {
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
   position: relative;
   z-index: 2; /* Content sits cleanly in front of smooth background transition overlay */
 }
@@ -104,12 +107,13 @@ body {
   border: 3px solid var(--c-cypress);
   border-bottom: 3px solid var(--c-cypress);
   margin-bottom: 0;
-  flex-wrap: nowrap; /* Single line along the title */
-  gap: 0.75rem;
+  flex-wrap: wrap; /* Allows natural wrapping on smaller widths; stretches full width on full screen */
+  gap: 0.6rem 0.85rem;
   background: #FFFFFF;
   box-shadow: var(--shadow-flat);
   position: relative;
   z-index: 10;
+  width: 100%;
 }
 
 .brand {
@@ -224,14 +228,14 @@ body {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  flex-wrap: nowrap; /* Single line along the title */
+  gap: 0.45rem;
+  flex-wrap: wrap;
   flex-shrink: 0;
 }
 
 .header-actions .btn {
-  font-size: 0.74rem;
-  padding: 0.42rem 0.72rem;
+  font-size: 0.72rem;
+  padding: 0.38rem 0.65rem;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -980,8 +984,8 @@ body {
 /* Cards Grid */
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.15rem;
 }
 
 .ingredient-card {
