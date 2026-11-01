@@ -2064,15 +2064,34 @@ body.day-sky-theme .hero-tagline-sub {
   font-style: italic;
 }
 
-/* Navbar Authenticated Profile and Sign Out */
+/* Navbar Authenticated Profile and Hover Dropdown */
 .navbar-auth-container {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.3rem 0.6rem;
-  background: rgba(14, 28, 20, 0.7);
-  border: 1px solid rgba(61, 125, 84, 0.3);
-  margin-left: 0.5rem;
+  margin-left: 0.6rem;
+  z-index: 105;
+}
+
+.navbar-user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.28rem 0.65rem 0.28rem 0.35rem;
+  background: rgba(14, 28, 20, 0.85);
+  border: 1px solid rgba(61, 125, 84, 0.4);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.navbar-user-pill:hover,
+.navbar-auth-container:hover .navbar-user-pill,
+.navbar-auth-container.is-active .navbar-user-pill {
+  background: rgba(26, 52, 38, 0.95);
+  border-color: #3D7D54;
+  box-shadow: 0 0 12px rgba(61, 125, 84, 0.25);
 }
 
 .user-avatar-badge {
@@ -2080,11 +2099,13 @@ body.day-sky-theme .hero-tagline-sub {
   height: 26px;
   border-radius: 50%;
   overflow: hidden;
-  background: #1A3D2A;
+  background: #143022;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #3D7D54;
+  border: 1.5px solid #3D7D54;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(61, 125, 84, 0.3);
 }
 
 .user-avatar-img {
@@ -2096,34 +2117,136 @@ body.day-sky-theme .hero-tagline-sub {
 .user-avatar-initial {
   font-family: 'Jost', sans-serif;
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: #A3D9B5;
+  line-height: 1;
 }
 
 .user-name-text {
   font-family: 'Inter', sans-serif;
-  font-size: 0.825rem;
-  color: #D6E4DC;
-  font-weight: 500;
+  font-size: 0.82rem;
+  color: #E2ECE6;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
-.btn-sign-out {
-  background: rgba(180, 40, 40, 0.2);
-  border: 1px solid rgba(220, 70, 70, 0.4);
-  color: #FFB3B3;
+.dropdown-caret {
+  color: #6C8578;
+  transition: transform 0.22s ease, color 0.22s ease;
+  margin-left: 0.1rem;
+}
+
+.navbar-auth-container:hover .dropdown-caret,
+.navbar-auth-container.is-active .dropdown-caret {
+  transform: rotate(180deg);
+  color: #A3D9B5;
+}
+
+/* Dropdown Menu appearing on hover */
+.navbar-auth-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.45rem;
+  min-width: 190px;
+  background: #0B1611;
+  border: 1px solid rgba(61, 125, 84, 0.4);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65), 0 0 16px rgba(46, 90, 62, 0.25);
+  padding: 0.65rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  pointer-events: none;
+  z-index: 1000;
+  backdrop-filter: blur(12px);
+}
+
+/* Invisible bridge so mouse moving from pill to dropdown doesn't flicker/close */
+.navbar-auth-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 0;
+  right: 0;
+  height: 12px;
+}
+
+.navbar-auth-container:hover .navbar-auth-dropdown,
+.navbar-auth-container.is-active .navbar-auth-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.dropdown-user-header {
+  padding: 0.25rem 0.35rem 0.45rem 0.35rem;
+}
+
+.dropdown-user-name {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #E2ECE6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-user-email {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  color: #7A9687;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.15rem;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: rgba(61, 125, 84, 0.25);
+  margin: 0.35rem 0 0.5rem 0;
+}
+
+.btn-dropdown-logout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.55rem;
+  padding: 0.48rem 0.65rem;
+  background: rgba(180, 40, 40, 0.12);
+  border: 1px solid rgba(220, 70, 70, 0.3);
+  border-radius: 6px;
+  color: #FFA5A5;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 600;
   text-transform: uppercase;
-  padding: 0.25rem 0.55rem;
-  cursor: pointer;
   letter-spacing: 0.05em;
-  transition: all 0.2s ease;
+  cursor: pointer;
+  transition: all 0.18s ease;
 }
 
-.btn-sign-out:hover {
-  background: rgba(220, 60, 60, 0.35);
+.btn-dropdown-logout svg {
+  stroke: #FFA5A5;
+  transition: stroke 0.18s ease, transform 0.18s ease;
+  flex-shrink: 0;
+}
+
+.btn-dropdown-logout:hover {
+  background: rgba(220, 50, 50, 0.3);
+  border-color: #FF5555;
   color: #FFFFFF;
-  border-color: #FF6666;
+  box-shadow: 0 0 10px rgba(220, 50, 50, 0.35);
+}
+
+.btn-dropdown-logout:hover svg {
+  stroke: #FFFFFF;
+  transform: translateX(2px);
 }
 
 

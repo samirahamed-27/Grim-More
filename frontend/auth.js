@@ -76,13 +76,13 @@ function redirectIfAuthenticated() {
 }
 
 /**
- * Renders user profile pill & Sign Out button in header nav if authenticated.
+ * Renders user profile pill & dropdown with Sign Out option in header nav on hover.
  */
 function initNavbarAuth() {
   const session = getAuthSession();
   if (!session) return;
 
-  const user = session.user;
+  const user = session.user || {};
   const navWrap = document.querySelector('.header-nav-wrap') || document.querySelector('.main-header');
   if (!navWrap || document.getElementById('navbarUserAuth')) return;
 
@@ -90,10 +90,17 @@ function initNavbarAuth() {
   authContainer.id = 'navbarUserAuth';
   authContainer.className = 'navbar-auth-container';
 
-  // User avatar or initial
+  // 1. Visible Compact Profile Pill
+  const pill = document.createElement('div');
+  pill.className = 'navbar-user-pill';
+  pill.setAttribute('role', 'button');
+  pill.setAttribute('aria-haspopup', 'true');
+  pill.setAttribute('aria-expanded', 'false');
+  pill.title = `${user.name || 'Alchemist'} (${user.email || ''})`;
+
+  // Avatar Wrapper
   const avatarWrapper = document.createElement('div');
   avatarWrapper.className = 'user-avatar-badge';
-  avatarWrapper.title = user.email || 'Authenticated Alchemist';
 
   if (user.picture) {
     const img = document.createElement('img');
@@ -108,26 +115,103 @@ function initNavbarAuth() {
     avatarWrapper.appendChild(initial);
   }
 
-  // Name display
+  // Name
   const nameSpan = document.createElement('span');
   nameSpan.className = 'user-name-text';
   nameSpan.textContent = user.name ? user.name.split(' ')[0] : 'Alchemist';
 
-  // Sign out button
+  // Dropdown caret SVG icon
+  const caret = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  caret.setAttribute('class', 'dropdown-caret');
+  caret.setAttribute('width', '11');
+  caret.setAttribute('height', '11');
+  caret.setAttribute('viewBox', '0 0 24 24');
+  caret.setAttribute('fill', 'none');
+  caret.setAttribute('stroke', 'currentColor');
+  caret.setAttribute('stroke-width', '2.5');
+  caret.setAttribute('stroke-linecap', 'round');
+  caret.setAttribute('stroke-linejoin', 'round');
+  const caretPoly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+  caretPoly.setAttribute('points', '6 9 12 15 18 9');
+  caret.appendChild(caretPoly);
+
+  pill.appendChild(avatarWrapper);
+  pill.appendChild(nameSpan);
+  pill.appendChild(caret);
+
+  // 2. Dropdown Menu appearing on hover
+  const dropdown = document.createElement('div');
+  dropdown.className = 'navbar-auth-dropdown';
+  dropdown.setAttribute('role', 'menu');
+
+  const userHeader = document.createElement('div');
+  userHeader.className = 'dropdown-user-header';
+
+  const dropName = document.createElement('div');
+  dropName.className = 'dropdown-user-name';
+  dropName.textContent = user.name || 'Alchemist';
+
+  const dropEmail = document.createElement('div');
+  dropEmail.className = 'dropdown-user-email';
+  dropEmail.textContent = user.email || '';
+  dropEmail.title = user.email || '';
+
+  userHeader.appendChild(dropName);
+  if (user.email) userHeader.appendChild(dropEmail);
+
+  const divider = document.createElement('div');
+  divider.className = 'dropdown-divider';
+
+  // Sign out button inside dropdown
   const signOutBtn = document.createElement('button');
   signOutBtn.type = 'button';
-  signOutBtn.className = 'btn-sign-out';
-  signOutBtn.textContent = 'Sign Out';
+  signOutBtn.className = 'btn-dropdown-logout';
+  signOutBtn.setAttribute('role', 'menuitem');
   signOutBtn.title = 'Clear session and return to login';
+
+  const logoutSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  logoutSvg.setAttribute('width', '13');
+  logoutSvg.setAttribute('height', '13');
+  logoutSvg.setAttribute('viewBox', '0 0 24 24');
+  logoutSvg.setAttribute('fill', 'none');
+  logoutSvg.setAttribute('stroke', 'currentColor');
+  logoutSvg.setAttribute('stroke-width', '2');
+  logoutSvg.setAttribute('stroke-linecap', 'round');
+  logoutSvg.setAttribute('stroke-linejoin', 'round');
+  logoutSvg.innerHTML = '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>';
+
+  const logoutText = document.createElement('span');
+  logoutText.textContent = 'Sign Out';
+
+  signOutBtn.appendChild(logoutSvg);
+  signOutBtn.appendChild(logoutText);
+
   signOutBtn.addEventListener('click', (e) => {
     e.preventDefault();
+    e.stopPropagation();
     signOutUser();
   });
 
-  authContainer.appendChild(avatarWrapper);
-  authContainer.appendChild(nameSpan);
-  authContainer.appendChild(signOutBtn);
+  dropdown.appendChild(userHeader);
+  dropdown.appendChild(divider);
+  dropdown.appendChild(signOutBtn);
 
+  // Click & Touch toggle support (alongside hover)
+  pill.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isActive = authContainer.classList.toggle('is-active');
+    pill.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!authContainer.contains(e.target)) {
+      authContainer.classList.remove('is-active');
+      pill.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  authContainer.appendChild(pill);
+  authContainer.appendChild(dropdown);
   navWrap.appendChild(authContainer);
 }
 
