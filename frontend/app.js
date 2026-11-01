@@ -171,6 +171,11 @@ function initSkyThemeToggle() {
         overlay.className = "";
       }, 1750);
     }
+
+    // Adapt chart colors if chart exists on page
+    if (typeof renderChart === "function" && typeof selectedIngredientId !== "undefined") {
+      renderChart(selectedIngredientId);
+    }
   });
 }
 
@@ -503,6 +508,13 @@ async function renderChart(ingredientId) {
     chartInstance.destroy();
   }
 
+  const isNight = !document.body.classList.contains("day-sky-theme");
+  const historyBorder = isNight ? "#48BB78" : "#022015";
+  const historyBg = isNight ? "rgba(72, 187, 120, 0.12)" : "rgba(2, 32, 21, 0.08)";
+  const gridColor = isNight ? "rgba(255, 255, 255, 0.08)" : "rgba(2, 32, 21, 0.08)";
+  const tickColor = isNight ? "#8EABA0" : "#4A6256";
+  const axisTitleColor = isNight ? "#D8E8DF" : "#022015";
+
   const ctx = elForecastCanvas.getContext("2d");
   chartInstance = new Chart(ctx, {
     type: "line",
@@ -512,12 +524,12 @@ async function renderChart(ingredientId) {
         {
           label: "Historical Daily Sales",
           data: historySeries,
-          borderColor: "#022015",
-          backgroundColor: "rgba(2, 32, 21, 0.08)",
+          borderColor: historyBorder,
+          backgroundColor: historyBg,
           borderWidth: 2.5,
           tension: 0.2,
           pointRadius: 2.5,
-          pointBackgroundColor: "#022015",
+          pointBackgroundColor: historyBorder,
           pointHoverRadius: 5
         },
         {
@@ -586,7 +598,7 @@ async function renderChart(ingredientId) {
           display: false // Custom styled chips used
         },
         tooltip: {
-          backgroundColor: "#022015",
+          backgroundColor: isNight ? "#07100b" : "#022015",
           titleColor: "#F3D3B1",
           bodyColor: "#FFFFFF",
           borderColor: "#A65600",
@@ -598,26 +610,26 @@ async function renderChart(ingredientId) {
       scales: {
         x: {
           grid: {
-            color: "rgba(2, 32, 21, 0.08)"
+            color: gridColor
           },
           ticks: {
-            color: "#4A6256",
+            color: tickColor,
             maxTicksLimit: 12,
             font: { family: "'JetBrains Mono', monospace", size: 10 }
           }
         },
         y: {
           grid: {
-            color: "rgba(2, 32, 21, 0.08)"
+            color: gridColor
           },
           ticks: {
-            color: "#4A6256",
+            color: tickColor,
             font: { family: "'JetBrains Mono', monospace", size: 11 }
           },
           title: {
             display: true,
             text: "Units (Sales & Stock)",
-            color: "#022015",
+            color: axisTitleColor,
             font: { size: 11, weight: "bold" }
           }
         }

@@ -252,3 +252,4 @@ export const AnimatedContent: React.FC<AnimatedContentProps> = ({
 };
 
 export default AnimatedContent;
+

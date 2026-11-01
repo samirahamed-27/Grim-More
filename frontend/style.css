@@ -1861,6 +1861,400 @@ body {
   transition: opacity 0.85s ease-out;
 }
 
+/* ================= DARK MODE BOXES, HEADINGS & SURFACES ================= */
+body:not(.day-sky-theme) .main-header {
+  background: #0b1410;
+  border-color: #1d382b;
+  box-shadow: 4px 4px 0px #000000;
+}
+
+body:not(.day-sky-theme) .main-header h1 {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .main-header .bat-icon path,
+body:not(.day-sky-theme) .main-header .bat-icon polygon {
+  fill: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .brand-icon {
+  background: #14281f;
+  border-color: #1d382b;
+  box-shadow: 2px 2px 0px #000000;
+}
+
+body:not(.day-sky-theme) .subtitle {
+  color: #8EABA0;
+}
+
+body:not(.day-sky-theme) .nav-link {
+  color: #9EC0B2;
+}
+
+body:not(.day-sky-theme) .nav-link:hover {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .nav-link.active {
+  color: #FFFFFF;
+  border-bottom-color: var(--c-ochre);
+}
+
+body:not(.day-sky-theme) .howling-wolf-header svg path {
+  fill: #8EABA0;
+}
+
+body:not(.day-sky-theme) .data-mode-badge {
+  background: #102018;
+  border-color: #1d382b;
+  color: #D8E8DF;
+}
+
+body:not(.day-sky-theme) .btn-secondary {
+  background: #13241b;
+  color: #FFFFFF;
+  border-color: #244636;
+  box-shadow: 2px 2px 0px #000000;
+}
+
+body:not(.day-sky-theme) .btn-secondary:hover {
+  background: #1d382b;
+  color: #FFFFFF;
+}
+
+/* Hero Bauhaus Box */
+body:not(.day-sky-theme) .hero-bauhaus {
+  background: #0b1410;
+  border-color: #1d382b;
+  box-shadow: 4px 4px 0px #000000;
+}
+
+body:not(.day-sky-theme) .hero-right-field {
+  background: #0b1410;
+  border-left-color: #1d382b;
+}
+
+body:not(.day-sky-theme) .hero-desc-lead {
+  color: #DCEBE2;
+}
+
+body:not(.day-sky-theme) .hero-desc-lead strong {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .hero-desc-sub {
+  color: #8EABA0;
+}
+
+body:not(.day-sky-theme) .hero-divider-rule {
+  border-top-color: #1d382b;
+}
+
+body:not(.day-sky-theme) .hero-stat-cell {
+  border-right-color: #1d382b;
+}
+
+body:not(.day-sky-theme) .hero-stat-num {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .hero-stat-num.accent-ochre {
+  color: #FFA500;
+}
+
+body:not(.day-sky-theme) .hero-stat-num.accent-green {
+  color: #48BB78;
+}
+
+body:not(.day-sky-theme) .hero-stat-lbl {
+  color: #8EABA0;
+}
+
+body:not(.day-sky-theme) .spiderweb-corner path {
+  stroke: #224332;
+}
+
+/* Feature Grid Boxes */
+body:not(.day-sky-theme) .feature-grid-bauhaus {
+  border-color: #1d382b;
+  box-shadow: 4px 4px 0px #000000;
+  background: #1d382b;
+}
+
+body:not(.day-sky-theme) .b-cell-white {
+  background: #0b1410;
+  border-right-color: #1d382b;
+}
+
+body:not(.day-sky-theme) .b-cell-white .b-cell-eyebrow {
+  color: #8EABA0;
+}
+
+body:not(.day-sky-theme) .b-cell-white .b-cell-title {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .b-cell-white .b-cell-body {
+  color: #DCEBE2;
+}
+
+body:not(.day-sky-theme) .b-cell-buff {
+  background: #12221a;
+  border-right-color: #1d382b;
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .b-cell-buff .b-cell-eyebrow {
+  color: #FFA500;
+}
+
+body:not(.day-sky-theme) .b-cell-buff .b-cell-title {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .b-cell-buff .b-cell-body {
+  color: #DCEBE2;
+}
+
+/* Manifesto Section Box */
+body:not(.day-sky-theme) .manifesto-section {
+  background: #0b1410;
+  border-color: #1d382b;
+  box-shadow: 4px 4px 0px #000000;
+}
+
+body:not(.day-sky-theme) .manifesto-label-rail {
+  background: #060e0a;
+  border-right-color: #1d382b;
+}
+
+body:not(.day-sky-theme) .manifesto-col {
+  border-right-color: #1d382b;
+}
+
+body:not(.day-sky-theme) .manifesto-num {
+  color: #FFA500;
+}
+
+body:not(.day-sky-theme) .manifesto-title {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .manifesto-desc {
+  color: #C2D8CD;
+}
+
+/* Interactive Launch Banner Box */
+body:not(.day-sky-theme) .launch-banner-card {
+  background: #0b1410;
+  border-color: #1d382b;
+  box-shadow: 4px 4px 0px #000000;
+}
+
+body:not(.day-sky-theme) .launch-banner-title {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .launch-banner-sub {
+  color: #8EABA0;
+}
+
+/* General Cards & Ingredient Cards */
+body:not(.day-sky-theme) .card {
+  background: #0b1410;
+  border-color: #1d382b;
+  box-shadow: 4px 4px 0px #000000;
+}
+
+body:not(.day-sky-theme) .ingredient-card {
+  background: #0b1410;
+  border-color: #1d382b;
+  box-shadow: 4px 4px 0px #000000;
+}
+
+body:not(.day-sky-theme) .ingredient-card:hover {
+  background: #112019;
+  border-color: #274d3a;
+  box-shadow: 6px 6px 0px #000000;
+}
+
+body:not(.day-sky-theme) .ingredient-card.selected {
+  border-color: #FFA500;
+  background: #15271e;
+  box-shadow: 4px 4px 0px #FFA500;
+}
+
+body:not(.day-sky-theme) .card-name {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .card-qty-num {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .card-qty-label {
+  color: #8EABA0;
+}
+
+body:not(.day-sky-theme) .card-subtext {
+  color: #8EABA0;
+}
+
+body:not(.day-sky-theme) .stock-bar-track {
+  background: #15291f;
+}
+
+/* Analytics Row (Chart & Diagnostics) */
+body:not(.day-sky-theme) .chart-panel h3,
+body:not(.day-sky-theme) .panel-header h3 {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .chart-sub {
+  color: #8EABA0;
+}
+
+body:not(.day-sky-theme) .panel-header {
+  border-bottom-color: #1d382b;
+}
+
+body:not(.day-sky-theme) .formula-item {
+  border-bottom-color: #1d382b;
+}
+
+body:not(.day-sky-theme) .f-body strong {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .f-body code {
+  background: #14281f;
+  color: #FFA500;
+  border-color: #244636;
+}
+
+body:not(.day-sky-theme) .f-body p {
+  color: #C2D8CD;
+}
+
+body:not(.day-sky-theme) .math-proof-box {
+  background: #07100b;
+  border-color: #1d382b;
+  box-shadow: 2px 2px 0px #000000;
+}
+
+body:not(.day-sky-theme) .math-proof-box h4 {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .proof-row {
+  color: #8EABA0;
+}
+
+body:not(.day-sky-theme) .proof-row strong {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .proof-row.highlight-row {
+  color: #FFFFFF;
+  border-top-color: #1d382b;
+}
+
+body:not(.day-sky-theme) .proof-row.highlight-row strong {
+  color: #FFA500;
+}
+
+/* Reorder Table Box */
+body:not(.day-sky-theme) .table-container {
+  background: #0b1410;
+  border-color: #1d382b;
+  box-shadow: 4px 4px 0px #000000;
+}
+
+body:not(.day-sky-theme) .reorder-table th {
+  background: #060e0a;
+  color: #FFA500;
+  border-bottom-color: #1d382b;
+}
+
+body:not(.day-sky-theme) .reorder-table td {
+  border-bottom-color: #15291f;
+  color: #E2EFE7;
+}
+
+body:not(.day-sky-theme) .reorder-table tbody tr:hover {
+  background: #12241b;
+}
+
+/* Restock Panel Box */
+body:not(.day-sky-theme) .restock-panel {
+  background: #0b1410;
+  border-color: #1d382b;
+  box-shadow: 4px 4px 0px #000000;
+}
+
+body:not(.day-sky-theme) .restock-group label {
+  color: #8EABA0;
+}
+
+body:not(.day-sky-theme) .restock-input {
+  background: #07100b;
+  color: #FFFFFF;
+  border-color: #244636;
+  box-shadow: 2px 2px 0px #000000;
+}
+
+body:not(.day-sky-theme) .restock-input:focus {
+  background: #0c1a12;
+  border-color: #FFA500;
+}
+
+body:not(.day-sky-theme) .search-results-dropdown {
+  background: #07100b;
+  border-color: #244636;
+  box-shadow: 4px 4px 0px #000000;
+}
+
+body:not(.day-sky-theme) .search-result-item {
+  border-bottom-color: #15291f;
+  color: #E2EFE7;
+}
+
+body:not(.day-sky-theme) .search-result-item:hover,
+body:not(.day-sky-theme) .search-result-item.highlighted {
+  background: #14281f;
+}
+
+body:not(.day-sky-theme) .search-item-stock {
+  color: #8EABA0;
+}
+
+/* Footer Box */
+body:not(.day-sky-theme) .main-footer {
+  background: #0b1410;
+  border-color: #1d382b;
+  box-shadow: 4px 4px 0px #000000;
+}
+
+body:not(.day-sky-theme) .main-footer h4 {
+  color: #FFFFFF;
+}
+
+body:not(.day-sky-theme) .main-footer p {
+  color: #8EABA0 !important;
+}
+
+body:not(.day-sky-theme) .footer-tag {
+  background: #14281f;
+  color: #D8E8DF;
+  border-color: #244636;
+  box-shadow: 2px 2px 0px #000000;
+}
+
+body:not(.day-sky-theme) .footer-tag:hover {
+  background: #A65600;
+  color: #FFFFFF;
+}
+
 /* Day Mode Styling for Webpage when toggle is unchecked */
 body.day-sky-theme {
   background-color: #F8EBDD;
