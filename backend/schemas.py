@@ -3,7 +3,7 @@ Potion Pantry - Request and Response Schemas (backend/schemas.py)
 Defines Pydantic models for restock purchases, search queries, and unified error responses.
 """
 
-from typing import Optional
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 
 # Maximum allowed quantity for a single purchase to prevent integer overflow
@@ -69,5 +69,50 @@ class GoogleAuthResponse(BaseModel):
 class AuthConfigResponse(BaseModel):
     """Public authentication configuration parameters for frontend initialization."""
     google_client_id: str
+
+
+class InvoiceScanItem(BaseModel):
+    """Line item extracted and matched by the invoice scanner."""
+    ingredient_id: int = Field(..., gt=0, description="Ingredient ID in database")
+    ingredient_name: str = Field(..., description="Canonical ingredient name")
+    detected_raw_text: str = Field(..., description="Original raw line item text from invoice")
+    quantity: int = Field(..., ge=1, le=MAX_QUANTITY, description="Quantity detected")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="OCR and match confidence score")
+
+
+class UnmatchedScanItem(BaseModel):
+    """Line item from invoice that could not be mapped to the ingredient roster."""
+    raw_text: str
+    quantity: Optional[int] = None
+    reason: str = "Unknown ingredient or auxiliary item"
+
+
+class InvoiceScanResponse(BaseModel):
+    """Structured extraction result returned by POST /api/invoice/scan."""
+    invoice_number: str
+    supplier: str
+    date: str
+    items: List[InvoiceScanItem]
+    unmatched_items: List[UnmatchedScanItem] = []
+
+
+class InvoiceConfirmItem(BaseModel):
+    """Item approved by merchant to be added to inventory."""
+    ingredient_id: int = Field(..., gt=0)
+    quantity: int = Field(..., ge=1, le=MAX_QUANTITY)
+
+
+class InvoiceConfirmRequest(BaseModel):
+    """Payload for POST /api/invoice/confirm."""
+    items: List[InvoiceConfirmItem] = Field(..., min_length=1)
+    invoice_reference: str = Field(default="")
+
+
+class InvoiceConfirmResponse(BaseModel):
+    """Response returned upon inventory batch increment."""
+    message: str
+    invoice_reference: str
+    updated_ingredients: List[Dict[str, Any]]
+
 
 

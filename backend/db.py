@@ -440,6 +440,46 @@ def record_purchase(
         return dict(cursor.fetchone())
 
 
+def record_invoice_purchases(
+    items: List[Dict[str, Any]],
+    invoice_reference: str = "",
+    db_path: Optional[Union[str, Path]] = None,
+) -> List[Dict[str, Any]]:
+    """
+    Atomically records a batch of invoice line items, inserts purchase rows,
+    and increments current_stock for all matched ingredients within one transaction.
+    """
+    now_utc = datetime.now(timezone.utc).isoformat()
+    conn = get_connection(db_path)
+    updated_ingredients: List[Dict[str, Any]] = []
+    with conn:
+        cursor = conn.cursor()
+        for item in items:
+            ing_id = int(item["ingredient_id"])
+            qty = int(item["quantity"])
+            if qty <= 0:
+                continue
+            cursor.execute("SELECT id, name, current_stock, lead_time_days, cover_days FROM ingredients WHERE id = ?;", (ing_id,))
+            row = cursor.fetchone()
+            if not row:
+                continue
+            cursor.execute(
+                "INSERT INTO purchases (ingredient_id, quantity, created_at) VALUES (?, ?, ?);",
+                (ing_id, qty, now_utc),
+            )
+            cursor.execute(
+                "UPDATE ingredients SET current_stock = current_stock + ? WHERE id = ?;",
+                (qty, ing_id),
+            )
+            cursor.execute(
+                "SELECT id, name, current_stock, lead_time_days, cover_days FROM ingredients WHERE id = ?;",
+                (ing_id,),
+            )
+            updated_ingredients.append(dict(cursor.fetchone()))
+    return updated_ingredients
+
+
+
 def get_latest_sales_date(db_path: Optional[Union[str, Path]] = None) -> str:
     """
     Returns the latest sales date recorded in the sales table.

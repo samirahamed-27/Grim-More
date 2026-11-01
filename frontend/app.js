@@ -132,6 +132,7 @@ function setupEventListeners() {
   if (elBtnAnnounceEvent) elBtnAnnounceEvent.addEventListener("click", handleAnnounceEvent);
   if (elBtnReset) elBtnReset.addEventListener("click", handleReset);
   initRestockPanel();
+  initInvoiceScanner();
   initSkyThemeToggle();
   initPurchaseOrderModal();
 }
@@ -1204,4 +1205,332 @@ if ("serviceWorker" in navigator) {
       .then((reg) => console.log("[PWA] Service Worker registered:", reg.scope))
       .catch((err) => console.warn("[PWA] Service Worker registration failed:", err));
   });
+}
+
+// ==============================================================================
+// AI INVOICE & E-BILL SCANNER CONTROLLER
+// ==============================================================================
+
+const CANONICAL_INGREDIENTS = [
+  { id: 1, name: "Moonflower" },
+  { id: 2, name: "Silver Dew" },
+  { id: 3, name: "Wolfsbane" },
+  { id: 4, name: "Dragon Resin" },
+  { id: 5, name: "Nightshade" },
+  { id: 6, name: "Mandrake Root" },
+];
+
+let scannedInvoiceReference = "";
+
+function initInvoiceScanner() {
+  const btnOpen = document.getElementById("btnOpenInvoiceScanner");
+  const modal = document.getElementById("invoiceScannerModal");
+  const btnClose = document.getElementById("btnCloseInvoiceModal");
+  const btnCancel = document.getElementById("btnCancelScan");
+  const dropZone = document.getElementById("invoiceDropZone");
+  const fileInput = document.getElementById("invoiceFileInput");
+  const btnConfirm = document.getElementById("btnConfirmInventory");
+  const btnAddManual = document.getElementById("btnAddManualItem");
+
+  if (!btnOpen || !modal) return;
+
+  function openModal() {
+    modal.classList.remove("hidden");
+    resetScannerState();
+  }
+
+  function closeModal() {
+    modal.classList.add("hidden");
+  }
+
+  btnOpen.addEventListener("click", openModal);
+  if (btnClose) btnClose.addEventListener("click", closeModal);
+  if (btnCancel) btnCancel.addEventListener("click", closeModal);
+
+  // Close modal when clicking outside dialog
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  // Dropzone interactions
+  if (dropZone && fileInput) {
+    dropZone.addEventListener("click", () => fileInput.click());
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+    dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        handleInvoiceFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files[0]) {
+        handleInvoiceFile(e.target.files[0]);
+      }
+    });
+  }
+
+  if (btnAddManual) {
+    btnAddManual.addEventListener("click", () => {
+      addScannedItemRow({
+        ingredient_id: 1,
+        ingredient_name: "Moonflower",
+        detected_raw_text: "Manual Entry",
+        quantity: 100,
+        confidence: 1.0,
+      });
+    });
+  }
+
+  if (btnConfirm) {
+    btnConfirm.addEventListener("click", handleConfirmScannedInventory);
+  }
+}
+
+function resetScannerState() {
+  const uploadStep = document.getElementById("scannerUploadStep");
+  const loadingStep = document.getElementById("scannerLoadingStep");
+  const reviewStep = document.getElementById("scannerReviewStep");
+  const statusBanner = document.getElementById("scannerConfirmStatus");
+  const tbody = document.getElementById("scannedItemsTableBody");
+  const fileInput = document.getElementById("invoiceFileInput");
+
+  if (uploadStep) uploadStep.classList.remove("hidden");
+  if (loadingStep) loadingStep.classList.add("hidden");
+  if (reviewStep) reviewStep.classList.add("hidden");
+  if (statusBanner) {
+    statusBanner.classList.add("hidden");
+    statusBanner.textContent = "";
+  }
+  if (tbody) tbody.innerHTML = "";
+  if (fileInput) fileInput.value = "";
+}
+
+async function handleInvoiceFile(file) {
+  const uploadStep = document.getElementById("scannerUploadStep");
+  const loadingStep = document.getElementById("scannerLoadingStep");
+
+  // Validate format and size (max 10MB)
+  const allowed = [".png", ".jpg", ".jpeg", ".webp", ".pdf"];
+  const ext = "." + (file.name.split(".").pop() || "").toLowerCase();
+  if (!allowed.includes(ext)) {
+    alert("Please upload a valid invoice image (.png, .jpg, .webp) or PDF.");
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    alert("Invoice file exceeds 10MB limit.");
+    return;
+  }
+
+  if (uploadStep) uploadStep.classList.add("hidden");
+  if (loadingStep) loadingStep.classList.remove("hidden");
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const res = await fetch(`${API_BASE}/api/invoice/scan`, {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "Invoice scanning failed.");
+      resetScannerState();
+      return;
+    }
+
+    renderScanReview(data);
+  } catch (err) {
+    console.error("Invoice scan network error:", err);
+    alert("Failed to communicate with invoice scanner on backend.");
+    resetScannerState();
+  }
+}
+
+function renderScanReview(data) {
+  const loadingStep = document.getElementById("scannerLoadingStep");
+  const reviewStep = document.getElementById("scannerReviewStep");
+  const metaInv = document.getElementById("metaInvoiceNum");
+  const metaSup = document.getElementById("metaSupplier");
+  const metaDate = document.getElementById("metaDate");
+  const tbody = document.getElementById("scannedItemsTableBody");
+
+  if (loadingStep) loadingStep.classList.add("hidden");
+  if (reviewStep) reviewStep.classList.remove("hidden");
+
+  scannedInvoiceReference = data.invoice_number || "INV-SCANNED";
+  if (metaInv) metaInv.textContent = data.invoice_number || "N/A";
+  if (metaSup) metaSup.textContent = data.supplier || "Supplier Wholesaler";
+  if (metaDate) metaDate.textContent = data.date || "N/A";
+
+  if (tbody) {
+    tbody.innerHTML = "";
+    if (data.items && data.items.length > 0) {
+      data.items.forEach(item => addScannedItemRow(item));
+    } else {
+      addScannedItemRow({
+        ingredient_id: 1,
+        ingredient_name: "Moonflower",
+        detected_raw_text: "Sample receipt item",
+        quantity: 100,
+        confidence: 0.9,
+      });
+    }
+  }
+}
+
+function addScannedItemRow(item) {
+  const tbody = document.getElementById("scannedItemsTableBody");
+  if (!tbody) return;
+
+  const tr = document.createElement("tr");
+
+  // Col 1: Ingredient Select
+  const tdIng = document.createElement("td");
+  const select = document.createElement("select");
+  select.className = "scanned-ing-select";
+  CANONICAL_INGREDIENTS.forEach(ing => {
+    const opt = document.createElement("option");
+    opt.value = ing.id;
+    opt.textContent = ing.name;
+    if (ing.id === item.ingredient_id) opt.selected = true;
+    select.appendChild(opt);
+  });
+  tdIng.appendChild(select);
+
+  // Col 2: Quantity Input
+  const tdQty = document.createElement("td");
+  const qtyInput = document.createElement("input");
+  qtyInput.type = "number";
+  qtyInput.min = "1";
+  qtyInput.max = "100000";
+  qtyInput.value = item.quantity || 50;
+  qtyInput.className = "scanned-qty-input";
+  tdQty.appendChild(qtyInput);
+
+  // Col 3: Detected Raw Text (safe textContent)
+  const tdRaw = document.createElement("td");
+  tdRaw.className = "scanned-raw-text";
+  tdRaw.textContent = item.detected_raw_text || "-";
+  tdRaw.title = item.detected_raw_text || "";
+
+  // Col 4: Match Confidence Badge
+  const tdConf = document.createElement("td");
+  const badge = document.createElement("span");
+  badge.className = "match-badge";
+  const pct = Math.round((item.confidence || 0.85) * 100);
+  badge.textContent = `${pct}%`;
+  tdConf.appendChild(badge);
+
+  // Col 5: Remove Row Button
+  const tdDel = document.createElement("td");
+  const btnDel = document.createElement("button");
+  btnDel.type = "button";
+  btnDel.className = "btn-remove-row";
+  btnDel.textContent = "✕";
+  btnDel.title = "Remove item";
+  btnDel.addEventListener("click", () => tr.remove());
+  tdDel.appendChild(btnDel);
+
+  tr.appendChild(tdIng);
+  tr.appendChild(tdQty);
+  tr.appendChild(tdRaw);
+  tr.appendChild(tdConf);
+  tr.appendChild(tdDel);
+
+  tbody.appendChild(tr);
+}
+
+async function handleConfirmScannedInventory() {
+  const tbody = document.getElementById("scannedItemsTableBody");
+  const banner = document.getElementById("scannerConfirmStatus");
+  const btnConfirm = document.getElementById("btnConfirmInventory");
+  if (!tbody) return;
+
+  const rows = tbody.querySelectorAll("tr");
+  if (rows.length === 0) {
+    if (banner) {
+      banner.className = "scanner-confirm-banner error";
+      banner.textContent = "No items to confirm. Add an item or scan another invoice.";
+      banner.classList.remove("hidden");
+    }
+    return;
+  }
+
+  const items = [];
+  rows.forEach(tr => {
+    const sel = tr.querySelector(".scanned-ing-select");
+    const qtyInput = tr.querySelector(".scanned-qty-input");
+    if (sel && qtyInput) {
+      const ingId = parseInt(sel.value, 10);
+      const qty = parseInt(qtyInput.value, 10);
+      if (ingId > 0 && qty > 0) {
+        items.push({ ingredient_id: ingId, quantity: qty });
+      }
+    }
+  });
+
+  if (items.length === 0) {
+    if (banner) {
+      banner.className = "scanner-confirm-banner error";
+      banner.textContent = "Please ensure all quantities are positive numbers.";
+      banner.classList.remove("hidden");
+    }
+    return;
+  }
+
+  if (btnConfirm) btnConfirm.disabled = true;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/invoice/confirm`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items: items,
+        invoice_reference: scannedInvoiceReference,
+      }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      if (banner) {
+        banner.className = "scanner-confirm-banner error";
+        banner.textContent = data.error || "Inventory replenishment failed.";
+        banner.classList.remove("hidden");
+      }
+      if (btnConfirm) btnConfirm.disabled = false;
+      return;
+    }
+
+    if (banner) {
+      banner.className = "scanner-confirm-banner success";
+      banner.textContent = `${data.message} Days of cover updated.`;
+      banner.classList.remove("hidden");
+    }
+
+    // Refresh all pantry cards, charts, and reorder tables immediately
+    await renderApp();
+
+    setTimeout(() => {
+      const modal = document.getElementById("invoiceScannerModal");
+      if (modal) modal.classList.add("hidden");
+      if (btnConfirm) btnConfirm.disabled = false;
+    }, 1400);
+
+  } catch (err) {
+    console.error("Invoice confirm error:", err);
+    if (banner) {
+      banner.className = "scanner-confirm-banner error";
+      banner.textContent = "Failed to communicate with inventory confirmation API.";
+      banner.classList.remove("hidden");
+    }
+    if (btnConfirm) btnConfirm.disabled = false;
+  }
 }
