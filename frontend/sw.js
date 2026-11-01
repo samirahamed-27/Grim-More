@@ -1,5 +1,5 @@
 // Grim-More Progressive Web App Service Worker
-const CACHE_NAME = "grim-more-v2";
+const CACHE_NAME = "grim-more-v3";
 const ASSETS_TO_CACHE = [
   "/",
   "/index.html",

@@ -114,8 +114,33 @@ const elWorkedExampleBox = document.getElementById("workedExampleBox");
 
 document.addEventListener("DOMContentLoaded", async () => {
   setupEventListeners();
-  await checkBackendConnection();
-  await renderApp();
+
+  // Instant synchronous first render: guarantees cards and tables are NEVER blank
+  currentIngredientsData = isFestivalActive ? MOCK_SPIKED_INGREDIENTS : MOCK_BASELINE_INGREDIENTS;
+  if (elIngredientsGrid) {
+    renderCards(currentIngredientsData);
+  }
+  if (elReorderTbody) {
+    renderReorderTable(currentIngredientsData);
+  }
+
+  // Probe backend connection with tight timeout guard
+  try {
+    await checkBackendConnection();
+  } catch (err) {
+    console.warn("Backend health check error:", err);
+    isBackendLive = false;
+  }
+
+  // Full asynchronous render with live data
+  try {
+    await renderApp();
+  } catch (err) {
+    console.warn("renderApp error, ensuring mock cards stay active:", err);
+    if (elIngredientsGrid && elIngredientsGrid.children.length === 0) {
+      renderCards(currentIngredientsData);
+    }
+  }
 });
 
 function setupEventListeners() {
@@ -131,10 +156,11 @@ function setupEventListeners() {
   if (elBtnTriggerSpike) elBtnTriggerSpike.addEventListener("click", handleTriggerFestival);
   if (elBtnAnnounceEvent) elBtnAnnounceEvent.addEventListener("click", handleAnnounceEvent);
   if (elBtnReset) elBtnReset.addEventListener("click", handleReset);
-  initRestockPanel();
-  initInvoiceScanner();
-  initSkyThemeToggle();
-  initPurchaseOrderModal();
+
+  try { initRestockPanel(); } catch (e) { console.warn("initRestockPanel error:", e); }
+  try { initInvoiceScanner(); } catch (e) { console.warn("initInvoiceScanner error:", e); }
+  try { initSkyThemeToggle(); } catch (e) { console.warn("initSkyThemeToggle error:", e); }
+  try { initPurchaseOrderModal(); } catch (e) { console.warn("initPurchaseOrderModal error:", e); }
 }
 
 // Sky theme toggle with right-to-left sweep transition
@@ -186,7 +212,10 @@ function initSkyThemeToggle() {
 // Check if FastAPI backend is reachable
 async function checkBackendConnection() {
   try {
-    const res = await fetch(`${API_BASE}/health`, { method: "GET" });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1200);
+    const res = await fetch(`${API_BASE}/health`, { method: "GET", signal: controller.signal });
+    clearTimeout(timeoutId);
     if (res.ok) {
       isBackendLive = true;
       if (elDataModeBadge) elDataModeBadge.remove();
@@ -207,7 +236,10 @@ async function renderApp() {
 
   if (isBackendLive) {
     try {
-      const res = await fetch(`${API_BASE}/api/ingredients`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1500);
+      const res = await fetch(`${API_BASE}/api/ingredients`, { signal: controller.signal });
+      clearTimeout(timeoutId);
       if (res.ok) {
         ingredients = await res.json();
       } else {
@@ -235,9 +267,14 @@ async function renderApp() {
 
 // Render 6 Ingredient Cards
 function renderCards(ingredients) {
+  if (!elIngredientsGrid) return;
+  const list = Array.isArray(ingredients) && ingredients.length > 0
+    ? ingredients
+    : (isFestivalActive ? MOCK_SPIKED_INGREDIENTS : MOCK_BASELINE_INGREDIENTS);
+
   elIngredientsGrid.innerHTML = "";
 
-  ingredients.forEach((ing) => {
+  list.forEach((ing) => {
     const card = document.createElement("div");
     card.className = `ingredient-card ${ing.status === "critical" ? "status-critical" : ""} ${ing.id === selectedIngredientId ? "selected" : ""}`;
     card.dataset.id = ing.id;
@@ -257,11 +294,11 @@ function renderCards(ingredients) {
       <div class="card-stats">
         <div class="stat-item">
           <span class="stat-label">Stock On Hand</span>
-          <span class="stat-val">${ing.current_stock.toLocaleString()}</span>
+          <span class="stat-val">${(ing.current_stock || 0).toLocaleString()}</span>
         </div>
         <div class="stat-item">
           <span class="stat-label">Forecast / Day</span>
-          <span class="stat-val">${Math.round(ing.daily_forecast)}</span>
+          <span class="stat-val">${Math.round(ing.daily_forecast || 0)}</span>
         </div>
         <div class="stat-item">
           <span class="stat-label">Days of Cover</span>
@@ -269,7 +306,7 @@ function renderCards(ingredients) {
         </div>
         <div class="stat-item">
           <span class="stat-label">Lead Time</span>
-          <span class="stat-val">${ing.lead_time_days} d</span>
+          <span class="stat-val">${ing.lead_time_days || 0} d</span>
         </div>
       </div>
       ${ing.status === 'critical' ? `<div class="card-footer-alert">🚨 Stockout in ${coverDisplay}d (Lead: ${ing.lead_time_days}d)</div>` : ''}
