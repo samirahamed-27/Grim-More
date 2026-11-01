@@ -7,9 +7,15 @@ day-by-day stockout simulation, and smart deduplicated reorder history tracking.
 """
 
 import math
+import os
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Union
+from dotenv import load_dotenv
+
+# Load local environment variables (.env) safely
+load_dotenv()
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -1058,7 +1064,7 @@ def get_copilot_status():
     import os
     from backend.copilot.tools import get_demo_today_str
     api_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    model = os.environ.get("COPILOT_MODEL", "gemini-2.5-flash")
+    model = os.environ.get("COPILOT_MODEL", "gemini-3.8-flash")
     return {
         "llm_available": bool(api_key),
         "mode": "llm" if bool(api_key) else "offline",

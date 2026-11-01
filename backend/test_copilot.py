@@ -48,7 +48,8 @@ def clean_test_environment():
     conn.close()
     pending_actions.clear()
     rate_limiter.clear()
-    yield
+    with patch.dict(os.environ, {"GEMINI_API_KEY": ""}):
+        yield
     reset_state()
     conn = get_connection()
     with conn:

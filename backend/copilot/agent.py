@@ -42,8 +42,8 @@ def get_env_int(key: str, default: int) -> int:
         return default
 
 
-COPILOT_MODEL = os.environ.get("COPILOT_MODEL", "gemini-2.5-flash")
-COPILOT_TIMEOUT_SECONDS = get_env_int("COPILOT_TIMEOUT_SECONDS", 10)
+COPILOT_MODEL = os.environ.get("COPILOT_MODEL", "gemini-3.8-flash")
+COPILOT_TIMEOUT_SECONDS = get_env_int("COPILOT_TIMEOUT_SECONDS", 120)
 COPILOT_MAX_TOOL_STEPS = get_env_int("COPILOT_MAX_TOOL_STEPS", 5)
 COPILOT_MAX_INPUT_CHARS = get_env_int("COPILOT_MAX_INPUT_CHARS", 500)
 COPILOT_RATE_LIMIT_PER_MINUTE = get_env_int("COPILOT_RATE_LIMIT_PER_MINUTE", 20)
@@ -315,7 +315,7 @@ async def _execute_llm_agent_loop(
     from google import genai
     from google.genai import types
 
-    model_name = os.environ.get("COPILOT_MODEL", "gemini-2.5-flash")
+    model_name = os.environ.get("COPILOT_MODEL", "gemini-3.8-flash")
     client = llm_client or genai.Client(api_key=api_key)
 
     system_instruction = build_system_prompt()
