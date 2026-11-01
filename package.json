@@ -23,9 +23,7 @@
   },
   "homepage": "https://github.com/samirahamed-27/Grim-More#readme",
   "dependencies": {
-    "gsap": "^3.15.0",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "gsap": "^3.15.0"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",
