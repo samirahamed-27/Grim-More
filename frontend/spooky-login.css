@@ -1,0 +1,396 @@
+/* ==========================================================================
+   Spooky Login Transition & Spectral Ghost Animation — Grim-More Potion Pantry
+   Aesthetic: Ethereal obsidian, emerald ectoplasm, floating spirit apparition
+   ========================================================================== */
+
+/* Full-viewport cinematic overlay for post-signin transition */
+#spookyAuthOverlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100000;
+  pointer-events: all;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 50%, rgba(12, 28, 20, 0.96) 0%, rgba(3, 8, 5, 0.98) 60%, #010403 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease-out, visibility 0.35s ease-out;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+#spookyAuthOverlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Creeping ectoplasm fog layers at the base */
+.spooky-fog-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 45vh;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+  opacity: 0.7;
+}
+
+.spooky-fog-layer {
+  position: absolute;
+  bottom: -30px;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: radial-gradient(ellipse at 30% 90%, rgba(61, 125, 84, 0.35) 0%, rgba(18, 38, 28, 0.2) 40%, transparent 75%),
+              radial-gradient(ellipse at 70% 85%, rgba(104, 211, 145, 0.25) 0%, rgba(12, 25, 18, 0.15) 45%, transparent 80%);
+  animation: eerieFogDrift 18s ease-in-out infinite alternate;
+}
+
+.spooky-fog-layer.secondary {
+  bottom: -10px;
+  opacity: 0.55;
+  background: radial-gradient(ellipse at 60% 95%, rgba(72, 187, 120, 0.3) 0%, rgba(10, 24, 17, 0.2) 50%, transparent 80%);
+  animation: eerieFogDrift 14s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes eerieFogDrift {
+  0% { transform: translateX(0) scaleY(1); }
+  50% { transform: translateX(-15%) scaleY(1.08); }
+  100% { transform: translateX(-30%) scaleY(0.95); }
+}
+
+/* Rotating Arcane Sanctum Seal */
+.spooky-arcane-seal {
+  position: absolute;
+  width: min(85vw, 480px);
+  height: min(85vw, 480px);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transform: scale(0.65) rotate(0deg);
+  transition: opacity 0.6s ease-out, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#spookyAuthOverlay.active .spooky-arcane-seal {
+  opacity: 0.85;
+  transform: scale(1) rotate(60deg);
+}
+
+.spooky-seal-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 25px rgba(61, 125, 84, 0.55));
+}
+
+.spooky-seal-ring {
+  transform-origin: center;
+  animation: sealSpin 22s linear infinite;
+}
+
+.spooky-seal-inner {
+  transform-origin: center;
+  animation: sealSpinRev 16s linear infinite;
+}
+
+@keyframes sealSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sealSpinRev {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+/* Flying Spectral Ghost Stage */
+.spooky-ghost-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+  overflow: hidden;
+}
+
+/* The Flying Ghost Entity */
+.spooky-flying-ghost {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150px;
+  height: 180px;
+  margin-top: -90px;
+  margin-left: -75px;
+  pointer-events: none;
+  opacity: 0;
+  filter: drop-shadow(0 0 24px rgba(104, 211, 145, 0.85))
+          drop-shadow(0 12px 35px rgba(0, 0, 0, 0.85));
+  will-change: transform, opacity, filter;
+}
+
+/* Flight Trajectory Animation */
+#spookyAuthOverlay.active .spooky-flying-ghost {
+  animation: ghostlyFlightSequence 1.75s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes ghostlyFlightSequence {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 90px, 0) scale(0.4) rotate(-15deg);
+  }
+  15% {
+    opacity: 1;
+    transform: translate3d(-35px, 20px, 0) scale(0.85) rotate(-8deg);
+  }
+  40% {
+    opacity: 1;
+    transform: translate3d(85px, -60px, 0) scale(1.15) rotate(14deg);
+    filter: drop-shadow(0 0 35px rgba(104, 211, 145, 0.95))
+            drop-shadow(0 16px 40px rgba(0, 0, 0, 0.9));
+  }
+  70% {
+    opacity: 1;
+    transform: translate3d(-50px, -20px, 0) scale(1.4) rotate(-10deg);
+  }
+  90% {
+    opacity: 0.95;
+    transform: translate3d(0, 0, 0) scale(3.2) rotate(3deg);
+    filter: drop-shadow(0 0 65px rgba(167, 243, 208, 1))
+            drop-shadow(0 0 100px rgba(61, 125, 84, 0.9));
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -10px, 0) scale(5.2) rotate(0deg);
+    filter: drop-shadow(0 0 90px rgba(255, 255, 255, 1));
+  }
+}
+
+/* Ghost Inner SVG Undulation */
+.spooky-ghost-body {
+  animation: ghostUndulate 0.7s ease-in-out infinite alternate;
+  transform-origin: 50% 30%;
+}
+
+@keyframes ghostUndulate {
+  0% {
+    transform: translateY(0) scaleX(1) scaleY(1);
+  }
+  100% {
+    transform: translateY(-8px) scaleX(1.05) scaleY(0.96);
+  }
+}
+
+/* Glowing Spectral Eyes */
+.spooky-ghost-eye-core {
+  animation: spectralEyePulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes spectralEyePulse {
+  0% {
+    fill: #00FFA3;
+    filter: drop-shadow(0 0 4px #00FFA3);
+  }
+  100% {
+    fill: #FFFFFF;
+    filter: drop-shadow(0 0 12px #68D391) drop-shadow(0 0 20px #00FFA3);
+  }
+}
+
+/* Trailing Spectral Particles */
+.spooky-trail-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, #A7F3D0 0%, #3D7D54 60%, transparent 100%);
+  box-shadow: 0 0 12px #68D391, 0 0 20px rgba(61, 125, 84, 0.6);
+  opacity: 0.9;
+  z-index: 8;
+  animation: particleFadeOut 0.8s ease-out forwards;
+}
+
+@keyframes particleFadeOut {
+  0% {
+    opacity: 0.9;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.15) translate3d(var(--drift-x, 0px), var(--drift-y, 30px), 0);
+  }
+}
+
+/* Spooky Sanctum Awakening Greeting Text */
+.spooky-sanctum-greeting {
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 12;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease-out, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 90%;
+  max-width: 500px;
+}
+
+#spookyAuthOverlay.active .spooky-sanctum-greeting {
+  opacity: 1;
+  transform: translate(-50%, -50%) translateY(0);
+  transition-delay: 0.25s;
+}
+
+.spooky-greeting-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #68D391;
+  text-shadow: 0 0 10px rgba(104, 211, 145, 0.65);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.spooky-greeting-title {
+  font-family: 'Marcellus', serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  letter-spacing: 0.08em;
+  color: #F8EBDD;
+  text-shadow: 0 0 15px rgba(248, 235, 221, 0.4), 0 0 30px rgba(61, 125, 84, 0.8);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.15;
+}
+
+.spooky-greeting-caption {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: #B5C7BD;
+  letter-spacing: 0.05em;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Spectral Portal Full Flash */
+.spooky-portal-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(104, 211, 145, 0.95) 0%, rgba(18, 48, 32, 0.9) 50%, #030806 90%);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease-in;
+}
+
+.spooky-portal-flash.flash-active {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Dashboard Arrival Transition (Continuous Experience Handshake)
+   ========================================================================== */
+.spooky-arrival-ghost-banner {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-120px);
+  z-index: 9999;
+  background: rgba(8, 20, 14, 0.94);
+  border: 1px solid rgba(104, 211, 145, 0.45);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.75), 0 0 25px rgba(61, 125, 84, 0.35);
+  border-radius: 40px;
+  padding: 0.65rem 1.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  pointer-events: none;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.45s ease;
+  opacity: 0;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.spooky-arrival-ghost-banner.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.spooky-banner-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 8px #68D391);
+}
+
+.spooky-banner-text {
+  font-family: 'Syne', 'Inter', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #F8EBDD;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.spooky-banner-name {
+  color: #68D391;
+  text-shadow: 0 0 8px rgba(104, 211, 145, 0.6);
+}
+
+/* Flying arrival spirit across dashboard top header */
+.spooky-arrival-swoop {
+  position: fixed;
+  top: 15px;
+  left: -120px;
+  width: 90px;
+  height: 100px;
+  z-index: 9998;
+  pointer-events: none;
+  filter: drop-shadow(0 0 16px rgba(104, 211, 145, 0.85));
+  animation: dashboardSwoopFlight 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes dashboardSwoopFlight {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.6) rotate(15deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.95;
+    transform: translate3d(20vw, 15px, 0) scale(0.95) rotate(-5deg);
+  }
+  60% {
+    opacity: 0.9;
+    transform: translate3d(65vw, -10px, 0) scale(1.1) rotate(12deg);
+  }
+  90% {
+    opacity: 0.4;
+    transform: translate3d(105vw, 25px, 0) scale(0.8) rotate(-8deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(120vw, 30px, 0) scale(0.5) rotate(0deg);
+  }
+}
+
+/* Reduced Motion Fallback */
+@media (prefers-reduced-motion: reduce) {
+  #spookyAuthOverlay.active .spooky-flying-ghost {
+    animation: none;
+    opacity: 0.9;
+    transform: translate3d(0, 0, 0) scale(1.2);
+  }
+  .spooky-arrival-swoop {
+    display: none;
+  }
+  .spooky-seal-ring, .spooky-seal-inner {
+    animation: none;
+  }
+}

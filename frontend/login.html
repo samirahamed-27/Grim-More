@@ -9,6 +9,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>Login — Grim-More Potion Pantry</title>
   <link rel="stylesheet" href="style.css?v=20261101_email_auth">
+  <link rel="stylesheet" href="spooky-login.css?v=20261101_apparition">
   <!-- Google Fonts: Jost, Marcellus, Syne, Inter, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -96,6 +97,7 @@
   </div>
 
   <script src="auth.js"></script>
+  <script src="spooky-login.js"></script>
   <script>
     (function () {
       // Check if user is already logged in; redirect if so
@@ -119,9 +121,13 @@
         PotionAuth.setAuthSession(data);
         const params = new URLSearchParams(window.location.search);
         const nextUrl = params.get('redirect') || PotionAuth.AUTH_CONFIG.HOME_PAGE;
-        setTimeout(() => {
-          window.location.href = nextUrl;
-        }, 350);
+        if (window.SpookyLogin && typeof window.SpookyLogin.playTransition === 'function') {
+          window.SpookyLogin.playTransition(data.user, nextUrl);
+        } else {
+          setTimeout(() => {
+            window.location.href = nextUrl;
+          }, 350);
+        }
       }
 
       /**
