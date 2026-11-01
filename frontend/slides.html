@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Grim-More — Pitch Deck (5-Minute Hackathon Demo)</title>
-  <link rel="stylesheet" href="style.css?v=20261101_clean_day_and_dark">
+  <link rel="stylesheet" href="style.css?v=20261101_mobile_optimized">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Google Fonts: Jost, Marcellus, Syne, Inter, JetBrains Mono -->
@@ -446,6 +446,100 @@
     body:not(.day-sky-theme) .slide-hint-text {
       color: #48BB78 !important;
     }
+
+    /* Mobile Responsive Optimizations */
+    @media (max-width: 768px) {
+      body {
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100vh;
+      }
+
+      .deck-topbar {
+        flex-wrap: wrap !important;
+        padding: 0.5rem 0.75rem !important;
+        gap: 0.5rem !important;
+      }
+
+      .deck-title {
+        font-size: 1.05rem !important;
+      }
+
+      .deck-howl-wolf {
+        display: none !important;
+      }
+
+      .deck-nav-right {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+      }
+
+      .deck-nav-right .nav-btn {
+        font-size: 0.7rem;
+        padding: 0.35rem 0.5rem;
+      }
+
+      .slide-viewport {
+        padding: 0.75rem 0.5rem 1.5rem !important;
+        height: auto !important;
+        min-height: calc(100vh - 120px);
+        display: flex;
+        align-items: stretch;
+      }
+
+      .slide {
+        position: relative !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        padding: 1.5rem 1.15rem 1.15rem !important;
+        box-shadow: 4px 4px 0px #022015 !important;
+        transform: none !important;
+      }
+
+      .slide-h1 {
+        font-size: 1.45rem !important;
+        margin-bottom: 0.75rem !important;
+        line-height: 1.2 !important;
+      }
+
+      .slide-body {
+        font-size: 0.95rem !important;
+        line-height: 1.55 !important;
+      }
+
+      .slide-grid-2 {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+      }
+
+      .feature-card {
+        padding: 1rem !important;
+      }
+
+      .walkthrough-box {
+        padding: 1rem !important;
+        font-size: 0.88rem !important;
+        line-height: 1.6 !important;
+      }
+
+      .slide-footer-nav {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.5rem !important;
+        text-align: center !important;
+      }
+
+      .speaker-badge {
+        font-size: 0.72rem !important;
+        padding: 0.3rem 0.5rem !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -504,7 +598,9 @@
 
         <a href="index.html" class="nav-btn">🏠 HOME</a>
         <a href="dashboard.html" class="nav-btn">💻 LIVE PANTRY 🐺</a>
+        <button id="prevSlideBtn" class="nav-btn" title="Previous Slide (← / Swipe Right)" onclick="showSlide(currentSlide - 1)">◀</button>
         <span id="slideIndicator" class="slide-counter-chip">Slide 1 / 6</span>
+        <button id="nextSlideBtn" class="nav-btn" title="Next Slide (→ / Swipe Left)" onclick="showSlide(currentSlide + 1)">▶</button>
       </div>
     </div>
   </header>
@@ -858,6 +954,24 @@
         showSlide(currentSlide - 1);
       }
     });
+
+    // Mobile touch swipe gestures
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    document.addEventListener("touchend", (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const swipeDistance = touchEndX - touchStartX;
+      if (swipeDistance < -45) {
+        showSlide(currentSlide + 1); // Swipe left -> Next
+      } else if (swipeDistance > 45) {
+        showSlide(currentSlide - 1); // Swipe right -> Previous
+      }
+    }, { passive: true });
 
     // Sky theme toggle with right-to-left sweep transition
     (function initSkyToggle() {
