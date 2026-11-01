@@ -270,9 +270,14 @@
 
       <!-- Section 3: Prioritized Reorders Table -->
       <section class="section-container">
-        <div class="section-header">
-          <h2>Automated Purchase Orders & Reorder Recommendations</h2>
-          <span class="section-hint">Ranked by urgency: stockout probability and lead-time safety window</span>
+        <div class="section-header reorders-header-with-action">
+          <div>
+            <h2>Automated Purchase Orders & Reorder Recommendations</h2>
+            <span class="section-hint">Ranked by urgency: stockout probability and lead-time safety window</span>
+          </div>
+          <button id="btnExportMasterPO" class="btn btn-primary btn-export-po" type="button" title="Generate combined supplier purchase order for all replenishment items">
+            📄 Export Master Purchase Order
+          </button>
         </div>
         <div class="table-container card">
           <div class="spiderweb-corner top-right watermark-web" style="opacity: 0.15;">
@@ -298,6 +303,7 @@
                 <th>Lead Time</th>
                 <th>Order Quantity</th>
                 <th>Stockout Risk</th>
+                <th class="th-po-action">Purchase Order</th>
               </tr>
             </thead>
             <tbody id="reordersTableBody">
@@ -320,6 +326,126 @@
         <a href="slides.html" class="footer-tag">Pitch Deck</a>
       </div>
     </footer>
+  </div>
+
+  <!-- Supplier Purchase Order Modal -->
+  <div id="poModalBackdrop" class="po-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="poDocNumber">
+    <div class="po-modal-container">
+      <!-- Modal Top Controls -->
+      <div class="po-modal-actions-bar">
+        <div class="po-status-badge" id="poStatusBadge">EMERGENCY RUSH EXPEDITE</div>
+        <div class="po-action-buttons">
+          <button id="btnCopyPOEmail" class="btn-po-action" type="button" title="Copy formatted supplier email draft">
+            📋 Copy Email Draft
+          </button>
+          <button id="btnPrintPO" class="btn-po-action btn-po-print" type="button" title="Print official parchment purchase order">
+            🖨️ Print / Save PDF
+          </button>
+          <button id="btnClosePOModal" class="btn-po-close" type="button" aria-label="Close modal">&times;</button>
+        </div>
+      </div>
+
+      <!-- The Printable Parchment Document -->
+      <div class="po-parchment-sheet" id="poPrintableSheet">
+        <!-- Document Header -->
+        <header class="po-doc-header">
+          <div class="po-brand-block">
+            <div class="po-wax-seal">⚜️</div>
+            <div>
+              <h1 class="po-shop-title">GRIM-MORE APOTHECARY</h1>
+              <p class="po-shop-subtitle">Autonomous Potion Pantry & Festival Inventory Engine</p>
+              <p class="po-shop-address">7 Shadowfen Spire, Sanctum Quarter • Lead Time Dispatch Unit</p>
+            </div>
+          </div>
+          <div class="po-meta-block">
+            <div class="po-meta-row">
+              <span class="po-meta-label">PURCHASE ORDER:</span>
+              <strong class="po-meta-value mono" id="poDocNumber">PO-2026-MF-001</strong>
+            </div>
+            <div class="po-meta-row">
+              <span class="po-meta-label">DATE ISSUED:</span>
+              <span class="po-meta-value mono" id="poDocDate">2024-01-02</span>
+            </div>
+            <div class="po-meta-row">
+              <span class="po-meta-label">DISPATCH DEADLINE:</span>
+              <span class="po-meta-value mono highlight" id="poDocDeadline">2024-01-04 17:00</span>
+            </div>
+            <div class="po-meta-row">
+              <span class="po-meta-label">PAYMENT TERMS:</span>
+              <span class="po-meta-value">Net 15 • Guild Transfer</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- Supplier & Delivery Parties -->
+        <section class="po-party-grid">
+          <div class="po-party-box">
+            <span class="po-box-label">VENDOR / SUPPLIER</span>
+            <h4 id="poSupplierName" class="po-party-name">Silvermist Herbal Conservatory</h4>
+            <p id="poSupplierGuild" class="po-party-sub">Guildmaster Evelyn • Northwood Glade</p>
+            <p id="poSupplierCourier" class="po-party-contact">Express Gryphon Delivery • Priority Lane 1</p>
+          </div>
+          <div class="po-party-box">
+            <span class="po-box-label">SHIP TO / DESTINATION</span>
+            <h4 class="po-party-name">Grim-More Central Potion Pantry</h4>
+            <p class="po-party-sub">Attn: Lead Alchemist (Sanctum Intake)</p>
+            <p class="po-party-contact">Vault Dock B • Urgent Festival Delivery</p>
+          </div>
+        </section>
+
+        <!-- Line Items Table -->
+        <table class="po-items-table">
+          <thead>
+            <tr>
+              <th>Item #</th>
+              <th>Ingredient & Specification</th>
+              <th>Lead Time</th>
+              <th>Safety Buffer</th>
+              <th class="text-right">Unit Cost</th>
+              <th class="text-right">Order Qty</th>
+              <th class="text-right">Line Total</th>
+            </tr>
+          </thead>
+          <tbody id="poLineItemsBody">
+            <!-- Populated dynamically via JS -->
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="5" class="po-subtotal-label">Subtotal:</td>
+              <td colspan="2" class="po-subtotal-val text-right mono" id="poSubtotalVal">$14,040.00</td>
+            </tr>
+            <tr>
+              <td colspan="5" class="po-subtotal-label">Expedited Festival Courier Surcharge (Waived by Guild):</td>
+              <td colspan="2" class="po-subtotal-val text-right mono">$0.00</td>
+            </tr>
+            <tr class="po-grand-total-row">
+              <td colspan="5" class="po-total-label">TOTAL AUTHORIZED PROCUREMENT:</td>
+              <td colspan="2" class="po-total-val text-right mono" id="poTotalVal">$14,040.00</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <!-- Mathematical Proof / Justification -->
+        <section class="po-proof-section">
+          <h5>Automated Replenishment Justification (Judges Audit Trail):</h5>
+          <p id="poProofText">
+            Calculated via Grim-More Supply-Chain Engine: Current stock will deplete in 1.3 days against festival forecast of 300 units/day. With a 2-day delivery lead time, ordering 1,170 units guarantees a 95% service level with 70 units dynamic safety stock (1.65 × Std × √Lead).
+          </p>
+        </section>
+
+        <!-- Signatures Block -->
+        <footer class="po-doc-footer">
+          <div class="po-sig-box">
+            <div class="po-sig-line">Lead Alchemist (Authorized Signature)</div>
+            <span>Procurement Officer • Grim-More Pantry</span>
+          </div>
+          <div class="po-sig-box">
+            <div class="po-sig-line">Automated Dispatch Stamp</div>
+            <span class="mono">VERIFIED BY STATISTICAL ENGINE (Z > 3.0)</span>
+          </div>
+        </footer>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>

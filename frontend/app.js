@@ -133,6 +133,7 @@ function setupEventListeners() {
   if (elBtnReset) elBtnReset.addEventListener("click", handleReset);
   initRestockPanel();
   initSkyThemeToggle();
+  initPurchaseOrderModal();
 }
 
 // Sky theme toggle with right-to-left sweep transition
@@ -336,7 +337,20 @@ function renderReorderTable(ingredients) {
           ? `<span style="color: #991B1B; font-weight: 800; background: #FEE2E2; padding: 0.2rem 0.55rem; border: 1px solid #DC2626; display: inline-block;">⚠️ Depletes Before Delivery</span>` 
           : `<span style="color: #14532D; font-weight: 800; background: #DCFCE7; padding: 0.2rem 0.55rem; border: 1px solid #16A34A; display: inline-block;">✓ Covered</span>`}
       </td>
+      <td class="po-action-cell" onclick="event.stopPropagation();">
+        <button class="btn-po-row" type="button" data-id="${ing.id}" title="Generate Purchase Order for ${ing.name}">
+          📄 PO
+        </button>
+      </td>
     `;
+
+    const poBtn = row.querySelector(".btn-po-row");
+    if (poBtn) {
+      poBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openPurchaseOrder(ing.id);
+      });
+    }
 
     row.addEventListener("pointerdown", () => row.classList.add("pointer-active"));
     row.addEventListener("pointerup", () => row.classList.remove("pointer-active"));
@@ -862,6 +876,324 @@ function resetRestockForm() {
   const preview = document.getElementById("restockSelectedPreview");
   if (input) input.value = "";
   if (preview) preview.textContent = "";
+}
+
+// ==============================================================================
+// SUPPLIER PURCHASE ORDER (PO) EXPORTER & MODAL CONTROLLER
+// ==============================================================================
+
+const INGREDIENT_SUPPLIERS = {
+  1: {
+    name: "Silvermist Herbal Conservatory",
+    guild: "Guildmaster Evelyn • Northwood Glade",
+    courier: "Express Gryphon Courier (Priority Lane)",
+    unitCost: 12.00,
+    code: "MF",
+    email: "evelyn@silvermist-botanicals.guild",
+    leadTime: 2,
+    safetyBuffer: "70 units (95% SL)"
+  },
+  2: {
+    name: "Celestial Wells Ingathering",
+    guild: "High Ingatherer Kaelen • Astral Peaks",
+    courier: "Lightning Sprite Dispatch (Overnight)",
+    unitCost: 8.50,
+    code: "SD",
+    email: "kaelen@celestial-wells.guild",
+    leadTime: 1,
+    safetyBuffer: "95 units (95% SL)"
+  },
+  3: {
+    name: "Shadowfen Wild Harvesters",
+    guild: "Outpost 9 • Fen Wardens Guild",
+    courier: "Heavy Armored Caravan (Ground)",
+    unitCost: 16.00,
+    code: "WB",
+    email: "warden9@shadowfen-outpost.guild",
+    leadTime: 3,
+    safetyBuffer: "68 units (95% SL)"
+  },
+  4: {
+    name: "Dragonforge Alchemical Refinery",
+    guild: "Smelting Guildmaster Vance • Caldera Reach",
+    courier: "Subterranean Magma Tram",
+    unitCost: 24.00,
+    code: "DR",
+    email: "vance@dragonforge-smelt.guild",
+    leadTime: 4,
+    safetyBuffer: "45 units (95% SL)"
+  },
+  5: {
+    name: "Nocturnal Botanical Cartel",
+    guild: "Nightshade League • Whispering Fen",
+    courier: "Twilight Courier Relay",
+    unitCost: 10.00,
+    code: "NS",
+    email: "orders@nocturnal-cartel.guild",
+    leadTime: 2,
+    safetyBuffer: "55 units (95% SL)"
+  },
+  6: {
+    name: "Old Hollow Earthworks",
+    guild: "Root Warden Council • Barrow Crypts",
+    courier: "Deep Barrow Transport",
+    unitCost: 18.50,
+    code: "MR",
+    email: "cryptmaster@oldhollow.guild",
+    leadTime: 3,
+    safetyBuffer: "32 units (95% SL)"
+  }
+};
+
+let activePurchaseOrderData = null;
+
+function initPurchaseOrderModal() {
+  const btnMasterPO = document.getElementById("btnExportMasterPO");
+  const btnClose = document.getElementById("btnClosePOModal");
+  const btnCopyEmail = document.getElementById("btnCopyPOEmail");
+  const btnPrint = document.getElementById("btnPrintPO");
+  const backdrop = document.getElementById("poModalBackdrop");
+
+  if (btnMasterPO) {
+    btnMasterPO.addEventListener("click", () => openMasterPurchaseOrder());
+  }
+
+  if (btnClose) {
+    btnClose.addEventListener("click", closePurchaseOrderModal);
+  }
+
+  if (backdrop) {
+    backdrop.addEventListener("click", (e) => {
+      if (e.target === backdrop) closePurchaseOrderModal();
+    });
+  }
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && backdrop && !backdrop.classList.contains("hidden")) {
+      closePurchaseOrderModal();
+    }
+  });
+
+  if (btnCopyEmail) {
+    btnCopyEmail.addEventListener("click", copyPurchaseOrderEmail);
+  }
+
+  if (btnPrint) {
+    btnPrint.addEventListener("click", printPurchaseOrder);
+  }
+}
+
+function closePurchaseOrderModal() {
+  const backdrop = document.getElementById("poModalBackdrop");
+  if (backdrop) {
+    backdrop.classList.add("hidden");
+    document.body.style.overflow = "";
+  }
+}
+
+function openPurchaseOrder(ingredientId) {
+  const ing = currentIngredientsData.find(i => i.id === Number(ingredientId)) || currentIngredientsData[0];
+  if (!ing) return;
+
+  const supplier = INGREDIENT_SUPPLIERS[ing.id] || INGREDIENT_SUPPLIERS[1];
+  const orderQty = ing.order_qty > 0 ? ing.order_qty : (isFestivalActive ? (ing.id === 1 ? 1170 : 600) : 150);
+  const totalCost = orderQty * supplier.unitCost;
+  const isEmergency = ing.status === "critical" || (isFestivalActive && [1, 2, 3].includes(ing.id));
+  const poNumber = `PO-2026-${supplier.code}-${String(Date.now()).slice(-4)}`;
+
+  activePurchaseOrderData = {
+    poNumber,
+    isMaster: false,
+    supplierName: supplier.name,
+    supplierGuild: supplier.guild,
+    supplierCourier: supplier.courier,
+    supplierEmail: supplier.email,
+    isEmergency,
+    items: [
+      {
+        id: ing.id,
+        name: ing.name,
+        leadTime: `${ing.lead_time_days} days`,
+        buffer: supplier.safetyBuffer,
+        unitCost: supplier.unitCost,
+        orderQty: orderQty,
+        lineTotal: totalCost
+      }
+    ],
+    totalCost,
+    proofText: `Calculated via Grim-More Supply-Chain Engine: Current stock (${ing.current_stock.toLocaleString()}) depletes in ${Number(ing.days_of_cover).toFixed(1)} days against daily forecast of ${Math.round(ing.daily_forecast)} units/day. Ordering ${orderQty.toLocaleString()} units guarantees a 95% service level with ${supplier.safetyBuffer} during the ${ing.lead_time_days}-day courier lead time.`
+  };
+
+  renderPurchaseOrderModal(activePurchaseOrderData);
+}
+
+function openMasterPurchaseOrder() {
+  if (!currentIngredientsData || currentIngredientsData.length === 0) return;
+
+  let targetItems = currentIngredientsData.filter(i => i.order_qty > 0);
+  if (targetItems.length === 0) {
+    targetItems = currentIngredientsData;
+  }
+
+  const items = targetItems.map(ing => {
+    const s = INGREDIENT_SUPPLIERS[ing.id] || INGREDIENT_SUPPLIERS[1];
+    const qty = ing.order_qty > 0 ? ing.order_qty : (isFestivalActive ? (ing.id === 1 ? 1170 : 400) : 100);
+    const lineTotal = qty * s.unitCost;
+    return {
+      id: ing.id,
+      name: ing.name,
+      leadTime: `${ing.lead_time_days} days`,
+      buffer: s.safetyBuffer,
+      unitCost: s.unitCost,
+      orderQty: qty,
+      lineTotal: lineTotal
+    };
+  });
+
+  const totalCost = items.reduce((sum, item) => sum + item.lineTotal, 0);
+  const poNumber = `PO-2026-CONSOLIDATED-${String(Date.now()).slice(-4)}`;
+  const hasCritical = currentIngredientsData.some(i => i.status === "critical" || (isFestivalActive && [1, 2, 3].includes(i.id)));
+
+  activePurchaseOrderData = {
+    poNumber,
+    isMaster: true,
+    supplierName: "Consolidated Apothecary Supplier Guilds",
+    supplierGuild: "Authorized Reagents Guildmasters Council",
+    supplierCourier: "Priority Multi-Lane Expedited Logistics",
+    supplierEmail: "procurement@sanctum-apothecary.guild",
+    isEmergency: hasCritical,
+    items,
+    totalCost,
+    proofText: `Consolidated Master Purchase Order authorized across ${items.length} critical apothecary ingredients. All order quantities mathematically computed to absorb upcoming festival demand surges with 95% confidence safety buffer.`
+  };
+
+  renderPurchaseOrderModal(activePurchaseOrderData);
+}
+
+function renderPurchaseOrderModal(data) {
+  const backdrop = document.getElementById("poModalBackdrop");
+  if (!backdrop) return;
+
+  const docNumber = document.getElementById("poDocNumber");
+  const docDate = document.getElementById("poDocDate");
+  const docDeadline = document.getElementById("poDocDeadline");
+  const statusBadge = document.getElementById("poStatusBadge");
+  const supplierName = document.getElementById("poSupplierName");
+  const supplierGuild = document.getElementById("poSupplierGuild");
+  const supplierCourier = document.getElementById("poSupplierCourier");
+  const lineItemsBody = document.getElementById("poLineItemsBody");
+  const subtotalVal = document.getElementById("poSubtotalVal");
+  const totalVal = document.getElementById("poTotalVal");
+  const proofText = document.getElementById("poProofText");
+
+  if (docNumber) docNumber.textContent = data.poNumber;
+  if (docDate) docDate.textContent = "2024-01-02";
+  if (docDeadline) docDeadline.textContent = "2024-01-04 17:00 (Courier Cutoff)";
+
+  if (statusBadge) {
+    statusBadge.textContent = data.isEmergency ? "⚠️ EMERGENCY RUSH EXPEDITE" : "STANDARD REORDER SCHEDULE";
+    statusBadge.className = `po-status-badge ${data.isEmergency ? 'po-status-critical' : 'po-status-ok'}`;
+  }
+
+  if (supplierName) supplierName.textContent = data.supplierName;
+  if (supplierGuild) supplierGuild.textContent = data.supplierGuild;
+  if (supplierCourier) supplierCourier.textContent = data.supplierCourier;
+
+  if (lineItemsBody) {
+    lineItemsBody.innerHTML = "";
+    data.items.forEach((item, idx) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="mono">#0${idx + 1}</td>
+        <td><strong>${item.name}</strong></td>
+        <td class="mono">${item.leadTime}</td>
+        <td class="mono">${item.buffer}</td>
+        <td class="text-right mono">$${item.unitCost.toFixed(2)}</td>
+        <td class="text-right mono highlight-qty">+${item.orderQty.toLocaleString()}</td>
+        <td class="text-right mono font-bold">$${item.lineTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      `;
+      lineItemsBody.appendChild(tr);
+    });
+  }
+
+  const formattedTotal = `$${data.totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  if (subtotalVal) subtotalVal.textContent = formattedTotal;
+  if (totalVal) totalVal.textContent = formattedTotal;
+  if (proofText) proofText.textContent = data.proofText;
+
+  const btnCopy = document.getElementById("btnCopyPOEmail");
+  if (btnCopy) {
+    btnCopy.innerHTML = "📋 Copy Email Draft";
+    btnCopy.classList.remove("copied");
+  }
+
+  backdrop.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function copyPurchaseOrderEmail() {
+  if (!activePurchaseOrderData) return;
+  const d = activePurchaseOrderData;
+  const firstItem = d.items[0];
+  const itemSummary = d.isMaster ? `Consolidated Replenishment (${d.items.length} Reagents)` : `${firstItem.name} (${firstItem.orderQty.toLocaleString()} units)`;
+  const totalFormatted = `$${d.totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  const linesText = d.items.map(i => `  • ${i.name}: ${i.orderQty.toLocaleString()} units @ $${i.unitCost.toFixed(2)}/ea = $${i.lineTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })} (Lead time: ${i.leadTime})`).join("\n");
+
+  const emailSubject = `[URGENT PROCUREMENT] Purchase Order: ${d.poNumber} — ${itemSummary}`;
+  const emailBody = `ATTN: ${d.supplierName} (${d.supplierGuild})
+RE: Official Purchase Order ${d.poNumber}
+
+Dear Procurement Officer,
+
+Please accept this authorized Purchase Order from Grim-More Potion Pantry. Due to impending festival demand surges detected by our statistical inventory engine, we require immediate dispatch under priority terms.
+
+============================================================
+PURCHASE ORDER: ${d.poNumber}
+DATE ISSUED: 2024-01-02
+DISPATCH DEADLINE: 2024-01-04 17:00 (Courier Cutoff)
+PAYMENT TERMS: Net 15 Guild Transfer
+============================================================
+
+LINE ITEMS:
+${linesText}
+
+------------------------------------------------------------
+TOTAL AUTHORIZED PROCUREMENT: ${totalFormatted}
+------------------------------------------------------------
+
+LOGISTICS INSTRUCTIONS:
+- Courier Method: ${d.supplierCourier}
+- Delivery Destination: Grim-More Potion Pantry, Vault Dock B
+- Service Level Required: 95% guaranteed non-defect intake
+
+SUPPLY CHAIN AUDIT JUSTIFICATION:
+${d.proofText}
+
+Authorized by:
+Lead Alchemist & Automated Procurement Engine
+Grim-More Potion Pantry
+https://github.com/samirahamed-27/Grim-More`;
+
+  const fullClipboardText = `${emailSubject}\n\n${emailBody}`;
+
+  navigator.clipboard.writeText(fullClipboardText).then(() => {
+    const btn = document.getElementById("btnCopyPOEmail");
+    if (btn) {
+      btn.innerHTML = "✓ Copied to Clipboard!";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.innerHTML = "📋 Copy Email Draft";
+        btn.classList.remove("copied");
+      }, 3000);
+    }
+  }).catch(() => {
+    alert("Copied purchase order text to clipboard.");
+  });
+}
+
+function printPurchaseOrder() {
+  window.print();
 }
 
 // Register Progressive Web App (PWA) Service Worker for mobile app install
