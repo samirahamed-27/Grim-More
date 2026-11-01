@@ -185,12 +185,12 @@ async function checkBackendConnection() {
     const res = await fetch(`${API_BASE}/health`, { method: "GET" });
     if (res.ok) {
       isBackendLive = true;
-      elDataModeBadge.innerHTML = `<span class="status-dot live-dot"></span><span>Live Backend (FastAPI :8000)</span>`;
+      if (elDataModeBadge) elDataModeBadge.remove();
       return;
     }
   } catch (e) {
     isBackendLive = false;
-    elDataModeBadge.innerHTML = `<span class="status-dot mock-dot"></span><span>Mock Standalone Mode</span>`;
+    if (elDataModeBadge) elDataModeBadge.remove();
   }
 }
 

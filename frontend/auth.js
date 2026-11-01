@@ -76,19 +76,35 @@ function redirectIfAuthenticated() {
 }
 
 /**
- * Renders user profile pill & dropdown with Sign Out option in header nav on hover.
+ * Renders user profile pill & dropdown with Sign Out option on the right-most of header-actions.
  */
 function initNavbarAuth() {
   const session = getAuthSession();
-  if (!session) return;
-
-  const user = session.user || {};
-  const navWrap = document.querySelector('.header-nav-wrap') || document.querySelector('.main-header');
-  if (!navWrap || document.getElementById('navbarUserAuth')) return;
+  const targetBar = document.querySelector('.header-actions') || document.querySelector('.main-header');
+  if (!targetBar || document.getElementById('navbarUserAuth')) return;
 
   const authContainer = document.createElement('div');
   authContainer.id = 'navbarUserAuth';
   authContainer.className = 'navbar-auth-container';
+
+  if (!session) {
+    // Show a clean Sign In / Profile pill on the right-most
+    const loginLink = document.createElement('a');
+    loginLink.href = 'login.html';
+    loginLink.className = 'navbar-user-pill';
+    loginLink.title = 'Sign In / Profile';
+    loginLink.innerHTML = `
+      <div class="user-avatar-badge">
+        <span class="user-avatar-initial">👤</span>
+      </div>
+      <span class="user-name-text">Sign In</span>
+    `;
+    authContainer.appendChild(loginLink);
+    targetBar.appendChild(authContainer);
+    return;
+  }
+
+  const user = session.user || {};
 
   // 1. Visible Compact Profile Pill
   const pill = document.createElement('div');
@@ -212,7 +228,7 @@ function initNavbarAuth() {
 
   authContainer.appendChild(pill);
   authContainer.appendChild(dropdown);
-  navWrap.appendChild(authContainer);
+  targetBar.appendChild(authContainer);
 }
 
 // Attach to window for global access
